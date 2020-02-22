@@ -1,5 +1,5 @@
 {
-  "name": "react-gastby-firebase-authentication",
+  "name": "gastby-firebase-airtable",
   "description": "Gatsby hello world starter",
   "scripts": {
     "develop": "gatsby develop",
