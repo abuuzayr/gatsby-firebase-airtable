@@ -1,1 +1,5 @@
-export const ADMIN = 'ADMIN';
+export const ROLES = {
+    ADMIN: 'ADMIN',
+    SALES: 'SALES',
+    INSTALL: 'INSTALL'
+}

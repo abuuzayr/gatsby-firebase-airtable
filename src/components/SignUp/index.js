@@ -3,14 +3,14 @@ import { Link, navigate } from 'gatsby';
 
 import { withFirebase } from '../Firebase';
 import * as ROUTES from '../../constants/routes';
-import * as ROLES from '../../constants/roles';
+import { ROLES } from '../../constants/roles';
 
 const INITIAL_STATE = {
   username: '',
   email: '',
   passwordOne: '',
   passwordTwo: '',
-  isAdmin: false,
+  role: 'SALES',
   error: null,
 };
 
@@ -32,11 +32,11 @@ class SignUpFormBase extends Component {
   }
 
   onSubmit = event => {
-    const { username, email, passwordOne, isAdmin } = this.state;
+    const { username, email, passwordOne, role } = this.state;
     const roles = {};
 
-    if (isAdmin) {
-      roles[ROLES.ADMIN] = ROLES.ADMIN;
+    if (role) {
+      roles[ROLES[role]] = ROLES[role];
     }
 
     this.props.firebase
@@ -54,7 +54,7 @@ class SignUpFormBase extends Component {
       })
       .then(() => {
         this.setState({ ...INITIAL_STATE });
-        navigate(ROUTES.HOME);
+        navigate(ROUTES.ADMIN);
       })
       .catch(error => {
         if (error.code === ERROR_CODE_ACCOUNT_EXISTS) {
@@ -81,7 +81,7 @@ class SignUpFormBase extends Component {
       email,
       passwordOne,
       passwordTwo,
-      isAdmin,
+      role,
       error,
     } = this.state;
 
@@ -122,16 +122,21 @@ class SignUpFormBase extends Component {
           placeholder="Confirm Password"
         />
         <label>
-          Admin:
-          <input
-            name="isAdmin"
-            type="checkbox"
-            checked={isAdmin}
+          Role:
+          <select
+            name="role"
+            value={role}
             onChange={this.onChangeCheckbox}
-          />
+          >
+            {
+              Object.keys(ROLES).map(role => (
+                <option value={role} key={role}>{role}</option>
+              ))
+            }
+          </select>
         </label>
         <button disabled={isInvalid} type="submit">
-          Sign Up
+          Add user
         </button>
 
         {error && <p>{error.message}</p>}
@@ -142,7 +147,7 @@ class SignUpFormBase extends Component {
 
 const SignUpLink = () => (
   <p>
-    Don't have an account? <Link to={ROUTES.SIGN_UP}>Sign Up</Link>
+    <Link to={ROUTES.SIGN_UP}>Add new user</Link>
   </p>
 );
 

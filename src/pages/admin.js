@@ -7,7 +7,7 @@ import {
   withEmailVerification,
 } from '../components/Session';
 import { UserList } from '../components/Users';
-import * as ROLES from '../constants/roles';
+import { ROLES } from '../constants/roles';
 
 const AdminPageBase = () => (
   <Fragment>
