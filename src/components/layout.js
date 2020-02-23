@@ -30,10 +30,9 @@ class Layout extends Component {
   }
 }
 
-const AppWithAuthentication = withAuthentication(({ children }) => (
+const AppWithAuthentication = withAuthentication(({ children, noheader }) => (
   <Fragment>
-    <Navigation />
-    <hr />
+    { !noheader && <Navigation /> }
     {children}
   </Fragment>
 ));

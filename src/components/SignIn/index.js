@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { navigate } from 'gatsby';
-
+import "../../styles/login.scss"
 import { withFirebase } from '../Firebase';
 import * as ROUTES from '../../constants/routes';
 
@@ -54,21 +54,37 @@ class SignInFormBase extends Component {
 
     return (
       <form onSubmit={this.onSubmit}>
-        <input
-          name="email"
-          value={email}
-          onChange={this.onChange}
-          type="text"
-          placeholder="Email Address"
-        />
-        <input
-          name="password"
-          value={password}
-          onChange={this.onChange}
-          type="password"
-          placeholder="Password"
-        />
-        <button disabled={isInvalid} type="submit">
+        <div className="field">
+          <div className="control">
+            <input
+              name="email"
+              value={email}
+              onChange={this.onChange}
+              type="text"
+              placeholder="Email Address"
+              className="input"
+              autofocus=""
+            />
+          </div>
+        </div>
+
+        <div className="field">
+          <div className="control">
+            <input
+              name="password"
+              value={password}
+              onChange={this.onChange}
+              type="password"
+              placeholder="Password"
+              className="input" 
+            />
+          </div>
+        </div>
+        <button 
+          disabled={isInvalid}
+          type="submit"
+          className="button is-block is-info is-fullwidth"
+        >
           Sign In
         </button>
 
