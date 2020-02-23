@@ -1,6 +1,7 @@
 import React, { Fragment } from 'react';
 import "../styles/main.scss"
 import Layout from '../components/layout';
+import { SignInPage } from './signin'
 
 const LandingPage = () => (
   <Fragment>
@@ -13,7 +14,7 @@ const LandingPage = () => (
 );
 
 export default () => (
-  <Layout>
-    <LandingPage />
+  <Layout noheader>
+    <SignInPage />
   </Layout>
-);
+)
