@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-
+import "../styles/main.scss"
 import Layout from '../components/layout';
 
 const LandingPage = () => (
