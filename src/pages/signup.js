@@ -5,7 +5,7 @@ import SignUpForm from '../components/SignUp';
 
 const SignUpPage = () => (
   <Fragment>
-    <h1>SignUp</h1>
+    <h1>Add a new user</h1>
     <SignUpForm />
   </Fragment>
 );

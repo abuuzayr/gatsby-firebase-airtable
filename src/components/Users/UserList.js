@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 
+import { SignUpLink } from '../SignUp'
+
 import { withFirebase } from '../Firebase';
 
 class UserList extends Component {
@@ -71,6 +73,7 @@ class UserList extends Component {
             </li>
           ))}
         </ul>
+        <SignUpLink />
       </div>
     );
   }
