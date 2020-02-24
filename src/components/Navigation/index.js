@@ -20,20 +20,20 @@ const Navigation = () => (
 );
 
 const NavigationAuth = ({ authUser }) => (
-  <nav class="navbar is-white topNav">
-    <div class="container">
-      <div class="navbar-brand">
+  <nav className="navbar is-white topNav">
+    <div className="container">
+      <div className="navbar-brand">
         <Link className="navbar-item" to={ROUTES.HOME}>
           <strong>Liveinpure</strong>
         </Link>
-        <div class="navbar-burger burger" data-target="topNav">
+        <div className="navbar-burger burger" data-target="topNav">
           <span></span>
           <span></span>
           <span></span>
         </div>
       </div>
-      <div id="topNav" class="navbar-menu">
-        <div class="navbar-start">
+      <div id="topNav" className="navbar-menu">
+        <div className="navbar-start">
           {
             authUser.roles[ROLES.SALES] ||
             authUser.roles[ROLES.ADMIN] &&
@@ -55,10 +55,10 @@ const NavigationAuth = ({ authUser }) => (
               <Link className="navbar-item" to={ROUTES.ADMIN}>Admin</Link> 
           }
         </div>
-        <div class="navbar-end">
-          <div class="navbar-item">
-            <div class="field is-grouped">
-              <p class="control">
+        <div className="navbar-end">
+          <div className="navbar-item">
+            <div className="field is-grouped">
+              <p className="control">
                 <SignOutButton/>
               </p>
             </div>
@@ -70,13 +70,13 @@ const NavigationAuth = ({ authUser }) => (
 );
 
 const NavigationNonAuth = () => (
-  <nav class="navbar is-white topNav">
-    <div class="container">
-      <div id="topNav" class="navbar-menu">
-        <div class="navbar-end">
-          <div class="navbar-item">
-            <div class="field is-grouped">
-              <p class="control">
+  <nav className="navbar is-white topNav">
+    <div className="container">
+      <div id="topNav" className="navbar-menu">
+        <div className="navbar-end">
+          <div className="navbar-item">
+            <div className="field is-grouped">
+              <p className="control">
                 <Link to={ROUTES.SIGN_IN} className="button is-small is-danger is-outlined">
                   <FiLogIn />
                   <span>Login</span>
