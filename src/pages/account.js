@@ -34,7 +34,7 @@ const AccountPage = compose(
 )(AccountPageBase);
 
 export default () => (
-  <Layout>
+  <Layout page={'Account'}>
     <AccountPage />
   </Layout>
 );
