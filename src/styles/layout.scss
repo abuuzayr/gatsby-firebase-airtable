@@ -1,0 +1,38 @@
+html, body {
+  background: #ECF0F3;
+}
+nav.navbar {
+  border-top: 4px solid #276cda;
+  margin-bottom: 1rem;
+}
+nav.navbar.is-white .navbar-brand > a.navbar-item,
+nav.navbar.is-white .navbar-brand > a.navbar-item:hover {
+    background: #276cda;
+}
+nav .navbar-brand a > * {
+    color: #fff;
+}
+.columns {
+  width: 100%;
+  height: 100%;
+  margin-left: 0;
+}
+.info-tiles {
+  margin: 1rem 0;
+}
+.info-tiles .title {
+  color: #363636;
+}
+.info-tiles .subtitle {
+  padding-top: 0;
+  font-weight: 300;
+  color: #8F99A3;
+}
+.hero.welcome.is-info {
+  background: #36D1DC;
+  background: -webkit-linear-gradient(to right, #5B86E5, #36D1DC);
+  background: linear-gradient(to right, #5B86E5, #36D1DC);
+}
+.hero.welcome .title, .hero.welcome .subtitle {
+  color: hsl(192, 17%, 99%);
+}
