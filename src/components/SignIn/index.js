@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { navigate } from 'gatsby';
-import "../../styles/login.scss"
 import { withFirebase } from '../Firebase';
 import * as ROUTES from '../../constants/routes';
 
