@@ -14,7 +14,7 @@ const LandingPage = () => (
 );
 
 export default () => (
-  <Layout noheader>
+  <Layout fullpage>
     <SignInPage />
   </Layout>
 )

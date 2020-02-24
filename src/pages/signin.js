@@ -44,7 +44,7 @@ export const SignInPage = () => {
 }
 
 export default () => (
-  <Layout noheader>
+  <Layout fullpage>
     <SignInPage />
   </Layout>
 )
