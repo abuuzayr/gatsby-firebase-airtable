@@ -6,7 +6,8 @@ nav.navbar {
   margin-bottom: 1rem;
 }
 nav.navbar.is-white .navbar-brand > a.navbar-item,
-nav.navbar.is-white .navbar-brand > a.navbar-item:hover {
+nav.navbar.is-white .navbar-brand > a.navbar-item:hover,
+nav.navbar.is-white .navbar-brand > a.navbar-item:focus {
     background: #276cda;
 }
 nav .navbar-brand a > * {
@@ -38,4 +39,7 @@ nav .navbar-brand a > * {
 }
 .info-tiles .tile .title {
   font-size: 1.5rem;
+}
+.breadcrumb span {
+  padding: 0 0.75em
 }
