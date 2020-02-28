@@ -1,8 +1,12 @@
-export const LANDING = '/';
-export const SIGN_UP = '/signup';
-export const SIGN_IN = '/signin';
-export const HOME = '/home';
-export const ACCOUNT = '/account';
-export const PASSWORD_FORGET = '/pw-forget';
-export const ADMIN = '/admin';
-export const ADMIN_DETAILS = '/admin/:id';
+const ROUTES = {
+    LANDING: '/',
+    SIGN_UP: '/signup',
+    SIGN_IN: '/signin',
+    HOME: '/home',
+    ACCOUNT: '/account',
+    PASSWORD_FORGET: '/pw-forget',
+    ADMIN: '/admin',
+    ADMIN_DETAILS: '/admin/:id',
+}
+
+export default ROUTES

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Link } from 'gatsby';
 
 import { withFirebase } from '../Firebase';
-import * as ROUTES from '../../constants/routes';
+import ROUTES from '../../constants/routes';
 
 const INITIAL_STATE = {
   email: '',

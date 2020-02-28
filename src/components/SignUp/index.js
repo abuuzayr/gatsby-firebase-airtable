@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Link, navigate } from 'gatsby';
 
 import { withFirebase } from '../Firebase';
-import * as ROUTES from '../../constants/routes';
+import ROUTES from '../../constants/routes';
 import { ROLES } from '../../constants/roles';
 
 const INITIAL_STATE = {
