@@ -3,9 +3,9 @@ import { Link } from 'gatsby';
 
 import { AuthUserContext } from '../Session';
 import SignOutButton from '../SignOut';
-import * as ROUTES from '../../constants/routes';
+import ROUTES from '../../constants/routes';
 import { ROLES } from '../../constants/roles';
-import { FiLogIn, FiLogOut } from 'react-icons/fi'
+import { FiLogIn } from 'react-icons/fi'
 
 const Navigation = () => (
   <AuthUserContext.Consumer>
@@ -35,13 +35,11 @@ const NavigationAuth = ({ authUser }) => (
       <div id="topNav" className="navbar-menu">
         <div className="navbar-start">
           {
-            authUser.roles[ROLES.SALES] ||
-            authUser.roles[ROLES.ADMIN] &&
+            (authUser.roles[ROLES.SALES] || authUser.roles[ROLES.ADMIN]) &&
             <Link className="navbar-item" to={ROUTES.ADMIN}>Opportunities</Link>
           }
           {
-            authUser.roles[ROLES.INSTALL] ||
-            authUser.roles[ROLES.ADMIN] &&
+            (authUser.roles[ROLES.INSTALL] || authUser.roles[ROLES.ADMIN]) &&
             <Link className="navbar-item" to={ROUTES.ADMIN}>Install / Maintenance</Link>
           }
           {
