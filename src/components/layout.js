@@ -37,8 +37,7 @@ class Layout extends Component {
         if (body.result === 'success') {
           const companies = body.rows.map(row => row.fields['Name']).filter(Boolean)
           this.setState({
-            companies,
-            company: this.state.company ? this.state.company : companies[0]
+            companies
           })
         }
       }
@@ -70,7 +69,7 @@ const AppWithAuthentication = withAuthentication(props => {
       {
         !fullpage &&
         <div className="container">
-          <div className="columns">
+          <div className="columns" style={{ "margin": "0 0 0.75rem 0" }}>
             <div className="column">
               <nav className="breadcrumb" aria-label="breadcrumbs">
                 <ul>
@@ -95,6 +94,8 @@ const AppWithAuthentication = withAuthentication(props => {
                         ({ company, companies, setCompany }) => {
                           if (authUser && Object.keys(authUser.roles).includes('ADMIN')) {
                             if (!companies.includes('All')) companies.unshift('All')
+                          } else if (companies.includes('All')) {
+                            companies.splice(companies.indexOf('All'), 1)
                           }
                           companies = companies.map(c => {
                             return {
@@ -106,7 +107,7 @@ const AppWithAuthentication = withAuthentication(props => {
                             options={companies} 
                             width='200px' 
                             onChange={setCompany}
-                            defaultValue={company || companies[0]}>
+                            value={company || companies[0]}>
                           </Select>
                         }
                       }
