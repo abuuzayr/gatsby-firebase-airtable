@@ -11,7 +11,5 @@ const PasswordForgetPage = () => (
 );
 
 export default () => (
-  <Layout>
-    <PasswordForgetPage />
-  </Layout>
+  <PasswordForgetPage />
 );

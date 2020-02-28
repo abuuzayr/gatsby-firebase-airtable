@@ -1,11 +1,12 @@
-import React, { Component, Fragment, cloneElement } from 'react';
+import React, { Component, Fragment } from 'react';
 import { Link } from 'gatsby';
-import * as ROUTES from '../constants/routes';
-
+import ROUTES from '../constants/routes';
 import Navigation from './Navigation';
 import getFirebase, { FirebaseContext } from './Firebase';
 import withAuthentication from './Session/withAuthentication';
 import '../styles/layout.scss'
+import Select from 'react-select'
+import { CompanyContext } from './Company'
 
 class Layout extends Component {
   state = {
@@ -14,10 +15,8 @@ class Layout extends Component {
     company: ''
   };
 
-  setCompany = (e) => {
-    this.setState({
-      company: e.currentTarget.value
-    })
+  setCompany = (company) => {
+    this.setState({ company })
   }
 
   async componentDidMount() {
@@ -49,21 +48,22 @@ class Layout extends Component {
   }
 
   render() {
+    const { company, companies } = this.state
     return (
       <FirebaseContext.Provider value={this.state.firebase}>
-        <AppWithAuthentication 
-          {...this.props} 
-          companies={this.state.companies}
-          company={this.state.company}
-          setCompany={this.setCompany}
-        />
+        <CompanyContext.Provider value={{ company, companies, setCompany: this.setCompany }}>
+          <AppWithAuthentication 
+            {...this.props}
+          />
+        </CompanyContext.Provider>
       </FirebaseContext.Provider>
     );
   }
 }
 
 const AppWithAuthentication = withAuthentication(props => {
-  const { children, fullpage, page, companies, company, setCompany } = props
+  const { children, pageContext, location, authUser } = props
+  const fullpage = pageContext && pageContext.layout && pageContext.layout === 'fullpage'
   return (
     <Fragment>
       {!fullpage && <Navigation />}
@@ -80,25 +80,43 @@ const AppWithAuthentication = withAuthentication(props => {
                     </Link>
                   </li>
                   <li className="is-active">
-                    <a href="#" aria-current="page">{page}</a>
+                    <span>{Object.keys(ROUTES)[Object.values(ROUTES).indexOf(location.pathname)]}</span>
                   </li>
                 </ul>
               </nav>
             </div>
-            <div className="column">
-              <div className="is-pulled-right">
-                <small>Company: </small>
-                <select value={company} onChange={setCompany}>
-                  {
-                    companies && companies.map(company => (
-                      <option key={company} value={company}>{company}</option>
-                    ))
-                  }
-                </select>
+            {
+              <div className="column">
+                <div className="is-pulled-right">
+                  <small>Company: </small>
+                  <div className="is-inline-block" style={{ 'minWidth': 200 }}>
+                    <CompanyContext.Consumer>
+                      {
+                        ({ company, companies, setCompany }) => {
+                          if (authUser && Object.keys(authUser.roles).includes('ADMIN')) {
+                            if (!companies.includes('All')) companies.unshift('All')
+                          }
+                          companies = companies.map(c => {
+                            return {
+                              value: c,
+                              label: c
+                            }
+                          })
+                          return <Select 
+                            options={companies} 
+                            width='200px' 
+                            onChange={setCompany}
+                            defaultValue={company || companies[0]}>
+                          </Select>
+                        }
+                      }
+                    </CompanyContext.Consumer>
+                  </div>
+                </div>
               </div>
-            </div>
+            }
           </div>
-          {cloneElement(children, { company: company ? company : companies[0] })}
+          {children}
         </div>
       }
       { fullpage && children }

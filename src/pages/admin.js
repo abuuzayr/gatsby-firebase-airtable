@@ -27,7 +27,5 @@ const AdminPage = compose(
 )(AdminPageBase);
 
 export default () => (
-  <Layout>
-    <AdminPage />
-  </Layout>
+  <AdminPage />
 );

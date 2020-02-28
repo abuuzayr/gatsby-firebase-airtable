@@ -11,7 +11,5 @@ const SignUpPage = () => (
 );
 
 export default () => (
-  <Layout>
-    <SignUpPage />
-  </Layout>
+  <SignUpPage />
 );

@@ -8,5 +8,13 @@ module.exports = {
     siteUrl: `https://liveinpure.builtforfifty.com`,
     description: `Liveinpure CRM App`,
   },
-  plugins: [`gatsby-plugin-sass`],
+  plugins: [
+    `gatsby-plugin-sass`,
+    {
+      resolve: `gatsby-plugin-layout`,
+      options: {
+        component: require.resolve(`./src/components/layout.js`),
+      },
+    },
+  ],
 }

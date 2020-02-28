@@ -6,6 +6,7 @@ import {
   withAuthorization,
   withEmailVerification,
 } from '../components/Session';
+import DataGrid from 'react-data-grid';
 
 const HomePageBase = (props) => {
   const [stats, setStats] = useState({})
@@ -89,7 +90,7 @@ const HomePageBase = (props) => {
       <iframe 
         className="airtable-embed" 
         src={dashURL} 
-        frameborder="0" 
+        frameBorder="0" 
         width="100%" 
         height="533" 
         style={{"background": "transparent", "border": "1px solid #ccc"}}>  
@@ -106,7 +107,5 @@ const HomePage = compose(
 )(HomePageBase);
 
 export default (props) => (
-  <Layout page={'Home'}>
-    <HomePage {...props} />
-  </Layout>
+  <HomePage {...props} />
 );
