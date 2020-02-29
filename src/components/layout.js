@@ -107,7 +107,7 @@ const AppWithAuthentication = withAuthentication(props => {
                             options={companies} 
                             width='200px' 
                             onChange={setCompany}
-                            value={company || companies[0]}>
+                            value={(!company || !company.value) ? companies[0] : company}>
                           </Select>
                         }
                       }
