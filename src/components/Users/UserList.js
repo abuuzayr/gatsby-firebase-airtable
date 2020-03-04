@@ -58,7 +58,7 @@ class UserList extends Component {
     users = users.map((user, id) => {
       return {
         ...user,
-        id,
+        id: id + 1,
         role: user.roles ? Object.keys(user.roles)[0] : ''
       }
     })
