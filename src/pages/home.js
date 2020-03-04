@@ -137,7 +137,9 @@ const HomePageBase = (props) => {
                   columns={data.labels}
                   rowGetter={i => data.rows[i]}
                   rowsCount={data.rows.length}
-                  minHeight={500} />
+                  minHeight={500}
+                  minColumnWidth={180}
+                />
               }
             </>
           )
