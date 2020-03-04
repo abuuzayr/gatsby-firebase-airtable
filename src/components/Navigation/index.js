@@ -6,6 +6,7 @@ import SignOutButton from '../SignOut';
 import ROUTES from '../../constants/routes';
 import { ROLES } from '../../constants/roles';
 import { FiLogIn } from 'react-icons/fi'
+import { IoMdPeople } from 'react-icons/io'
 
 const Navigation = () => (
   <AuthUserContext.Consumer>
@@ -24,7 +25,7 @@ const NavigationAuth = ({ authUser }) => (
     <div className="container">
       <div className="navbar-brand">
         <Link className="navbar-item" to={ROUTES.HOME}>
-          <strong>Liveinpure</strong>
+          <strong><IoMdPeople style={{ 'height': 30, 'width': 30 }} /></strong>
         </Link>
         <div className="navbar-burger burger" data-target="topNav">
           <span></span>
