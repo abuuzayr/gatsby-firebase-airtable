@@ -79,9 +79,12 @@ const AppWithAuthentication = withAuthentication(props => {
                       Home
                     </Link>
                   </li>
-                  <li className="is-active">
-                    <span>{`${title.slice(0,1)}${title.slice(1).toLowerCase()}`}</span>
-                  </li>
+                  {
+                    title !== 'HOME' &&
+                    <li className="is-active">
+                      <span>{`${title.slice(0,1)}${title.slice(1).toLowerCase()}`}</span>
+                    </li>
+                  }
                 </ul>
               </nav>
             </div>
