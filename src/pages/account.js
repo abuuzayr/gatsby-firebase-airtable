@@ -16,10 +16,29 @@ const AccountPageBase = () => (
     <AuthUserContext.Consumer>
       {authUser => (
         <div>
-          <h1>Account: {authUser.email}</h1>
-          <PasswordForgetForm />
-          <PasswordChangeForm />
-          <LoginManagement authUser={authUser} />
+          <div className="content">
+            <div className="title is-3">
+              Account details
+            </div>
+            <div>
+              <strong>Email:</strong> {authUser.email}
+            </div>
+            <div>
+              <strong>Role:</strong> {Object.keys(authUser.roles)[0]}
+            </div>
+          </div>
+          <div className="content">
+            <div className="title is-4">
+              Update email address
+            </div>
+            <PasswordForgetForm />
+          </div>
+          <div className="content">
+            <div className="title is-4">
+              Change password
+            </div>
+            <PasswordChangeForm />
+          </div>
         </div>
       )}
     </AuthUserContext.Consumer>
