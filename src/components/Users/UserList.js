@@ -94,6 +94,7 @@ class UserList extends Component {
                 rowsCount={users.length}
                 minHeight={300}
                 minColumnWidth={10}
+                enableCellAutoFocus={false}
               />
               <SignUpLink />
             </>

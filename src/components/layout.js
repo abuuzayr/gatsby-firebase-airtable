@@ -63,6 +63,7 @@ class Layout extends Component {
 const AppWithAuthentication = withAuthentication(props => {
   const { children, pageContext, location, authUser } = props
   const fullpage = pageContext && pageContext.layout && pageContext.layout === 'fullpage'
+  const adminPage = pageContext && pageContext.layout && pageContext.layout === 'admin'
   const title = Object.keys(ROUTES)[Object.values(ROUTES).indexOf(location.pathname)]
   return (
     <Fragment>
@@ -89,6 +90,7 @@ const AppWithAuthentication = withAuthentication(props => {
               </nav>
             </div>
             {
+              !adminPage &&
               <div className="column">
                 <div className="is-pulled-right">
                   <small>Company: </small>
