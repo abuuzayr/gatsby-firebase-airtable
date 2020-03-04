@@ -11,8 +11,7 @@ import { ROLES } from '../constants/roles';
 
 const AdminPageBase = () => (
   <Fragment>
-    <h1>Admin</h1>
-    <p>The Admin Page is accessible by every signed in admin user.</p>
+    <div className="title is-3">Users list</div>
 
     <UserList />
   </Fragment>
