@@ -4,7 +4,7 @@ require("dotenv").config({
 
 module.exports = {
   siteMetadata: {
-    title: `Liveinpure`,
+    title: `CRM`,
     siteUrl: `https://liveinpure.builtforfifty.com`,
     description: `Liveinpure CRM App`,
   },
