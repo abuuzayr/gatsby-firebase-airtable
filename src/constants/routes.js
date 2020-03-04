@@ -7,6 +7,10 @@ const ROUTES = {
     PASSWORD_FORGET: '/pw-forget',
     ADMIN: '/admin',
     ADMIN_DETAILS: '/admin/:id',
+    OPPORTUNITIES: '/opportunities',
+    MAINTAINENCE: '/maintainence',
+    PAYMENTS: '/payments',
+    PRODUCTS: '/products',
 }
 
 export default ROUTES

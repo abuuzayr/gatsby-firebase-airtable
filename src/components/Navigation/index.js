@@ -36,17 +36,17 @@ const NavigationAuth = ({ authUser }) => (
         <div className="navbar-start">
           {
             (authUser.roles[ROLES.SALES] || authUser.roles[ROLES.ADMIN]) &&
-            <Link className="navbar-item" to={ROUTES.ADMIN}>Opportunities</Link>
+            <Link className="navbar-item" to={ROUTES.OPPORTUNITIES}>Opportunities</Link>
           }
           {
             (authUser.roles[ROLES.INSTALL] || authUser.roles[ROLES.ADMIN]) &&
-            <Link className="navbar-item" to={ROUTES.ADMIN}>Install / Maintenance</Link>
+            <Link className="navbar-item" to={ROUTES.MAINTAINENCE}>Install / Maintenance</Link>
           }
           {
             authUser.roles[ROLES.ADMIN] &&
-            <Link className="navbar-item" to={ROUTES.ADMIN}>Payments</Link>
+            <Link className="navbar-item" to={ROUTES.PAYMENTS}>Payments</Link>
           }
-          <Link className="navbar-item" to={ROUTES.ADMIN}>Products</Link>
+          <Link className="navbar-item" to={ROUTES.PRODUCTS}>Products</Link>
           <Link className="navbar-item" to={ROUTES.ACCOUNT}>Account</Link>
           { 
             authUser.roles[ROLES.ADMIN] && 
