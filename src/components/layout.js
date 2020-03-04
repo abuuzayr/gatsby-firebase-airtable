@@ -63,6 +63,7 @@ class Layout extends Component {
 const AppWithAuthentication = withAuthentication(props => {
   const { children, pageContext, location, authUser } = props
   const fullpage = pageContext && pageContext.layout && pageContext.layout === 'fullpage'
+  const title = Object.keys(ROUTES)[Object.values(ROUTES).indexOf(location.pathname)]
   return (
     <Fragment>
       {!fullpage && <Navigation />}
@@ -75,11 +76,11 @@ const AppWithAuthentication = withAuthentication(props => {
                 <ul>
                   <li>
                     <Link to={ROUTES.HOME}>
-                      CRM
+                      Home
                     </Link>
                   </li>
                   <li className="is-active">
-                    <span>{Object.keys(ROUTES)[Object.values(ROUTES).indexOf(location.pathname)]}</span>
+                    <span>{`${title.slice(0,1)}${title.slice(1).toLowerCase()}`}</span>
                   </li>
                 </ul>
               </nav>
