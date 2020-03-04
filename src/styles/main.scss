@@ -1,4 +1,8 @@
 @charset "utf-8";
-// If need, change your variables before importing Bulma
-$title-color: #ff0000;
+
+// Change variables before importing Bulma
 @import "~bulma/bulma.sass";
+
+html {
+    background: #ECF0F3;
+}
