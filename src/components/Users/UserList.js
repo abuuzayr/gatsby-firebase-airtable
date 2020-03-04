@@ -4,6 +4,8 @@ import { SignUpLink } from '../SignUp'
 
 import { withFirebase } from '../Firebase';
 
+import DataGrid from 'react-data-grid'
+
 class UserList extends Component {
   _initFirebase = false;
 
@@ -51,29 +53,51 @@ class UserList extends Component {
   }
 
   render() {
-    const { users, loading } = this.state;
+    let { users, loading } = this.state;
+
+    users = users.map((user, id) => {
+      return {
+        ...user,
+        id,
+        role: user.roles ? Object.keys(user.roles)[0] : ''
+      }
+    })
+
+    if (users.length < 7) {
+      const limit = 7 - users.length
+      for (let i = 0; i < limit; i++) {
+        users.push({
+          id: "",
+          name: "",
+          username: "",
+          role: "",
+        })
+      }
+    }
+
+    const columns = [
+      { key: "id", name: "ID", resize : true },
+      { key: "email", name: "Email", resize : true },
+      { key: "username", name: "Username", resize : true },
+      { key: "role", name: "Role", resize : true }
+    ];
 
     return (
       <div>
-        <h2>Users</h2>
-        {loading && <div>Loading ...</div>}
-
-        <ul>
-          {users.map(user => (
-            <li key={user.uid}>
-              <span>
-                <strong>ID:</strong> {user.uid}
-              </span>
-              <span>
-                <strong>E-Mail:</strong> {user.email}
-              </span>
-              <span>
-                <strong>Username:</strong> {user.username}
-              </span>
-            </li>
-          ))}
-        </ul>
-        <SignUpLink />
+        {
+          loading ?
+            <div>Loading ...</div> :
+            <>
+              <DataGrid
+                columns={columns}
+                rowGetter={i => users[i]}
+                rowsCount={users.length}
+                minHeight={300}
+                minColumnWidth={10}
+              />
+              <SignUpLink />
+            </>
+        }
       </div>
     );
   }
