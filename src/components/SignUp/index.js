@@ -4,6 +4,7 @@ import { Link, navigate } from 'gatsby';
 import { withFirebase } from '../Firebase';
 import ROUTES from '../../constants/routes';
 import { ROLES } from '../../constants/roles';
+import { FiPlus } from 'react-icons/fi';
 
 const INITIAL_STATE = {
   username: '',
@@ -146,8 +147,10 @@ class SignUpFormBase extends Component {
 }
 
 const SignUpLink = () => (
-  <p>
-    <Link to={ROUTES.SIGN_UP}>Add new user</Link>
+  <p style={{ 'margin': '10px 0' }} className="is-pulled-right">
+    <Link to={ROUTES.SIGN_UP} style={{ 'verticalAlign': 'middle' }}>
+      <FiPlus style={{ 'verticalAlign': 'middle' }}/> Add new user
+    </Link>
   </p>
 );
 
