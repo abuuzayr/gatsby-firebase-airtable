@@ -7,15 +7,20 @@ import {
 } from '../components/Session';
 import { CompanyContext } from '../components/Company'
 import DataGrid from 'react-data-grid';
+import { FiEyeOff, FiFilter, FiSearch, FiArrowUp, FiArrowDown } from 'react-icons/fi'
+import { AiOutlineSortAscending } from 'react-icons/ai'
 
 const HomePageBase = (props) => {
   const [stats, setStats] = useState({})
   const [company, setCompany] = useState(false)
-  const [data, setData] = useState({
-    labels: [],
-    rows: []
-  })
+  const [labels, setLabels] = useState([])
+  const [rows, setRows] = useState([])
+  const [initialRows, setInitialRows] = useState([])
   const [dashURL, setDashURL] = useState('')
+  const [sort, setSort] = useState({
+    column: '',
+    direction: ''
+  })
   const { authUser } = props
 
   useEffect(() => {
@@ -52,22 +57,53 @@ const HomePageBase = (props) => {
     }
     getDashURL()
   }, [company])
+
   useEffect(() => {
     async function getOpportunities() {
-      if (!(company && company.company && authUser)) return 
-      const role = Object.keys(authUser.roles)[0]
-      const cpy = company.company.value
+      if (!(company && company.companies && authUser)) return 
+      // const role = Object.keys(authUser.roles)[0]
+      // const cpy = company.company.value
+      const fields = [
+        'Opportunity name',
+        'Company',
+        'Salesperson',
+        'Stage',
+        'Contact details',
+        'AG no.',
+        'Agreement date & time',
+        'Sales remarks',
+        'Product',
+        'Price',
+        'Unit',
+        'Subtotal',
+        'Discount',
+        'GST',
+        'Grand Total',
+        'Payments',
+        'Total paid',
+        'Outstanding',
+        'Install / Maintenance',
+      ]
       try {
         const result = await fetch(`${process.env.GATSBY_STDLIB_URL}/getRawTableData?name=Opportunities`)
         if (result.status === 200) {
           const body = await result.json()
-          const labels = Object.keys(body.rows[0].fields).map(key => {
-            return {
-              key, 
-              name: key
+          const labels = fields.map(key => {
+            const obj = {
+              key,
+              name: key,
+              sortable: true,
+              width: 180,
             }
+            if (key === 'Opportunity name') {
+              obj.frozen = true
+              obj.width = 250
+            }
+            return obj
           })
-          setData({ labels, rows: body.rows.map(row => row.fields) })
+          setLabels(labels)
+          setRows(body.rows.map(row => row.fields))
+          setInitialRows(body.rows.map(row => row.fields))
         }
       } catch (e) {
         console.error(e)
@@ -75,11 +111,55 @@ const HomePageBase = (props) => {
     }
     getOpportunities()
   }, [company, authUser])
+
+  const sortRows = (initialRows, sortColumn, sortDirection) => rows => {
+    const comparer = (a, b) => {
+      if (sortDirection === "ASC") {
+        return a[sortColumn] > b[sortColumn] ? 1 : -1;
+      } else if (sortDirection === "DESC") {
+        return a[sortColumn] < b[sortColumn] ? 1 : -1;
+      }
+    };
+    return sortDirection === "NONE" ? initialRows : [...rows].sort(comparer);
+  };
+
   return (
     <CompanyContext.Consumer>
       {
         companyContext => {
           setCompany(companyContext)
+          if (!labels.map(l => l.key).includes('index')) {
+            labels.unshift({
+              key: 'index',
+              name: '',
+              width: 40,
+              frozen: true
+            }) 
+          }
+          const columns = labels.map(label => {
+            return {
+              ...label,
+              headerRenderer: (props) => (
+                <div className="level">
+                  <div className="level-left">
+                    <div className="level-item">
+                      {props.column.name}
+                    </div>
+                  </div>
+                  <div className="level-right">
+                    <div className="level-item">
+                      {
+                        sort.column &&
+                        sort.column === props.column.name &&
+                        sort.direction !== 'NONE' &&
+                        (sort.direction === 'ASC' ? <FiArrowUp /> : <FiArrowDown />)
+                      }
+                    </div>
+                  </div>
+                </div>
+              )
+            }
+          })
           return (
             <>
               <section className="hero is-info welcome is-small">
@@ -131,15 +211,64 @@ const HomePageBase = (props) => {
                 style={{"background": "transparent", "border": "1px solid #ccc"}}>  
               </iframe>
               {
-                data.rows.length &&
-                data.labels.length &&
-                <DataGrid
-                  columns={data.labels}
-                  rowGetter={i => data.rows[i]}
-                  rowsCount={data.rows.length}
-                  minHeight={500}
-                  minColumnWidth={180}
-                />
+                rows.length &&
+                columns.length &&
+                <>
+                  <div className="rdg-head">
+                    <div className="level">
+                      <div className="level-left">
+                        <div className="level-item">
+                          <FiEyeOff /> 
+                          <span>Hide fields</span>
+                        </div>
+                        <div className="level-item">
+                          <FiFilter />
+                          <span>Filter</span>
+                        </div>
+                        <div className="level-item">
+                          <AiOutlineSortAscending />
+                          <span>Sort</span>
+                        </div>
+                      </div>
+                      <div className="level-right">
+                        <div className="level-item">
+                          <FiSearch />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <DataGrid
+                    columns={columns}
+                    rowGetter={i => {return {index: i + 1, ...rows[i]}}}
+                    rowsCount={rows.length}
+                    minHeight={500}
+                    minColumnWidth={20}
+                    onGridSort={(sortColumn, sortDirection) => {
+                      console.log(sortDirection)
+                      let direction = sortDirection
+                      switch (sort.direction) {
+                        case 'ASC':
+                          direction = 'DESC'
+                          break
+                        case 'DESC':
+                          direction = 'NONE'
+                          break
+                        case 'NONE':
+                          direction = 'ASC'
+                          break
+                        default:
+                          break
+                      }
+                      setRows(sortRows(initialRows, sortColumn, direction))
+                      setSort(prev => {
+                        return {
+                          column: sortColumn,
+                          direction
+                        }
+                      })
+                    }}
+                  />
+                </>
               }
             </>
           )
