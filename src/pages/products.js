@@ -5,7 +5,8 @@ import {
   withEmailVerification,
 } from '../components/Session';
 import DataGrid from 'react-data-grid';
-import { FiPlus } from 'react-icons/fi'
+import { FiPlus, FiEdit, FiTrash2 } from 'react-icons/fi';
+import Modal from '../components/Modal';
 
 const hiddenFields = ['Opportunities']
 
@@ -21,6 +22,7 @@ const ProductPageBase = (props) => {
     labels = labels.map(label => {
       if (label.key === 'Model') {
         label.frozen = true
+        label.width = 250
       }
       return label
     })
@@ -29,6 +31,22 @@ const ProductPageBase = (props) => {
       name: '#',
       width: 40,
       frozen: true
+    })
+    const colorIndex = labels.map(l => l.key).indexOf('Color')
+    labels.splice(colorIndex - 1, 0, {
+      key: 'actions',
+      name: 'Actions',
+      width: 80,
+      formatter: () => {
+        return <div className="level">
+          <div className="level-item">
+            <Modal button={<a href="#"><FiEdit /></a>}></Modal>
+          </div>
+          <div className="level-item">
+            <a href="#"><FiTrash2 /></a>
+          </div>
+        </div>
+      }
     })
     return labels
   }
@@ -80,7 +98,18 @@ const ProductPageBase = (props) => {
             />
             <p style={{ 'margin': '10px 0' }} className="is-pulled-right">
               <a style={{ 'verticalAlign': 'middle' }}>
-                <FiPlus style={{ 'verticalAlign': 'middle' }}/> Add new product
+                <Modal button={
+                    <><FiPlus style={{ 'verticalAlign': 'middle' }} /> Add new product</>
+                  }>
+                  <div>I am a modal</div>
+                  <form>
+                    <input />
+                    <button>tab navigation</button>
+                    <button>stays</button>
+                    <button>inside</button>
+                    <button>the modal</button>
+                  </form>
+                </Modal>
               </a>
             </p>
           </> :
