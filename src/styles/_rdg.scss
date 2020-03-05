@@ -1,3 +1,22 @@
 .rdg-cell {
     font-size: 13px;
 }
+
+.rdg-head {
+    height: 40px;
+    border: 1px solid #ddd;
+    background: #fff;
+    border-bottom: none;
+    font-size: 13px;
+    .level {
+        height: 40px;
+        padding: 0 15px;
+        .level-item {
+            cursor: pointer;
+            font-weight: 500;
+            span {
+                margin-left: 5px;
+            }
+        }
+    }
+}
