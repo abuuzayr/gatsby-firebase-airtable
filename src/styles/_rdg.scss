@@ -1,5 +1,20 @@
 .rdg-cell {
     font-size: 13px;
+    .rdg-cell-value {
+        button {
+            vertical-align: middle;
+            color: #fff;
+            border-color: #fff;
+            font-size: 11px;
+        }
+        .actions svg {
+            color: #3273dc;
+            cursor: pointer;
+            &:hover {
+                color: #333;
+            }
+        }
+    }
 }
 
 .rdg-head {
