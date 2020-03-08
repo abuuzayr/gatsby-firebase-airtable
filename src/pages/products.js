@@ -11,6 +11,7 @@ import Modal from '../components/Modal';
 const hiddenFields = ['Opportunities']
 
 const ProductPageBase = (props) => {
+  const [trigger, setTrigger] = useState(false)
   const [data, setData] = useState({
     labels: [],
     rows: []
@@ -37,10 +38,18 @@ const ProductPageBase = (props) => {
       key: 'actions',
       name: 'Actions',
       width: 80,
-      formatter: () => {
-        return <div className="level">
+      formatter: ({ row }) => {
+        return <div className="level actions">
           <div className="level-item">
-            <Modal button={<a href="#"><FiEdit /></a>}></Modal>
+            <Modal
+              button={<FiEdit />}
+              id={row.id}
+              type="Products"
+              user={authUser}
+              mode="Edit"
+              onCloseModal={() => setTrigger(p => !p)}
+            >
+            </Modal>
           </div>
           <div className="level-item">
             <a href="#"><FiTrash2 /></a>
@@ -71,7 +80,8 @@ const ProductPageBase = (props) => {
             rows: body.rows.map((row, index) => {
               return {
                 ...row.fields,
-                index: index + 1
+                index: index + 1,
+                id: row.id
               }
             }) 
           })
@@ -97,19 +107,16 @@ const ProductPageBase = (props) => {
               minColumnWidth={35}
             />
             <div style={{ 'margin': '10px 0', 'fontWeight': 700 }} className="is-pulled-right">
-              <a style={{ 'verticalAlign': 'middle' }}>
-                <Modal button={
+              <a style={{ 'verticalAlign': 'middle' }} href="#">
+                <Modal
+                  button={
                     <><FiPlus style={{ 'verticalAlign': 'middle' }} /> Add new product</>
-                  }>
-                  <div>I am a modal</div>
-                  <form>
-                    <input />
-                    <button>tab navigation</button>
-                    <button>stays</button>
-                    <button>inside</button>
-                    <button>the modal</button>
-                  </form>
-                </Modal>
+                  }
+                  type="Products"
+                  user={authUser}
+                  mode="New"
+                  onCloseModal={() => setTrigger(p => !p)}
+                ></Modal>
               </a>
             </div>
           </> :
