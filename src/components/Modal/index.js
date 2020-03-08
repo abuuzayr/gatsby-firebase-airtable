@@ -71,7 +71,7 @@ const Modal = (props) => {
     }
 
     const getData = async (type, id) => {
-        if (props.mode === 'Edit') {
+        if (props.mode === 'Edit' || props.mode === 'View') {
             try {
                 const result = await fetch(`${process.env.GATSBY_STDLIB_URL}/getRawTableData?name=${type}&id=${id}`)
                 if (result.status === 200) {
@@ -221,6 +221,22 @@ const Modal = (props) => {
         }
     }
 
+    const deleteRecord = () => {
+        const savingToast = addToast('Deleting...', { appearance: 'info' })
+        base(props.type).destroy([props.id], function (err, records) {
+            removeToast(savingToast)
+            if (err) {
+                console.error(err);
+                addToast(`Error while saving: ${err}`, { appearance: 'error', autoDismiss: true })
+                return
+            }
+            if (records.length > 0) {
+                addToast('Record successfully deleted', { appearance: 'success', autoDismiss: true })
+                closeModal()
+            }
+        })
+    }
+
     return (
         <div>
             {
@@ -240,77 +256,105 @@ const Modal = (props) => {
             >
                 <div className="panel">
                     <div className="panel-heading">{
-                        props.mode + ' record'
+                        props.mode + ' record ' + props.title
                     }</div>
                     {
-                        data ? fields.map(f => (
-                            <div className={['CX', 'SX'].includes(f) ? 'is-hidden' : 'panel-block'} key={f}>
-                                <div className="level-left">
-                                    {
-                                        Object.keys(identifiers).includes(f) ? 
-                                            identifiers[f][0] : f
-                                    }
-                                </div>
-                                {
-                                    (Object.keys(optionsObj).includes(f) || f === 'Stage') ?
-                                        <Select
-                                            options={options[f]}
-                                            isLoading={!Object.keys(options).length}
-                                            isDisabled={!Object.keys(options).length}
-                                            styles={{
-                                                container: provided => ({
-                                                    ...provided,
-                                                    width: '100%'
-                                                })
-                                            }}
-                                            onChange={val => {
-                                                updateData(f, val)
-                                            }}
-                                            value={
-                                                data.fields[f] && data.fields[f].hasOwnProperty('value') ? 
-                                                    data.fields[f] : 
-                                                    {
-                                                        value: data.fields[f],
-                                                        label: getLabel(data.fields[f], f)
-                                                    }
+                        props.mode !== 'Delete' &&
+                        <>
+                            {
+                                data ? fields.map(f => (
+                                    <div className={['CX', 'SX'].includes(f) ? 'is-hidden' : 'panel-block'} key={f}>
+                                        <div className="level-left">
+                                            {
+                                                Object.keys(identifiers).includes(f) ?
+                                                    identifiers[f][0] : f
                                             }
-                                            readOnly={readOnlyFields.includes(f)}
-                                            >
-                                        </Select> :
-                                        <input 
-                                            className={`input ${!data.fields[f] ? 'is-warning' : ''}`}
-                                            value={datetimeFields.includes(f) && data.fields[f] ? toDatetimeLocal(data.fields[f]) : data.fields[f] || ''} 
-                                            onChange={e => {
-                                                updateData(f, e.currentTarget.value)
-                                            }}
-                                            readOnly={readOnlyFields.includes(f)}
-                                            { ...getInputType(f) }
-                                        />
-                                }
+                                        </div>
+                                        {
+                                            (props.mode === 'Edit' || props.mode === 'View') &&
+                                            ((Object.keys(optionsObj).includes(f) || f === 'Stage') ?
+                                                <Select
+                                                    options={options[f]}
+                                                    isLoading={!Object.keys(options).length}
+                                                    isDisabled={!Object.keys(options).length || props.mode === 'View'}
+                                                    styles={{
+                                                        container: provided => ({
+                                                            ...provided,
+                                                            width: '100%'
+                                                        })
+                                                    }}
+                                                    onChange={val => {
+                                                        updateData(f, val)
+                                                    }}
+                                                    value={
+                                                        data.fields[f] && data.fields[f].hasOwnProperty('value') ?
+                                                            data.fields[f] :
+                                                            {
+                                                                value: data.fields[f],
+                                                                label: getLabel(data.fields[f], f)
+                                                            }
+                                                    }
+                                                    readOnly={readOnlyFields.includes(f) || props.mode === 'View'}
+                                                >
+                                                </Select> :
+                                                <input
+                                                    className={`input ${!data.fields[f] ? 'is-warning' : ''} ${props.mode === 'View' ? 'is-disabled' : ''}`}
+                                                    value={datetimeFields.includes(f) && data.fields[f] ? toDatetimeLocal(data.fields[f]) : data.fields[f] || ''}
+                                                    onChange={e => {
+                                                        updateData(f, e.currentTarget.value)
+                                                    }}
+                                                    readOnly={readOnlyFields.includes(f) || props.mode === 'View'}
+                                                    {...getInputType(f)}
+                                                />)
+                                        }
+                                    </div>
+                                )) :
+                                <div className="panel-block">
+                                    Loading...
+                                </div>
+                            }
+                            <div className="level">
+                                <div className="level-left">
+                                    <button
+                                        className="button is-danger"
+                                        disabled={data ? '' : 'disabled'}
+                                        onClick={closeModal}>
+                                        Close
+                            </button>
+                                </div>
+                                <div className="level-right">
+                                    <button
+                                        className="button is-warning"
+                                        disabled={data ? '' : 'disabled'}
+                                        onClick={handleSave}>
+                                        Save &amp; close
+                            </button>
+                                </div>
                             </div>
-                        )) :
-                        <div className="panel-block">
-                            Loading...
-                        </div>
+                        </>
                     }
-                    <div className="level">
-                        <div className="level-left">
-                            <button 
-                                className="button is-danger"
-                                disabled={data ? '' : 'disabled'}
-                                onClick={closeModal}>
-                                    Close
-                            </button>
-                        </div>
-                        <div className="level-right">
-                            <button 
-                                className="button is-warning"
-                                disabled={data ? '' : 'disabled'}
-                                onClick={handleSave}>
-                                    Save &amp; close
-                            </button>
-                        </div>
-                    </div>
+                    {
+                        props.mode === 'Delete' &&
+                        <>
+                            <div className="panel-block">Are you sure?</div>
+                            <div className="level">
+                                <div className="level-left">
+                                    <button
+                                        className="button is-success"
+                                        onClick={closeModal}>
+                                        Cancel
+                                    </button>
+                                </div>
+                                <div className="level-right">
+                                    <button
+                                        className="button is-danger"
+                                        onClick={deleteRecord}>
+                                        Confirm Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </>
+                    }
                     {props.children}
                 </div>
             </ReactModal>
