@@ -43,6 +43,23 @@ const stages = Object.keys(STAGES).filter(s => s !== 'default').map(stage => ({
 // Make sure to bind modal to your appElement (http://reactcommunity.org/react-modal/accessibility/)
 ReactModal.setAppElement('#___gatsby')
 
+const toDatetimeLocal = (str) => {
+    let
+        date = new Date(str),
+        ten = function (i) {
+            return (i < 10 ? '0' : '') + i;
+        },
+        YYYY = date.getFullYear(),
+        MM = ten(date.getMonth() + 1),
+        DD = ten(date.getDate()),
+        HH = ten(date.getHours()),
+        II = ten(date.getMinutes()),
+        SS = ten(date.getSeconds())
+        ;
+    return YYYY + '-' + MM + '-' + DD + 'T' +
+        HH + ':' + II + ':' + SS;
+}
+
 const Modal = (props) => {
     const [modalIsOpen, setIsOpen] = useState(false)
     const [data, setData] = useState(false)
@@ -54,14 +71,18 @@ const Modal = (props) => {
     }
 
     const getData = async (type, id) => {
-        try {
-            const result = await fetch(`${process.env.GATSBY_STDLIB_URL}/getRawTableData?name=${type}&id=${id}`)
-            if (result.status === 200) {
-                const body = await result.json()
-                setData(body.rows[0])
+        if (props.mode === 'Edit') {
+            try {
+                const result = await fetch(`${process.env.GATSBY_STDLIB_URL}/getRawTableData?name=${type}&id=${id}`)
+                if (result.status === 200) {
+                    const body = await result.json()
+                    setData(body.rows[0])
+                }
+            } catch (e) {
+                console.error(e)
             }
-        } catch (e) {
-            console.error(e)
+        } else {
+            setData(props.id ? {id: props.id, fields: {}} : {fields: {}})
         }
     }
 
@@ -82,22 +103,24 @@ const Modal = (props) => {
     }
 
     const afterOpenModal = async () => {
-        if (props.type && props.id) {
+        if (props.type) {
             await getData(props.type, props.id)
             await getOptions()
         }
     }
 
     const closeModal = () => {
-        setIsOpen(false);
+        setIsOpen(false)
+        props.onCloseModal && props.onCloseModal()
     }
 
-    const updateData = (key, data) => {
+    const updateData = (key, value) => {
+        if (!value) return
         setData(prevData => ({
             ...prevData,
             fields: {
                 ...prevData.fields,
-                [key]: data
+                [key]: datetimeFields.includes(key) ? new Date(value).toISOString() : value
             }
         }))
     }
@@ -142,10 +165,24 @@ const Modal = (props) => {
         })
         // Transform react-select fields
         Object.keys(optionsObj).forEach(field => {
-            cleanData[field] = [cleanData[field].value]
+            if (cleanData[field]) {
+                cleanData[field] = [cleanData[field].value]
+            }
         })
         selectFields.forEach(field => {
-            cleanData[field] = cleanData[field].value
+            if (cleanData[field]) {
+                cleanData[field] = cleanData[field].value
+            }
+        })
+        numberFields.forEach(field => {
+            if (cleanData[field]) {
+                cleanData[field] = parseInt(cleanData[field])
+            }
+        })
+        currencyFields.forEach(field => {
+            if (cleanData[field]) {
+                cleanData[field] = parseFloat(cleanData[field])
+            }
         })
         // Remove null fields
         Object.keys(cleanData).forEach(field => {
@@ -154,23 +191,34 @@ const Modal = (props) => {
             if (cleanData[field] && cleanData[field].length === 1 && !cleanData[field][0]) toDelete = true
             if (toDelete) delete cleanData[field]
         })
-        const postData = {
-            id: data.id,
-            fields: cleanData
-        }
         // Save the record!
-        base(props.type).update([postData], function (err, records) {
-            removeToast(savingToast)
-            if (err) {
-                console.error(err);
-                addToast(`Error while saving: ${err}`, { appearance: 'error', autoDismiss: true })
-                return;
-            }
-            if (records.length > 0) {
-                addToast('Saved!', { appearance: 'success', autoDismiss: true })
-                closeModal()
-            }
-        });
+        if (data.hasOwnProperty('id')) {
+            base(props.type).update([{ id: data.id, fields: cleanData }], function (err, records) {
+                removeToast(savingToast)
+                if (err) {
+                    console.error(err);
+                    addToast(`Error while saving: ${err}`, { appearance: 'error', autoDismiss: true })
+                    return
+                }
+                if (records.length > 0) {
+                    addToast('Saved!', { appearance: 'success', autoDismiss: true })
+                    closeModal()
+                }
+            })
+        } else {
+            base(props.type).create([{ fields: cleanData }], function (err, records) {
+                removeToast(savingToast)
+                if (err) {
+                    console.error(err);
+                    addToast(`Error while saving: ${err}`, { appearance: 'error', autoDismiss: true })
+                    return
+                }
+                if (records.length > 0) {
+                    addToast('New record created!', { appearance: 'success', autoDismiss: true })
+                    closeModal()
+                }
+            })
+        }
     }
 
     return (
@@ -187,13 +235,15 @@ const Modal = (props) => {
                 onAfterOpen={afterOpenModal}
                 onRequestClose={closeModal}
                 style={customStyles}
-                contentLabel="Example Modal"
+                contentLabel="Record modal"
                 closeTimeoutMS={2000}
             >
                 <div className="panel">
-                    <div className="panel-heading">Edit</div>
+                    <div className="panel-heading">{
+                        props.mode + ' record'
+                    }</div>
                     {
-                        data ? fields.filter(f => Object.keys(data.fields).includes(f)).map(f => (
+                        data ? fields.map(f => (
                             <div className={['CX', 'SX'].includes(f) ? 'is-hidden' : 'panel-block'} key={f}>
                                 <div className="level-left">
                                     {
@@ -228,8 +278,8 @@ const Modal = (props) => {
                                             >
                                         </Select> :
                                         <input 
-                                            className="input" 
-                                            value={data.fields[f] || ''} 
+                                            className={`input ${!data.fields[f] ? 'is-warning' : ''}`}
+                                            value={datetimeFields.includes(f) && data.fields[f] ? toDatetimeLocal(data.fields[f]) : data.fields[f] || ''} 
                                             onChange={e => {
                                                 updateData(f, e.currentTarget.value)
                                             }}
