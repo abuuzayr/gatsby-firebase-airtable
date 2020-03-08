@@ -1,16 +1,25 @@
-export const fields = [
-    'Opportunity name',
-    'Stage',
-    'CTX',
-    'AG no.',
-    'Agreement date & time',
-    'PX',
-    'Unit',
-    'Discount',
-    'GST',
-    'Grand Total',
-    'Sales remarks',
-]
+export const fields = {
+    'Opportunities': [
+        'Opportunity name',
+        'Stage',
+        'CTX',
+        'AG no.',
+        'Agreement date & time',
+        'PX',
+        'Unit',
+        'Discount',
+        'GST',
+        'Grand Total',
+        'Sales remarks',
+    ],
+    'Products': [
+        'Model',
+        'Color',
+        'Price',
+        'Commission (sales)',
+        'Commission (install)'
+    ]
+}
 
 export const readOnlyFields = [
     'GST',
@@ -29,6 +38,10 @@ export const currencyFields = [
     'GST',
     'Discount',
     'Grand Total',
+    'Subtotal',
+    'Outstanding',
+    'Total paid',
+    'Price'
 ]
 
 export const options = {
@@ -45,20 +58,26 @@ export const identifiers = {
     'PX': ['Product', 'Model'],
 }
 
-export const computedFields = [
-    'Price',
-    'Subtotal',
-    'GST',
-    'Grand Total',
-    'Total paid',
-    'Outstanding',
-    'Salesperson',
-    'Product link',
-    'Fresh',
-    'Company',
-    'Contact details',
-    'Product'
-]
+export const computedFields = {
+    'Opportunities': [
+        'Price',
+        'Subtotal',
+        'GST',
+        'Grand Total',
+        'Total paid',
+        'Outstanding',
+        'Salesperson',
+        'Product link',
+        'Fresh',
+        'Company',
+        'Contact details',
+        'Product'
+    ],
+    'Products': [
+        'Commission (sales)',
+        'Commission (sales)'
+    ]
+}
 
 export const selectFields = [
     'Stage'

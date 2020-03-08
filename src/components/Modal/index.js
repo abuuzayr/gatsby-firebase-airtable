@@ -76,6 +76,7 @@ const Modal = (props) => {
                 const result = await fetch(`${process.env.GATSBY_STDLIB_URL}/getRawTableData?name=${type}&id=${id}`)
                 if (result.status === 200) {
                     const body = await result.json()
+                    console.log(body)
                     setData(body.rows[0])
                 }
             } catch (e) {
@@ -160,7 +161,7 @@ const Modal = (props) => {
         const savingToast = addToast('Saving...', { appearance: 'info' })
         const cleanData = { ...data.fields }
         // Remove computed fields
-        computedFields.forEach(field => {
+        computedFields[props.type].forEach(field => {
             delete cleanData[field]
         })
         // Transform react-select fields
@@ -256,13 +257,13 @@ const Modal = (props) => {
             >
                 <div className="panel">
                     <div className="panel-heading">{
-                        props.mode + ' record ' + props.title
+                        props.mode + ' record ' + (props.title ? `: ${props.title}` : '')
                     }</div>
                     {
                         props.mode !== 'Delete' &&
                         <>
                             {
-                                data ? fields.map(f => (
+                                data ? fields[props.type].map(f => (
                                     <div className={['CX', 'SX'].includes(f) ? 'is-hidden' : 'panel-block'} key={f}>
                                         <div className="level-left">
                                             {
@@ -271,7 +272,7 @@ const Modal = (props) => {
                                             }
                                         </div>
                                         {
-                                            (props.mode === 'Edit' || props.mode === 'View') &&
+                                            ['Edit', 'View', 'New'].includes(props.mode) &&
                                             ((Object.keys(optionsObj).includes(f) || f === 'Stage') ?
                                                 <Select
                                                     options={options[f]}
