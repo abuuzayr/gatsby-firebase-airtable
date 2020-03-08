@@ -1,14 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { compose } from 'recompose';
-import { ROLES } from '../constants/roles';
+import React, { useState, useEffect } from 'react'
+import { compose } from 'recompose'
+import { ROLES } from '../constants/roles'
 import {
   withAuthorization,
   withEmailVerification,
-} from '../components/Session';
+} from '../components/Session'
 import { CompanyContext } from '../components/Company'
-import DataGrid from 'react-data-grid';
-import { FiEyeOff, FiFilter, FiSearch, FiArrowUp, FiArrowDown } from 'react-icons/fi'
+import DataGrid from 'react-data-grid'
+import { FiEyeOff, FiFilter, FiSearch, FiArrowUp, FiArrowDown, FiPlus, FiEdit, FiTrash2 } from 'react-icons/fi'
 import { AiOutlineSortAscending } from 'react-icons/ai'
+import Modal from '../components/Modal'
+import STAGES from '../constants/stages'
+import { datetimeFields } from '../constants/fields'
 
 const HomePageBase = (props) => {
   const [stats, setStats] = useState({})
@@ -22,6 +25,63 @@ const HomePageBase = (props) => {
     direction: ''
   })
   const { authUser } = props
+
+  const transformLabels = labels => {
+    if (!labels.map(l => l.key).includes('count')) {
+      labels.unshift({
+        key: 'count',
+        name: '',
+        width: 40,
+        frozen: true,
+        formatter: ({ value, row }) => {
+          const stageColor = STAGES[row['Stage']] ? STAGES[row['Stage']] : '#fff'
+          return <div
+            style={{
+              'textAlign': 'center',
+              'borderRight': '5px solid ' + stageColor,
+              'marginRight': -8,
+              'paddingRight': 2
+            }}
+          >
+            {value}
+          </div>
+        }
+      })
+      const oppIndex = labels.map(l => l.key).indexOf('Opportunity name')
+      labels.splice(oppIndex, 0, {
+        key: 'edit',
+        name: '',
+        frozen: true,
+        width: 30,
+        formatter: ({ row }) => {
+          return <div className="level actions">
+            <div className="level-item">
+              <Modal 
+                button={<FiEdit />} 
+                id={row.id} 
+                type="Opportunities"
+                user={authUser}
+              >
+              </Modal>
+            </div>
+          </div>
+        }
+      })
+      labels.push({
+        key: 'delete',
+        name: '',
+        width: 30,
+        formatter: () => {
+          return <div className="level actions">
+            <div className="level-item">
+              <a href="#"><FiTrash2 /></a>
+            </div>
+          </div>
+        }
+      })
+    }
+    return labels
+  }
 
   useEffect(() => {
     async function getStats () {
@@ -88,7 +148,7 @@ const HomePageBase = (props) => {
         const result = await fetch(`${process.env.GATSBY_STDLIB_URL}/getRawTableData?name=Opportunities`)
         if (result.status === 200) {
           const body = await result.json()
-          const labels = fields.map(key => {
+          const labelFields = fields.map(key => {
             const obj = {
               key,
               name: key,
@@ -99,10 +159,39 @@ const HomePageBase = (props) => {
               obj.frozen = true
               obj.width = 250
             }
+            if (key === 'Stage') {
+              obj.formatter = ({ value }) => {
+                const stageColor = STAGES[value] ? STAGES[value] : STAGES['default']
+                if (value) {
+                  return (
+                    <button 
+                      className="button is-rounded is-small"
+                      style={{
+                        'backgroundColor': stageColor
+                      }}
+                    >
+                      {value}
+                    </button>
+                  )
+                } else {
+                  return value
+                }
+              }
+            }
+            if (datetimeFields.includes(key)) {
+              obj.formatter = ({ value }) => value ? new Date(value).toLocaleString() : ''
+            }
             return obj
           })
-          setLabels(labels)
-          setRows(body.rows.map(row => row.fields))
+          if (labels.length === 0) {
+            setLabels(transformLabels(labelFields))
+          }
+          setRows(body.rows.map(row => {
+            return {
+              ...row.fields,
+              id: row.id
+            }
+          }))
           setInitialRows(body.rows.map(row => row.fields))
         }
       } catch (e) {
@@ -128,31 +217,29 @@ const HomePageBase = (props) => {
       {
         companyContext => {
           setCompany(companyContext)
-          if (!labels.map(l => l.key).includes('index')) {
-            labels.unshift({
-              key: 'index',
-              name: '',
-              width: 40,
-              frozen: true
-            }) 
-          }
           const columns = labels.map(label => {
             return {
               ...label,
-              headerRenderer: (props) => (
+              headerRenderer: ({ column }) => (
                 <div className="level">
                   <div className="level-left">
                     <div className="level-item">
-                      {props.column.name}
+                      {column.name}
                     </div>
                   </div>
                   <div className="level-right">
                     <div className="level-item">
                       {
                         sort.column &&
-                        sort.column === props.column.name &&
-                        sort.direction !== 'NONE' &&
-                        (sort.direction === 'ASC' ? <FiArrowUp /> : <FiArrowDown />)
+                        sort.column === column.name ?
+                          (
+                            sort.direction === 'NONE' ? 
+                              <FiArrowUp style={{ 'color': '#ccc' }} /> :
+                              sort.direction === 'ASC' ? 
+                                <FiArrowUp /> :
+                                <FiArrowDown />
+                          ) :
+                          !['count', 'edit', 'delete'].includes(column.key) && <FiArrowUp style={{ 'color': '#ccc' }} />
                       }
                     </div>
                   </div>
@@ -202,73 +289,81 @@ const HomePageBase = (props) => {
                   </div>
                 </div>
               </section>
-              <iframe 
-                className="airtable-embed" 
-                src={dashURL} 
-                frameBorder="0" 
-                width="100%" 
-                height="533" 
-                style={{"background": "transparent", "border": "1px solid #ccc"}}>  
-              </iframe>
               {
                 rows.length &&
-                columns.length &&
-                <>
-                  <div className="rdg-head">
-                    <div className="level">
-                      <div className="level-left">
-                        <div className="level-item">
-                          <FiEyeOff /> 
-                          <span>Hide fields</span>
+                columns.length ?
+                  <>
+                    <div className="rdg-head">
+                      <div className="level">
+                        <div className="level-left">
+                          <div className="level-item">
+                            <FiEyeOff /> 
+                            <span>Hide fields</span>
+                          </div>
+                          <div className="level-item">
+                            <FiFilter />
+                            <span>Filter</span>
+                          </div>
+                          <div className="level-item">
+                            <AiOutlineSortAscending />
+                            <span>Sort</span>
+                          </div>
                         </div>
-                        <div className="level-item">
-                          <FiFilter />
-                          <span>Filter</span>
-                        </div>
-                        <div className="level-item">
-                          <AiOutlineSortAscending />
-                          <span>Sort</span>
-                        </div>
-                      </div>
-                      <div className="level-right">
-                        <div className="level-item">
-                          <FiSearch />
+                        <div className="level-right">
+                          <div className="level-item">
+                            <FiSearch />
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                  <DataGrid
-                    columns={columns}
-                    rowGetter={i => {return {index: i + 1, ...rows[i]}}}
-                    rowsCount={rows.length}
-                    minHeight={500}
-                    minColumnWidth={20}
-                    onGridSort={(sortColumn, sortDirection) => {
-                      console.log(sortDirection)
-                      let direction = sortDirection
-                      switch (sort.direction) {
-                        case 'ASC':
-                          direction = 'DESC'
-                          break
-                        case 'DESC':
-                          direction = 'NONE'
-                          break
-                        case 'NONE':
-                          direction = 'ASC'
-                          break
-                        default:
-                          break
-                      }
-                      setRows(sortRows(initialRows, sortColumn, direction))
-                      setSort(prev => {
-                        return {
-                          column: sortColumn,
-                          direction
+                    <DataGrid
+                      columns={columns}
+                      rowGetter={i => { return { count: i + 1, ...rows[i] } }}
+                      rowsCount={rows.length}
+                      minHeight={500}
+                      minColumnWidth={20}
+                      onGridSort={(sortColumn, sortDirection) => {
+                        let direction = sortDirection
+                        switch (sort.direction) {
+                          case 'ASC':
+                            direction = 'DESC'
+                            break
+                          case 'DESC':
+                            direction = 'NONE'
+                            break
+                          case 'NONE':
+                            direction = 'ASC'
+                            break
+                          default:
+                            break
                         }
-                      })
-                    }}
-                  />
-                </>
+                        setRows(sortRows(initialRows, sortColumn, direction))
+                        setSort(prev => {
+                          return {
+                            column: sortColumn,
+                            direction
+                          }
+                        })
+                      }}
+                    />
+                    <div style={{ 'margin': '10px 0', 'fontWeight': 700 }} className="is-pulled-right">
+                      <a style={{ 'verticalAlign': 'middle' }}>
+                        <Modal button={
+                          <><FiPlus style={{ 'verticalAlign': 'middle' }} /> Add new opportunity</>
+                        }>
+                          <div>I am a modal</div>
+                          <form>
+                            <input />
+                            <button>tab navigation</button>
+                            <button>stays</button>
+                            <button>inside</button>
+                            <button>the modal</button>
+                          </form>
+                        </Modal>
+                      </a>
+                    </div>
+                  </> :
+                  <div>Loading...</div>
               }
             </>
           )
