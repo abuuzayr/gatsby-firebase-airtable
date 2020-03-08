@@ -35,3 +35,47 @@
         }
     }
 }
+
+.ReactModal__Overlay {
+    z-index: 99;
+    opacity: 0;
+    transition: opacity 1000ms ease-in-out;
+}
+
+.ReactModal__Content {
+    .panel {
+        .panel-heading {
+            margin-bottom: 10px;
+        }
+        .panel-block {
+            border-bottom: none;
+            padding-top: 2px;
+            padding-bottom: 2px;
+            &,
+            .input {
+                font-size: 13px;
+            }
+            .level-left {
+                width: 200px;
+            }
+        }
+        .level {
+            padding: 10px;
+            .level-left,
+            .level-right {
+                width: 50%;
+                .button {
+                    width: calc(100% - 5px);
+                }
+            }
+        }
+    }
+}
+
+.ReactModal__Overlay--after-open{
+    opacity: 1;
+}
+
+.ReactModal__Overlay--before-close{
+    opacity: 0;
+}
