@@ -96,7 +96,7 @@ const ProductPageBase = (props) => {
               minHeight={500}
               minColumnWidth={35}
             />
-            <p style={{ 'margin': '10px 0' }} className="is-pulled-right">
+            <div style={{ 'margin': '10px 0', 'fontWeight': 700 }} className="is-pulled-right">
               <a style={{ 'verticalAlign': 'middle' }}>
                 <Modal button={
                     <><FiPlus style={{ 'verticalAlign': 'middle' }} /> Add new product</>
@@ -111,7 +111,7 @@ const ProductPageBase = (props) => {
                   </form>
                 </Modal>
               </a>
-            </p>
+            </div>
           </> :
           <div>Loading...</div>
       }
