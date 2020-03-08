@@ -41,7 +41,9 @@ export const currencyFields = [
     'Subtotal',
     'Outstanding',
     'Total paid',
-    'Price'
+    'Price',
+    'Commission (sales)',
+    'Commission (install)'
 ]
 
 export const options = {
@@ -74,8 +76,6 @@ export const computedFields = {
         'Product'
     ],
     'Products': [
-        'Commission (sales)',
-        'Commission (sales)'
     ]
 }
 
