@@ -7,6 +7,7 @@ import withAuthentication from './Session/withAuthentication';
 import '../styles/layout.scss'
 import Select from 'react-select'
 import { CompanyContext } from './Company'
+import { ToastProvider } from 'react-toast-notifications'
 
 class Layout extends Component {
   state = {
@@ -51,9 +52,11 @@ class Layout extends Component {
     return (
       <FirebaseContext.Provider value={this.state.firebase}>
         <CompanyContext.Provider value={{ company, companies, setCompany: this.setCompany }}>
-          <AppWithAuthentication 
-            {...this.props}
-          />
+          <ToastProvider>
+            <AppWithAuthentication 
+              {...this.props}
+            />
+          </ToastProvider>
         </CompanyContext.Provider>
       </FirebaseContext.Provider>
     );
