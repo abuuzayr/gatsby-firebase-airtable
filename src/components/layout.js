@@ -67,7 +67,7 @@ const AppWithAuthentication = withAuthentication(props => {
   const { children, pageContext, location, authUser } = props
   const fullpage = pageContext && pageContext.layout && pageContext.layout === 'fullpage'
   const adminPage = pageContext && pageContext.layout && pageContext.layout === 'admin'
-  const title = Object.keys(ROUTES)[Object.values(ROUTES).indexOf(location.pathname)]
+  const title = Object.keys(ROUTES)[Object.values(ROUTES).indexOf(location.pathname.replace(/\/+$/, ''))]
   return (
     <Fragment>
       {!fullpage && <Navigation />}
