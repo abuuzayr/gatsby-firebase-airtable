@@ -11,7 +11,7 @@ import { FiEyeOff, FiFilter, FiSearch, FiArrowUp, FiArrowDown, FiPlus, FiEdit, F
 import { AiOutlineSortAscending } from 'react-icons/ai'
 import Modal from '../components/Modal'
 import STAGES from '../constants/stages'
-import { datetimeFields } from '../constants/fields'
+import { datetimeFields, currencyFields } from '../constants/fields'
 
 const HomePageBase = (props) => {
   const [stats, setStats] = useState({})
@@ -187,6 +187,9 @@ const HomePageBase = (props) => {
             if (datetimeFields.includes(key)) {
               obj.formatter = ({ value }) => value ? new Date(value).toLocaleString() : ''
             }
+            if (currencyFields.includes(key)) {
+              obj.formatter = ({ value }) => value ? `$${parseFloat(value).toFixed(2)}` : ''
+            }
             return obj
           })
           if (labels.length === 0) {
@@ -353,7 +356,7 @@ const HomePageBase = (props) => {
                       }}
                     />
                     <div style={{ 'margin': '10px 0', 'fontWeight': 700 }} className="is-pulled-right">
-                      <a style={{ 'verticalAlign': 'middle' }}>
+                      <a style={{ 'verticalAlign': 'middle' }} href="#">
                         <Modal 
                           button={
                             <><FiPlus style={{ 'verticalAlign': 'middle' }} /> Add new opportunity</>
