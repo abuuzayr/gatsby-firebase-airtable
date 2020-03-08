@@ -29,15 +29,25 @@ const ProductPageBase = (props) => {
     })
     labels.unshift({
       key: 'index',
-      name: '#',
-      width: 40,
-      frozen: true
+      name: '',
+      width: 30,
+      frozen: true,
+      formatter: ({ value }) => {
+        return <div
+          style={{
+            'textAlign': 'center',
+          }}
+        >
+          {value}
+        </div>
+      }
     })
-    const colorIndex = labels.map(l => l.key).indexOf('Color')
-    labels.splice(colorIndex - 1, 0, {
-      key: 'actions',
-      name: 'Actions',
-      width: 80,
+    const modelIndex = labels.map(l => l.key).indexOf('Model')
+    labels.splice(modelIndex, 0, {
+      key: 'edit',
+      name: '',
+      frozen: true,
+      width: 30,
       formatter: ({ row }) => {
         return <div className="level actions">
           <div className="level-item">
@@ -51,8 +61,26 @@ const ProductPageBase = (props) => {
             >
             </Modal>
           </div>
+        </div>
+      }
+    })
+    labels.push({
+      key: 'delete',
+      name: '',
+      width: 30,
+      formatter: ({ row }) => {
+        return <div className="level actions">
           <div className="level-item">
-            <a href="#"><FiTrash2 /></a>
+            <Modal
+              button={<FiTrash2 />}
+              id={row.id}
+              title={row['Model']}
+              type="Products"
+              user={authUser}
+              mode="Delete"
+              onCloseModal={() => setTrigger(p => !p)}
+            >
+            </Modal>
           </div>
         </div>
       }
@@ -91,7 +119,7 @@ const ProductPageBase = (props) => {
       }
     }
     getProducts()
-  }, [authUser])
+  }, [authUser, trigger])
 
   return (
     <>
