@@ -7,7 +7,7 @@ import {
 } from '../components/Session'
 import { CompanyContext } from '../components/Company'
 import DataGrid from 'react-data-grid'
-import { FiEyeOff, FiFilter, FiSearch, FiArrowUp, FiArrowDown, FiPlus, FiEdit, FiTrash2 } from 'react-icons/fi'
+import { FiEyeOff, FiFilter, FiSearch, FiArrowUp, FiArrowDown, FiPlus, FiEdit, FiTrash2, FiMaximize2 } from 'react-icons/fi'
 import { AiOutlineSortAscending } from 'react-icons/ai'
 import Modal from '../components/Modal'
 import STAGES from '../constants/stages'
@@ -74,10 +74,19 @@ const HomePageBase = (props) => {
         key: 'delete',
         name: '',
         width: 30,
-        formatter: () => {
+        formatter: ({ row }) => {
           return <div className="level actions">
             <div className="level-item">
-              <a href="#"><FiTrash2 /></a>
+              <Modal
+                button={<FiTrash2 />}
+                id={row.id}
+                title={row['Opportunity name']}
+                type="Opportunities"
+                user={authUser}
+                mode="Delete"
+                onCloseModal={() => setTrigger(p => !p)}
+              >
+              </Modal>
             </div>
           </div>
         }
@@ -141,6 +150,20 @@ const HomePageBase = (props) => {
             if (key === 'Opportunity name') {
               obj.frozen = true
               obj.width = 250
+              obj.formatter = (props) => (
+                <div className="level">
+                  <div className="level-left">{props.value}</div>
+                  <div className="level-right">
+                    <Modal
+                      button={<FiMaximize2 className="expand"/>}
+                      id={props.row.id}
+                      type="Opportunities"
+                      mode="View"
+                    >
+                    </Modal>
+                  </div>
+                </div>
+              )
             }
             if (key === 'Stage') {
               obj.formatter = ({ value }) => {
