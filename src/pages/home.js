@@ -20,6 +20,7 @@ const HomePageBase = (props) => {
   const [rows, setRows] = useState([])
   const [initialRows, setInitialRows] = useState([])
   const [dashURL, setDashURL] = useState('')
+  const [trigger, setTrigger] = useState(false)
   const [sort, setSort] = useState({
     column: '',
     direction: ''
@@ -61,6 +62,8 @@ const HomePageBase = (props) => {
                 id={row.id} 
                 type="Opportunities"
                 user={authUser}
+                mode="Edit"
+                onCloseModal={() => setTrigger(p => !p)}
               >
               </Modal>
             </div>
@@ -97,26 +100,6 @@ const HomePageBase = (props) => {
     }
     getStats()
   }, [])
-
-  useEffect(() => {
-    async function getDashURL() {
-      const role = Object.keys(authUser.roles)[0]
-      if (role === ROLES.ADMIN) {
-        setDashURL(process.env.GATSBY_ADMIN_DASH)
-      } else if (company) {
-        try {
-          const result = await fetch(`${process.env.GATSBY_STDLIB_URL}/getUserDash?role=${role}&email=${authUser.email}&company=${company}`)
-          if (result.status === 200) {
-            const body = await result.json()
-            setDashURL(body.url)
-          }
-        } catch (e) {
-          console.error(e)
-        }
-      }
-    }
-    getDashURL()
-  }, [company])
 
   useEffect(() => {
     async function getOpportunities() {
@@ -199,7 +182,7 @@ const HomePageBase = (props) => {
       }
     }
     getOpportunities()
-  }, [company, authUser])
+  }, [company, authUser, trigger])
 
   const sortRows = (initialRows, sortColumn, sortDirection) => rows => {
     const comparer = (a, b) => {
@@ -348,18 +331,15 @@ const HomePageBase = (props) => {
                     />
                     <div style={{ 'margin': '10px 0', 'fontWeight': 700 }} className="is-pulled-right">
                       <a style={{ 'verticalAlign': 'middle' }}>
-                        <Modal button={
-                          <><FiPlus style={{ 'verticalAlign': 'middle' }} /> Add new opportunity</>
-                        }>
-                          <div>I am a modal</div>
-                          <form>
-                            <input />
-                            <button>tab navigation</button>
-                            <button>stays</button>
-                            <button>inside</button>
-                            <button>the modal</button>
-                          </form>
-                        </Modal>
+                        <Modal 
+                          button={
+                            <><FiPlus style={{ 'verticalAlign': 'middle' }} /> Add new opportunity</>
+                          }
+                          type="Opportunities"
+                          user={authUser}
+                          mode="New"
+                          onCloseModal={() => setTrigger(p => !p)}
+                        ></Modal>
                       </a>
                     </div>
                   </> :
