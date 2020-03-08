@@ -7,6 +7,7 @@ import {
 import DataGrid from 'react-data-grid';
 import { FiPlus, FiEdit, FiTrash2 } from 'react-icons/fi';
 import Modal from '../components/Modal';
+import { currencyFields } from '../constants/fields'
 
 const hiddenFields = ['Opportunities']
 
@@ -24,6 +25,9 @@ const ProductPageBase = (props) => {
       if (label.key === 'Model') {
         label.frozen = true
         label.width = 250
+      }
+      if (currencyFields.includes(label.key)) {
+        label.formatter = ({ value }) => value ? `$${parseFloat(value).toFixed(2)}` : ''
       }
       return label
     })
