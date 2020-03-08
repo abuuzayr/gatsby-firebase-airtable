@@ -86,7 +86,7 @@ const AppWithAuthentication = withAuthentication(props => {
                   {
                     title !== 'HOME' &&
                     <li className="is-active">
-                      <span>{`${title.slice(0,1)}${title.slice(1).toLowerCase()}`}</span>
+                      <span>{`${title&&title.slice(0,1)}${title&&title.slice(1).toLowerCase()}`}</span>
                     </li>
                   }
                 </ul>
