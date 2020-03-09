@@ -18,6 +18,17 @@ export const fields = {
         'Price',
         'Commission (sales)',
         'Commission (install)'
+    ],
+    'Contacts': [
+        'Name',
+        'Company',
+        'Phone',
+        'Email',
+        'DOB',
+        'Address',
+        'Unit',
+        'Postal Code',
+        'Zone'
     ]
 }
 
@@ -28,6 +39,10 @@ export const readOnlyFields = [
 
 export const datetimeFields = [
     'Agreement date & time',
+]
+
+export const dateFields = [
+    'DOB',
 ]
 
 export const numberFields = [
@@ -75,8 +90,6 @@ export const computedFields = {
         'Contact details',
         'Product'
     ],
-    'Products': [
-    ]
 }
 
 export const selectFields = [
