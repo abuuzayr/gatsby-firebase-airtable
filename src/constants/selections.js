@@ -17,6 +17,22 @@ export const STATUS = {
     "Call": "#f82b60",
 }
 
+export const PAYMENT_STATUS = {
+    "Fully paid": "#20c933",
+    "Partially paid": "#fcb400",
+    "Instalment": "#2d7ff9",
+}
+
+export const PAYMENT_MODE = {
+    "Cash": "#20c933",
+    "Cheque": "#338a17",
+    "Credit Card": "#b87503",
+    "Instalment - 3 Months": "#ffdaf6",
+    "Instalment - 6 Months": "#f99de2",
+    "Instalment - 9 Months": "#ff08c2",
+    "Instalment - 12 Months": "#ba1e45",
+}
+
 export const JOB = {
     "Site Survey": "#ffffff",
     "Installation": "#ffffff",
@@ -31,7 +47,9 @@ export const JOB = {
 const SELECTIONS = {
     STAGES,
     STATUS,
-    JOB
+    JOB,
+    PAYMENT_STATUS,
+    PAYMENT_MODE
 }
 
 export default SELECTIONS

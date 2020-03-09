@@ -106,6 +106,8 @@ const Modal = (props) => {
                     Stage: selections['STAGES'],
                     Status: selections['STATUS'],
                     Job: selections['JOB'],
+                    'Payment Mode': selections['PAYMENT_MODE'],
+                    'Payment Status': selections['PAYMENT_STATUS'],
                 })
             }
         } catch (e) {
