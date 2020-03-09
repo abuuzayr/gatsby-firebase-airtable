@@ -9,7 +9,7 @@ const ROUTES = {
     ADMIN_DETAILS: '/admin/:id',
     OPPORTUNITIES: '/opportunities',
     CONTACTS: '/contacts',
-    MAINTAINENCE: '/maintainence',
+    MAINTAINENCE: '/maintenance',
     PAYMENTS: '/payments',
     PRODUCTS: '/products',
 }

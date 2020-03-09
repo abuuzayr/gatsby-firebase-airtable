@@ -29,6 +29,16 @@ export const fields = {
         'Unit',
         'Postal Code',
         'Zone'
+    ],
+    'Maintenance': [
+        'Name',
+        'Job',
+        'Unit',
+        'Date & Time',
+        'Amount',
+        'Mode',
+        'Remarks',
+        'Status'
     ]
 }
 
@@ -39,6 +49,7 @@ export const readOnlyFields = [
 
 export const datetimeFields = [
     'Agreement date & time',
+    'Date & Time',
 ]
 
 export const dateFields = [
@@ -58,7 +69,8 @@ export const currencyFields = [
     'Total paid',
     'Price',
     'Commission (sales)',
-    'Commission (install)'
+    'Commission (install)',
+    'Amount',
 ]
 
 export const options = {
@@ -66,7 +78,7 @@ export const options = {
     'CTX': 'Contacts',
     'PX': 'Products',
     'Payments': 'Payments',
-    'Install / Maintenance': 'Installation / Maintenance',
+    'Install / Maintenance': 'Maintenance',
     'SX': 'Salespeople',
 }
 
@@ -93,5 +105,7 @@ export const computedFields = {
 }
 
 export const selectFields = [
-    'Stage'
+    'Stage',
+    'Status',
+    'Job'
 ]
