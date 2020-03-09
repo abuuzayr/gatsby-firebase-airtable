@@ -6,6 +6,7 @@ import {
     fields,
     readOnlyFields,
     datetimeFields,
+    dateFields,
     currencyFields,
     numberFields,
     options as optionsObj,
@@ -149,6 +150,7 @@ const Modal = (props) => {
             type: 'text'
         }
         if (datetimeFields.includes(field)) obj.type = 'datetime-local'
+        if (dateFields.includes(field)) obj.type = 'date'
         if (numberFields.includes(field) || currencyFields.includes(field)) obj.type = 'number'
         if (currencyFields.includes(field)) {
             obj.min = "0.01"
@@ -161,7 +163,7 @@ const Modal = (props) => {
         const savingToast = addToast('Saving...', { appearance: 'info' })
         const cleanData = { ...data.fields }
         // Remove computed fields
-        computedFields[props.type].forEach(field => {
+        computedFields[props.type] && computedFields[props.type].forEach(field => {
             delete cleanData[field]
         })
         // Transform react-select fields
