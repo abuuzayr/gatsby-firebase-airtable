@@ -39,6 +39,19 @@ export const fields = {
         'Mode',
         'Remarks',
         'Status'
+    ],
+    'Payments': [
+        'ID',
+        'Payment Mode',
+        'Amount',
+        'Date',
+        'Bank',
+        'Detail',
+        'Total',
+        'Total paid',
+        'Outstanding',
+        'Remarks',
+        'Payment Status'
     ]
 }
 
@@ -102,10 +115,17 @@ export const computedFields = {
         'Contact details',
         'Product'
     ],
+    'Payments': [
+        'Total',
+        'Total paid',
+        'Outstanding'
+    ]
 }
 
 export const selectFields = [
     'Stage',
     'Status',
-    'Job'
+    'Job',
+    'Payment Mode',
+    'Payment Status'
 ]
