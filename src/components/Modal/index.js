@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import ReactModal from 'react-modal';
 import Select from 'react-select'
-import STAGES from '../../constants/stages'
+import SELECTIONS from '../../constants/selections'
 import { 
     fields,
     readOnlyFields,
@@ -36,10 +36,14 @@ const customStyles = {
     }
 };
 
-const stages = Object.keys(STAGES).filter(s => s !== 'default').map(stage => ({
-    value: stage,
-    label: stage
-}))
+// Declare selections from constants
+const selections = {}
+Object.keys(SELECTIONS).forEach(s => {
+    selections[s] = Object.keys(SELECTIONS[s]).map(select => ({
+        value: select,
+        label: select
+    }))
+})
 
 // Make sure to bind modal to your appElement (http://reactcommunity.org/react-modal/accessibility/)
 ReactModal.setAppElement('#___gatsby')
@@ -97,7 +101,12 @@ const Modal = (props) => {
                 Object.keys(optionsObj).map(option => {
                     obj[option] = buildOptions(body.rows[optionsObj[option]], option)
                 })
-                setOptions({ ...obj, Stage: stages })
+                setOptions({ 
+                    ...obj, 
+                    Stage: selections['STAGES'],
+                    Status: selections['STATUS'],
+                    Job: selections['JOB'],
+                })
             }
         } catch (e) {
             console.error(e)
@@ -109,6 +118,7 @@ const Modal = (props) => {
             await getData(props.type, props.id)
             await getOptions()
         }
+        console.log(options)
     }
 
     const closeModal = () => {
@@ -275,7 +285,7 @@ const Modal = (props) => {
                                         </div>
                                         {
                                             ['Edit', 'View', 'New'].includes(props.mode) &&
-                                            ((Object.keys(optionsObj).includes(f) || f === 'Stage') ?
+                                            ((Object.keys(optionsObj).includes(f) || selectFields.includes(f)) ?
                                                 <Select
                                                     options={options[f]}
                                                     isLoading={!Object.keys(options).length}

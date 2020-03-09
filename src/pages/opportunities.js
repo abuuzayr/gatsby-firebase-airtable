@@ -9,7 +9,7 @@ import DataGrid from 'react-data-grid'
 import { FiEyeOff, FiFilter, FiSearch, FiArrowUp, FiArrowDown, FiPlus, FiEdit, FiTrash2, FiMaximize2 } from 'react-icons/fi'
 import { AiOutlineSortAscending } from 'react-icons/ai'
 import Modal from '../components/Modal'
-import STAGES from '../constants/stages'
+import { STAGES } from '../constants/selections'
 import { datetimeFields, currencyFields } from '../constants/fields'
 
 const OpportunitiesPageBase = (props) => {
