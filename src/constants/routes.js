@@ -8,6 +8,7 @@ const ROUTES = {
     ADMIN: '/admin',
     ADMIN_DETAILS: '/admin/:id',
     OPPORTUNITIES: '/opportunities',
+    CONTACTS: '/contacts',
     MAINTAINENCE: '/maintainence',
     PAYMENTS: '/payments',
     PRODUCTS: '/products',

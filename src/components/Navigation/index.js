@@ -36,6 +36,9 @@ const NavigationAuth = ({ authUser }) => (
       <div id="topNav" className="navbar-menu">
         <div className="navbar-start">
           {
+            <Link className="navbar-item" to={ROUTES.CONTACTS}>Contacts</Link>
+          }
+          {
             (authUser.roles[ROLES.SALES] || authUser.roles[ROLES.ADMIN]) &&
             <Link className="navbar-item" to={ROUTES.OPPORTUNITIES}>Opportunities</Link>
           }
