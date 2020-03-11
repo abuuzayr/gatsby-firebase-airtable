@@ -6,3 +6,7 @@
 html {
     background: #ECF0F3;
 }
+
+#gatsby-focus-wrapper > .container {
+    max-width: calc(100% - 20px);
+}

@@ -74,57 +74,59 @@ const AppWithAuthentication = withAuthentication(props => {
       {
         !fullpage &&
         <div className="container">
-          <div className="columns" style={{ "margin": "0 0 0.75rem 0" }}>
-            <div className="column">
-              <nav className="breadcrumb" aria-label="breadcrumbs">
-                <ul>
-                  <li>
-                    <Link to={ROUTES.HOME}>
-                      Home
-                    </Link>
-                  </li>
-                  {
-                    title !== 'HOME' &&
-                    <li className="is-active">
-                      <span>{`${title&&title.slice(0,1)}${title&&title.slice(1).toLowerCase()}`}</span>
-                    </li>
-                  }
-                </ul>
-              </nav>
-            </div>
-            {
-              !adminPage &&
+          <div className="container">
+            <div className="columns" style={{ "margin": "0 0 0.75rem 0" }}>
               <div className="column">
-                <div className="is-pulled-right">
-                  <small>Company: </small>
-                  <div className="is-inline-block" style={{ 'minWidth': 200 }}>
-                    <CompanyContext.Consumer>
-                      {
-                        ({ company, companies, setCompany }) => {
-                          if (authUser && Object.keys(authUser.roles).includes('ADMIN')) {
-                            if (!companies.includes('All')) companies.unshift('All')
-                          } else if (companies.includes('All')) {
-                            companies.splice(companies.indexOf('All'), 1)
-                          }
-                          companies = companies.map(c => {
-                            return {
-                              value: c,
-                              label: c
+                <nav className="breadcrumb" aria-label="breadcrumbs">
+                  <ul>
+                    <li>
+                      <Link to={ROUTES.HOME}>
+                        Home
+                      </Link>
+                    </li>
+                    {
+                      title !== 'HOME' &&
+                      <li className="is-active">
+                        <span>{`${title&&title.slice(0,1)}${title&&title.slice(1).toLowerCase()}`}</span>
+                      </li>
+                    }
+                  </ul>
+                </nav>
+              </div>
+              {
+                !adminPage &&
+                <div className="column">
+                  <div className="is-pulled-right">
+                    <small>Company: </small>
+                    <div className="is-inline-block" style={{ 'minWidth': 200 }}>
+                      <CompanyContext.Consumer>
+                        {
+                          ({ company, companies, setCompany }) => {
+                            if (authUser && Object.keys(authUser.roles).includes('ADMIN')) {
+                              if (!companies.includes('All')) companies.unshift('All')
+                            } else if (companies.includes('All')) {
+                              companies.splice(companies.indexOf('All'), 1)
                             }
-                          })
-                          return <Select 
-                            options={companies} 
-                            width='200px' 
-                            onChange={setCompany}
-                            value={(!company || !company.value) ? companies[0] : company}>
-                          </Select>
+                            companies = companies.map(c => {
+                              return {
+                                value: c,
+                                label: c
+                              }
+                            })
+                            return <Select 
+                              options={companies} 
+                              width='200px' 
+                              onChange={setCompany}
+                              value={(!company || !company.value) ? companies[0] : company}>
+                            </Select>
+                          }
                         }
-                      }
-                    </CompanyContext.Consumer>
+                      </CompanyContext.Consumer>
+                    </div>
                   </div>
                 </div>
-              </div>
-            }
+              }
+            </div>
           </div>
           {children}
         </div>
