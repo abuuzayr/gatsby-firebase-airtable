@@ -193,15 +193,19 @@ const HomePageBase = (props) => {
               obj.formatter = ({ value, row }) => {
                 const values = body.rows.filter(r => r.id === row.id)[0]['fields']
                 if (!values['CTX'] || values['CTX'].length === 0) return value
-                return values['CTX'].map(contact => {
-                  return <Modal
-                    button={<button class="button is-light">{value}</button>}
-                    id={contact}
-                    type="Contacts"
-                    mode="View"
-                  >
-                  </Modal>
-                })
+                return <div className="level">
+                {
+                  values['CTX'].map((contact, i) => {
+                    return <Modal
+                      button={<button className="button is-light level-item" key={contact}>{value[i]}</button>}
+                      id={contact}
+                      type="Contacts"
+                      mode="View"
+                    >
+                    </Modal>
+                  })
+                }
+                </div>
               }
             }
             return obj
