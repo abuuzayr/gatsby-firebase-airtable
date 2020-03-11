@@ -22,7 +22,7 @@ const ContactPageBase = (props) => {
   const transformLabels = labels => {
     labels = labels.filter(label => !hiddenFields.includes(label.key))
     labels = labels.map(label => {
-      if (label.key === 'Model') {
+      if (label.key === 'Name') {
         label.frozen = true
         label.width = 250
       }
