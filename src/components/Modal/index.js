@@ -329,22 +329,25 @@ const Modal = (props) => {
                                 </div>
                             }
                             <div className="level">
-                                <div className="level-left">
+                                <div className={props.mode !== 'View' ? 'level-left' : 'level-item'}>
                                     <button
-                                        className="button is-danger"
+                                        className={`button is-danger ${props.mode === 'View' && 'is-fullwidth'}`}
                                         disabled={data ? '' : 'disabled'}
                                         onClick={closeModal}>
                                         Close
-                            </button>
+                                    </button>
                                 </div>
-                                <div className="level-right">
-                                    <button
-                                        className="button is-warning"
-                                        disabled={data ? '' : 'disabled'}
-                                        onClick={handleSave}>
-                                        Save &amp; close
-                            </button>
-                                </div>
+                                {
+                                    props.mode !== 'View' &&
+                                    <div className="level-right">
+                                        <button
+                                            className="button is-warning"
+                                            disabled={data ? '' : 'disabled'}
+                                            onClick={handleSave}>
+                                            Save &amp; close
+                                        </button>
+                                    </div>
+                                }
                             </div>
                         </>
                     }
