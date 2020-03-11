@@ -6,6 +6,9 @@
             color: #fff;
             border-color: #fff;
             font-size: 11px;
+            &.is-light {
+                color: #363636;
+            }
         }
         .actions svg {
             color: #3273dc;
