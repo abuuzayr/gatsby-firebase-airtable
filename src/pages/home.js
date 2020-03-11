@@ -19,7 +19,6 @@ const HomePageBase = (props) => {
   const [labels, setLabels] = useState([])
   const [rows, setRows] = useState([])
   const [initialRows, setInitialRows] = useState([])
-  const [dashURL, setDashURL] = useState('')
   const [trigger, setTrigger] = useState(false)
   const [sort, setSort] = useState({
     column: '',
@@ -189,6 +188,21 @@ const HomePageBase = (props) => {
             }
             if (currencyFields.includes(key)) {
               obj.formatter = ({ value }) => value ? `$${parseFloat(value).toFixed(2)}` : ''
+            }
+            if (key === 'Contact details') {
+              obj.formatter = ({ value, row }) => {
+                const values = body.rows.filter(r => r.id === row.id)[0]['fields']
+                if (!values['CTX'] || values['CTX'].length === 0) return value
+                return values['CTX'].map(contact => {
+                  return <Modal
+                    button={<button class="button is-light">{value}</button>}
+                    id={contact}
+                    type="Contacts"
+                    mode="View"
+                  >
+                  </Modal>
+                })
+              }
             }
             return obj
           })
