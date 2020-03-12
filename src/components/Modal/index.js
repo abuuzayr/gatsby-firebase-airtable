@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactModal from 'react-modal';
 import Select from 'react-select'
 import SELECTIONS from '../../constants/selections'
@@ -67,13 +67,44 @@ const toDatetimeLocal = (str) => {
 
 const Modal = (props) => {
     const [modalIsOpen, setIsOpen] = useState(false)
-    const [data, setData] = useState(false)
+    const [data, setData] = useState({
+        fields: {
+            'PX': [],
+            'Unit': 1,
+            'Discount': 0,
+        }
+    })
     const [options, setOptions] = useState({})
     const { addToast, removeToast } = useToasts()
 
     const openModal = () => {
         setIsOpen(true);
     }
+
+    useEffect(() => {
+        if (!options || !Object.keys(options).length) return
+        const unit = data.fields['Unit'] || 1
+        const discount = data.fields['Discount'] || 0
+        let price = 0
+        if (Array.isArray(data.fields['PX'])) {
+            const product = options['PX'].filter(p => p.value === data.fields['PX'][0])[0]
+            price = product ? product.fields['Price'] : 0
+        } else {
+            price = data.fields['PX']['fields']['Price'] || 0
+        }
+        console.log(price)
+        const subTotal = unit * price - discount
+        const GST = 0.07 * subTotal
+        updateData('Price', price)
+        updateData('GST', GST)
+        updateData('Grand Total', subTotal + GST)
+    }, [
+        options,
+        data.fields['PX'],
+        data.fields['Unit'],
+        data.fields['Discount']
+    ])
+
 
     const getData = async (type, id) => {
         if (props.mode === 'Edit' || props.mode === 'View') {
@@ -120,7 +151,6 @@ const Modal = (props) => {
             await getData(props.type, props.id)
             await getOptions()
         }
-        console.log(options)
     }
 
     const closeModal = () => {
@@ -153,7 +183,8 @@ const Modal = (props) => {
         if (!Object.keys(identifiers).includes(field)) return rows
         return rows.map(row => ({
             value: row.id,
-            label: row.fields[identifiers[field][1]]
+            label: row.fields[identifiers[field][1]],
+            fields: row.fields
         }))
     }
 
@@ -164,9 +195,13 @@ const Modal = (props) => {
         if (datetimeFields.includes(field)) obj.type = 'datetime-local'
         if (dateFields.includes(field)) obj.type = 'date'
         if (numberFields.includes(field) || currencyFields.includes(field)) obj.type = 'number'
+        if (numberFields.includes(field)) {
+            obj.min = "1"
+            obj.step = "1"
+        }
         if (currencyFields.includes(field)) {
             obj.min = "0.01"
-            obj.step = "0.01"
+            obj.step = "1.00"
         }
         return obj
     }
@@ -252,6 +287,7 @@ const Modal = (props) => {
         })
     }
 
+    if (Object.keys(options).length) console.log("options: ", options)
     return (
         <div>
             {
@@ -312,15 +348,26 @@ const Modal = (props) => {
                                                     readOnly={readOnlyFields.includes(f) || props.mode === 'View'}
                                                 >
                                                 </Select> :
-                                                <input
-                                                    className={`input ${!data.fields[f] ? 'is-warning' : ''} ${props.mode === 'View' ? 'is-disabled' : ''}`}
-                                                    value={datetimeFields.includes(f) && data.fields[f] ? toDatetimeLocal(data.fields[f]) : data.fields[f] || ''}
-                                                    onChange={e => {
-                                                        updateData(f, e.currentTarget.value)
-                                                    }}
-                                                    readOnly={readOnlyFields.includes(f) || props.mode === 'View'}
-                                                    {...getInputType(f)}
-                                                />)
+                                                <>
+                                                    {
+                                                        currencyFields.includes(f) && <label style={{ 'marginRight': 10 }}>$</label>
+                                                    }
+                                                    <input
+                                                        className={`input ${!data.fields[f] ? 'is-warning' : ''} ${props.mode === 'View' ? 'is-disabled' : ''}`}
+                                                        value={
+                                                            data.fields[f] ? 
+                                                                (datetimeFields.includes(f) && toDatetimeLocal(data.fields[f])) ||
+                                                                (currencyFields.includes(f) && parseFloat(data.fields[f]).toFixed(2)) ||
+                                                                data.fields[f] :
+                                                                    data.fields[f] || ''
+                                                        }
+                                                        onChange={e => {
+                                                            updateData(f, e.currentTarget.value)
+                                                        }}
+                                                        readOnly={readOnlyFields.includes(f) || props.mode === 'View'}
+                                                        {...getInputType(f)}
+                                                    />
+                                                </>)
                                         }
                                     </div>
                                 )) :
