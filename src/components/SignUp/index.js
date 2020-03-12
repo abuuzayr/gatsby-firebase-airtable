@@ -147,7 +147,7 @@ class SignUpFormBase extends Component {
 }
 
 const SignUpLink = () => (
-  <p style={{ 'margin': '10px 0' }} className="is-pulled-right">
+  <p style={{ 'margin': '10px 0' }}>
     <Link to={ROUTES.SIGN_UP} style={{ 'verticalAlign': 'middle' }}>
       <FiPlus style={{ 'verticalAlign': 'middle' }}/> Add new user
     </Link>

@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import { FiEyeOff, FiFilter, FiSearch } from 'react-icons/fi';
+import { AiOutlineSortAscending } from 'react-icons/ai';
 
 import { SignUpLink } from '../SignUp'
 
@@ -88,6 +90,30 @@ class UserList extends Component {
           loading ?
             <div>Loading ...</div> :
             <>
+              <div className="rdg-head">
+                <div className="level">
+                  <div className="level-left">
+                    <div className="level-item">
+                      <FiEyeOff />
+                      <span>Hide fields</span>
+                    </div>
+                    <div className="level-item">
+                      <FiFilter />
+                      <span>Filter</span>
+                    </div>
+                    <div className="level-item">
+                      <AiOutlineSortAscending />
+                      <span>Sort</span>
+                    </div>
+                    <SignUpLink />
+                  </div>
+                  <div className="level-right">
+                    <div className="level-item">
+                      <FiSearch />
+                    </div>
+                  </div>
+                </div>
+              </div>
               <DataGrid
                 columns={columns}
                 rowGetter={i => users[i]}
@@ -96,7 +122,6 @@ class UserList extends Component {
                 minColumnWidth={10}
                 enableCellAutoFocus={false}
               />
-              <SignUpLink />
             </>
         }
       </div>
