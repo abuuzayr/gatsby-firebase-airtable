@@ -19,6 +19,7 @@ export const fields = {
         'Agreement date & time',
         'PX',
         'Unit',
+        'Price',
         'Discount',
         'GST',
         'Grand Total',
@@ -59,6 +60,7 @@ export const fields = {
 export const readOnlyFields = [
     'GST',
     'Grand Total',
+    'Price',
 ]
 
 export const datetimeFields = [
