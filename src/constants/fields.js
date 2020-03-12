@@ -1,8 +1,20 @@
 export const fields = {
-    'Opportunities': [
-        'Opportunity name',
+    'Appointments': [
+        'Appointment name',
         'Stage',
-        'CTX',
+        'Appointment date & time',
+        'Name',
+        'Contact',
+        'Customer company',
+        'Email',
+        'DOB',
+        'Address',
+        'House Unit',
+        'Postal Code',
+        'Zone',
+        'Name 2',
+        'Contact 2',
+        'Relationship',
         'AG no.',
         'Agreement date & time',
         'PX',
@@ -18,17 +30,6 @@ export const fields = {
         'Price',
         'Commission (sales)',
         'Commission (install)'
-    ],
-    'Contacts': [
-        'Name',
-        'Company',
-        'Phone',
-        'Email',
-        'DOB',
-        'Address',
-        'Unit',
-        'Postal Code',
-        'Zone'
     ],
     'Maintenance': [
         'Name',
@@ -61,6 +62,7 @@ export const readOnlyFields = [
 ]
 
 export const datetimeFields = [
+    'Appointment date & time',
     'Agreement date & time',
     'Date & Time',
 ]
@@ -88,7 +90,6 @@ export const currencyFields = [
 
 export const options = {
     'CX': 'Companies',
-    'CTX': 'Contacts',
     'PX': 'Products',
     'Payments': 'Payments',
     'Install / Maintenance': 'Maintenance',
@@ -96,12 +97,11 @@ export const options = {
 }
 
 export const identifiers = {
-    'CTX': ['Contact details', 'Name'],
     'PX': ['Product', 'Model'],
 }
 
 export const computedFields = {
-    'Opportunities': [
+    'Appointments': [
         'Price',
         'Subtotal',
         'GST',
@@ -112,7 +112,6 @@ export const computedFields = {
         'Product link',
         'Fresh',
         'Company',
-        'Contact details',
         'Product'
     ],
     'Payments': [
