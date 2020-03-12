@@ -10,7 +10,7 @@ import Modal from '../components/Modal';
 import { currencyFields } from '../constants/fields'
 import { PAYMENT_MODE, PAYMENT_STATUS } from '../constants/selections'
 
-const hiddenFields = ['Opportunities']
+const hiddenFields = ['Appointments']
 
 const PaymentsPageBase = (props) => {
   const [trigger, setTrigger] = useState(false)

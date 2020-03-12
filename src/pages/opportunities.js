@@ -12,7 +12,7 @@ import Modal from '../components/Modal'
 import { STAGES } from '../constants/selections'
 import { datetimeFields, currencyFields } from '../constants/fields'
 
-const OpportunitiesPageBase = (props) => {
+const AppointmentsPageBase = (props) => {
   const [company, setCompany] = useState(false)
   const [labels, setLabels] = useState([])
   const [rows, setRows] = useState([])
@@ -45,7 +45,7 @@ const OpportunitiesPageBase = (props) => {
           </div>
         }
       })
-      const oppIndex = labels.map(l => l.key).indexOf('Opportunity name')
+      const oppIndex = labels.map(l => l.key).indexOf('Appointment name')
       labels.splice(oppIndex, 0, {
         key: 'edit',
         name: '',
@@ -57,7 +57,7 @@ const OpportunitiesPageBase = (props) => {
               <Modal 
                 button={<FiEdit />} 
                 id={row.id} 
-                type="Opportunities"
+                type="Appointments"
                 user={authUser}
                 mode="Edit"
                 onCloseModal={() => setTrigger(p => !p)}
@@ -77,8 +77,8 @@ const OpportunitiesPageBase = (props) => {
               <Modal
                 button={<FiTrash2 />}
                 id={row.id}
-                title={row['Opportunity name']}
-                type="Opportunities"
+                title={row['Appointment name']}
+                type="Appointments"
                 user={authUser}
                 mode="Delete"
                 onCloseModal={() => setTrigger(p => !p)}
@@ -93,12 +93,12 @@ const OpportunitiesPageBase = (props) => {
   }
 
   useEffect(() => {
-    async function getOpportunities() {
+    async function getAppointments() {
       if (!(company && company.companies && authUser)) return 
       // const role = Object.keys(authUser.roles)[0]
       // const cpy = company.company.value
       const fields = [
-        'Opportunity name',
+        'Appointment name',
         'Company',
         'Salesperson',
         'Stage',
@@ -119,7 +119,7 @@ const OpportunitiesPageBase = (props) => {
         'Install / Maintenance',
       ]
       try {
-        const result = await fetch(`${process.env.GATSBY_STDLIB_URL}/getRawTableData?name=Opportunities`)
+        const result = await fetch(`${process.env.GATSBY_STDLIB_URL}/getRawTableData?name=Appointments`)
         if (result.status === 200) {
           const body = await result.json()
           const labelFields = fields.map(key => {
@@ -129,7 +129,7 @@ const OpportunitiesPageBase = (props) => {
               sortable: true,
               width: 180,
             }
-            if (key === 'Opportunity name') {
+            if (key === 'Appointment name') {
               obj.frozen = true
               obj.width = 250
               obj.formatter = (props) => (
@@ -139,7 +139,7 @@ const OpportunitiesPageBase = (props) => {
                     <Modal
                       button={<FiMaximize2 className="expand"/>}
                       id={props.row.id}
-                      type="Opportunities"
+                      type="Appointments"
                       mode="View"
                     >
                     </Modal>
@@ -172,25 +172,6 @@ const OpportunitiesPageBase = (props) => {
             if (currencyFields.includes(key)) {
               obj.formatter = ({ value }) => value ? `$${parseFloat(value).toFixed(2)}` : ''
             }
-            if (key === 'Contact details') {
-              obj.formatter = ({ value, row }) => {
-                const values = body.rows.filter(r => r.id === row.id)[0]['fields']
-                if (!values['CTX'] || values['CTX'].length === 0) return value
-                return <div className="level">
-                  {
-                    values['CTX'].map((contact, i) => {
-                      return <Modal
-                        button={<button className="button is-light level-item" key={contact}>{value[i]}</button>}
-                        id={contact}
-                        type="Contacts"
-                        mode="View"
-                      >
-                      </Modal>
-                    })
-                  }
-                </div>
-              }
-            }
             return obj
           })
           if (labels.length === 0) {
@@ -208,7 +189,7 @@ const OpportunitiesPageBase = (props) => {
         console.error(e)
       }
     }
-    getOpportunities()
+    getAppointments()
   }, [company, authUser, trigger])
 
   const sortRows = (initialRows, sortColumn, sortDirection) => rows => {
@@ -320,9 +301,9 @@ const OpportunitiesPageBase = (props) => {
                       <a style={{ 'verticalAlign': 'middle' }}>
                         <Modal 
                           button={
-                            <><FiPlus style={{ 'verticalAlign': 'middle' }} /> Add new opportunity</>
+                            <><FiPlus style={{ 'verticalAlign': 'middle' }} /> Add new appointment</>
                           }
-                          type="Opportunities"
+                          type="Appointments"
                           user={authUser}
                           mode="New"
                           onCloseModal={() => setTrigger(p => !p)}
@@ -342,11 +323,11 @@ const OpportunitiesPageBase = (props) => {
 
 const condition = authUser => !!authUser;
 
-const OpportunitiesPage = compose(
+const AppointmentsPage = compose(
   withEmailVerification,
   withAuthorization(condition),
-)(OpportunitiesPageBase);
+)(AppointmentsPageBase);
 
 export default (props) => (
-  <OpportunitiesPage {...props} />
+  <AppointmentsPage {...props} />
 );

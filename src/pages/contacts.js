@@ -9,7 +9,7 @@ import { FiPlus, FiEdit, FiTrash2 } from 'react-icons/fi';
 import Modal from '../components/Modal';
 import { currencyFields } from '../constants/fields'
 
-const hiddenFields = ['Opportunities']
+const hiddenFields = ['Appointments']
 
 const ContactPageBase = (props) => {
   const [trigger, setTrigger] = useState(false)

@@ -10,7 +10,7 @@ import Modal from '../components/Modal';
 import { currencyFields } from '../constants/fields'
 import { STATUS } from '../constants/selections'
 
-const hiddenFields = ['Opportunities']
+const hiddenFields = ['Appointments']
 
 const MaintenancePageBase = (props) => {
   const [trigger, setTrigger] = useState(false)
