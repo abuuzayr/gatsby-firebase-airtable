@@ -335,6 +335,19 @@ const HomePageBase = (props) => {
                             <AiOutlineSortAscending />
                             <span>Sort</span>
                           </div>
+                          <div style={{ 'margin': '10px 0', 'fontWeight': 700 }}>
+                            <a style={{ 'verticalAlign': 'middle' }} href="#">
+                              <Modal
+                                button={
+                                  <><FiPlus style={{ 'verticalAlign': 'middle' }} /> Add new appointment</>
+                                }
+                                type="Appointments"
+                                user={authUser}
+                                mode="New"
+                                onCloseModal={() => setTrigger(p => !p)}
+                              ></Modal>
+                            </a>
+                          </div>
                         </div>
                         <div className="level-right">
                           <div className="level-item">
@@ -373,19 +386,6 @@ const HomePageBase = (props) => {
                         })
                       }}
                     />
-                    <div style={{ 'margin': '10px 0', 'fontWeight': 700 }} className="is-pulled-right">
-                      <a style={{ 'verticalAlign': 'middle' }} href="#">
-                        <Modal 
-                          button={
-                            <><FiPlus style={{ 'verticalAlign': 'middle' }} /> Add new appointment</>
-                          }
-                          type="Appointments"
-                          user={authUser}
-                          mode="New"
-                          onCloseModal={() => setTrigger(p => !p)}
-                        ></Modal>
-                      </a>
-                    </div>
                   </> :
                   <div>Loading...</div>
               }
