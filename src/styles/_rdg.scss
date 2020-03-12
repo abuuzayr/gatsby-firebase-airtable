@@ -1,6 +1,7 @@
 .rdg-cell {
     font-size: 13px;
     .rdg-cell-value {
+        overflow-y: scroll;
         button {
             vertical-align: middle;
             color: #fff;
