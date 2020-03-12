@@ -5,7 +5,8 @@ import {
   withEmailVerification,
 } from '../components/Session';
 import DataGrid from 'react-data-grid';
-import { FiPlus, FiEdit, FiTrash2 } from 'react-icons/fi';
+import { FiPlus, FiEdit, FiTrash2, FiEyeOff, FiFilter, FiSearch } from 'react-icons/fi';
+import { AiOutlineSortAscending } from 'react-icons/ai';
 import Modal from '../components/Modal';
 import { currencyFields } from '../constants/fields'
 import { STATUS } from '../constants/selections'
@@ -151,6 +152,42 @@ const MaintenancePageBase = (props) => {
         data.rows.length &&
         data.labels.length ?
           <>
+            <div className="rdg-head">
+              <div className="level">
+                <div className="level-left">
+                  <div className="level-item">
+                    <FiEyeOff />
+                    <span>Hide fields</span>
+                  </div>
+                  <div className="level-item">
+                    <FiFilter />
+                    <span>Filter</span>
+                  </div>
+                  <div className="level-item">
+                    <AiOutlineSortAscending />
+                    <span>Sort</span>
+                  </div>
+                  <div style={{ 'margin': '10px 0', 'fontWeight': 700 }}>
+                    <a style={{ 'verticalAlign': 'middle' }} href="#">
+                      <Modal
+                        button={
+                          <><FiPlus style={{ 'verticalAlign': 'middle' }} /> Add new install / maintenance</>
+                        }
+                        type="Maintenance"
+                        user={authUser}
+                        mode="New"
+                        onCloseModal={() => setTrigger(p => !p)}
+                      ></Modal>
+                    </a>
+                  </div>
+                </div>
+                <div className="level-right">
+                  <div className="level-item">
+                    <FiSearch />
+                  </div>
+                </div>
+              </div>
+            </div>
             <DataGrid
               columns={data.labels}
               rowGetter={i => data.rows[i]}
@@ -158,19 +195,6 @@ const MaintenancePageBase = (props) => {
               minHeight={500}
               minColumnWidth={35}
             />
-            <div style={{ 'margin': '10px 0', 'fontWeight': 700 }} className="is-pulled-right">
-              <a style={{ 'verticalAlign': 'middle' }} href="#">
-                <Modal
-                  button={
-                    <><FiPlus style={{ 'verticalAlign': 'middle' }} /> Add new install / maintenance</>
-                  }
-                  type="Maintenance"
-                  user={authUser}
-                  mode="New"
-                  onCloseModal={() => setTrigger(p => !p)}
-                ></Modal>
-              </a>
-            </div>
           </> :
           <div>Loading...</div>
       }
