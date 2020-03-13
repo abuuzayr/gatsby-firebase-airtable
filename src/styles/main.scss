@@ -10,3 +10,11 @@ html {
 #gatsby-focus-wrapper > .container {
     max-width: calc(100% - 20px);
 }
+
+@font-face {
+  font-family: 'rsuite-icon-font';
+  src: url('../../node_modules/rsuite/dist/styles/fonts/rsuite-icon-font.eot');
+  src: url('../../node_modules/rsuite/dist/styles/fonts/rsuite-icon-font.eot?#iefix') format('eot'), url('../../node_modules/rsuite/dist/styles/fonts/rsuite-icon-font.ttf') format('truetype'), url('../../node_modules/rsuite/dist/styles/fonts/rsuite-icon-font.woff') format('woff'), url('../../node_modules/rsuite/dist/styles/fonts/rsuite-icon-font.svg#rsuite-icon-font') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
