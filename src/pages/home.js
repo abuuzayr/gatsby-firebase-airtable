@@ -24,6 +24,7 @@ const largeFields = [
   'Address',
   'Name',
   'Name 2',
+  'Appointment date & time',
 ]
 
 const HomePageBase = (props) => {
@@ -132,6 +133,7 @@ const HomePageBase = (props) => {
         'Company',
         'Salesperson',
         'Stage',
+        'Appointment date & time',
         'Name',
         'Contact',
         'Customer company',
@@ -168,7 +170,8 @@ const HomePageBase = (props) => {
               key,
               name: key,
               sortable: true,
-              width: 100
+              width: 100,
+              resizable: true
             }
             if (key === 'Appointment name') {
               obj.frozen = true
@@ -221,17 +224,18 @@ const HomePageBase = (props) => {
           if (labels.length === 0) {
             setLabels(transformLabels(labelFields))
           }
-          setRows(body.rows.map(row => {
+          const rows = body.rows.map(row => {
             if (cpy && cpy !== 'All') {
               if (!row.fields['Company']) return false
               if (row.fields['Company'] && row.fields['Company'][0] !== cpy) return false
-            } 
+            }
             return {
               ...row.fields,
               id: row.id
             }
-          }).filter(Boolean))
-          setInitialRows(body.rows.map(row => row.fields))
+          }).filter(Boolean)
+          setRows(rows)
+          setInitialRows(rows)
         }
       } catch (e) {
         console.error(e)
@@ -242,10 +246,20 @@ const HomePageBase = (props) => {
 
   const sortRows = (initialRows, sortColumn, sortDirection) => rows => {
     const comparer = (a, b) => {
+      let A = a[sortColumn]
+      let B = b[sortColumn]
       if (sortDirection === "ASC") {
-        return a[sortColumn] > b[sortColumn] ? 1 : -1;
+        if (datetimeFields.includes(sortColumn)) {
+          A = A ? new Date(A).getTime() : new Date(new Date().getTime() + Math.pow(10, 12))
+          B = B ? new Date(B).getTime() : new Date(new Date().getTime() + Math.pow(10, 12))
+        }
+        return A > B ? 1 : -1;
       } else if (sortDirection === "DESC") {
-        return a[sortColumn] < b[sortColumn] ? 1 : -1;
+        if (datetimeFields.includes(sortColumn)) {
+          A = A ? new Date(A).getTime() : new Date(null)
+          B = B ? new Date(B).getTime() : new Date(null)
+        }
+        return A < B ? 1 : -1;
       }
     };
     return sortDirection === "NONE" ? initialRows : [...rows].sort(comparer);
