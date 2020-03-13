@@ -62,6 +62,10 @@
             .level-left {
                 width: 200px;
             }
+            .rs-picker-toggle-wrapper {
+                display: block;
+                width: 100%;
+            }
         }
         .level {
             padding: 10px;
@@ -86,4 +90,10 @@
 
 .expand {
     color: #aaa;
+}
+
+.ReactModal__Body--open {
+    .rs-picker-menu {
+        z-index: 999;
+    }
 }
