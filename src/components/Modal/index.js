@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import ReactModal from 'react-modal';
 import Select from 'react-select'
+import { DatePicker } from 'rsuite'
+import '../../../node_modules/rsuite/dist/styles/rsuite-default.min.css'
 import SELECTIONS from '../../constants/selections'
 import { 
     fields,
@@ -353,21 +355,35 @@ const Modal = (props) => {
                                                     {
                                                         currencyFields.includes(f) && <label style={{ 'marginRight': 10 }}>$</label>
                                                     }
-                                                    <input
-                                                        className={`input ${!data.fields[f] ? 'is-warning' : ''} ${props.mode === 'View' ? 'is-disabled' : ''}`}
-                                                        value={
-                                                            data.fields[f] ? 
-                                                                (datetimeFields.includes(f) && toDatetimeLocal(data.fields[f])) ||
-                                                                (currencyFields.includes(f) && parseFloat(data.fields[f]).toFixed(2)) ||
-                                                                data.fields[f] :
-                                                                    data.fields[f] || ''
-                                                        }
-                                                        onChange={e => {
-                                                            updateData(f, e.currentTarget.value)
-                                                        }}
-                                                        readOnly={readOnlyFields.includes(f) || props.mode === 'View'}
-                                                        {...getInputType(f)}
-                                                    />
+                                                    {
+
+                                                        datetimeFields.includes(f) || dateFields.includes(f) ?
+                                                            <DatePicker
+                                                                onChange={date => updateData(f, date)}
+                                                                value={data.fields[f] ? new Date(data.fields[f]) : null}
+                                                                format={datetimeFields.includes(f) ? "YYYY-MM-DD HH:mm" : "YYYY-MM-DD"}
+                                                                ranges={[
+                                                                    {
+                                                                        label: datetimeFields.includes(f) ? "Now" : "Today",
+                                                                        value: new Date()
+                                                                    }
+                                                                ]}
+                                                            /> :
+                                                            <input
+                                                                className={`input ${!data.fields[f] ? 'is-warning' : ''} ${props.mode === 'View' ? 'is-disabled' : ''}`}
+                                                                value={
+                                                                    data.fields[f] ?
+                                                                        (currencyFields.includes(f) && parseFloat(data.fields[f]).toFixed(2)) ||
+                                                                        data.fields[f] :
+                                                                        data.fields[f] || ''
+                                                                }
+                                                                onChange={e => {
+                                                                    updateData(f, e.currentTarget.value)
+                                                                }}
+                                                                readOnly={readOnlyFields.includes(f) || props.mode === 'View'}
+                                                                {...getInputType(f)}
+                                                            />
+                                                    }
                                                 </>)
                                         }
                                     </div>
