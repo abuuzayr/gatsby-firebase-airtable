@@ -65,15 +65,17 @@ const toDatetimeLocal = (str) => {
         HH + ':' + II + ':' + SS;
 }
 
+const defaultData = {
+    fields: {
+        'PX': [],
+        'Unit': 1,
+        'Discount': 0,
+    }
+}
+
 const Modal = (props) => {
     const [modalIsOpen, setIsOpen] = useState(false)
-    const [data, setData] = useState({
-        fields: {
-            'PX': [],
-            'Unit': 1,
-            'Discount': 0,
-        }
-    })
+    const [data, setData] = useState({ ...defaultData })
     const [options, setOptions] = useState({})
     const { addToast, removeToast } = useToasts()
 
@@ -112,14 +114,13 @@ const Modal = (props) => {
                 const result = await fetch(`${process.env.GATSBY_STDLIB_URL}/getRawTableData?name=${type}&id=${id}`)
                 if (result.status === 200) {
                     const body = await result.json()
-                    console.log(body)
-                    setData(body.rows[0])
+                    if (body.rows[0]) setData(body.rows[0])
                 }
             } catch (e) {
                 console.error(e)
             }
         } else {
-            setData(props.id ? {id: props.id, fields: {}} : {fields: {}})
+            setData(props.id ? { id: props.id, ...defaultData } : { ...defaultData })
         }
     }
 
