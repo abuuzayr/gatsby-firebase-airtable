@@ -36,7 +36,7 @@ class Layout extends Component {
       if (companies.status === 200) {
         const body = await companies.json()
         if (body.result === 'success') {
-          const companies = body.rows.map(row => row.fields['Name']).filter(Boolean)
+          const companies = body.rows.filter(row => !!row.fields['Company'])
           this.setState({
             companies
           })
@@ -103,14 +103,14 @@ const AppWithAuthentication = withAuthentication(props => {
                         {
                           ({ company, companies, setCompany }) => {
                             if (authUser && Object.keys(authUser.roles).includes('ADMIN')) {
-                              if (!companies.includes('All')) companies.unshift('All')
-                            } else if (companies.includes('All')) {
-                              companies.splice(companies.indexOf('All'), 1)
+                              if (!companies.map(c => c.fields['Company']).includes('All')) companies.unshift({fields: {'Company': 'All'}})
+                            } else if (companies.map(c => c.fields['Company']).includes('All')) {
+                              companies = companies.filter(c => c.fields['Company'] !== 'All')
                             }
                             companies = companies.map(c => {
                               return {
-                                value: c,
-                                label: c
+                                value: c.id || c.fields['Company'],
+                                label: c.fields['Company']
                               }
                             })
                             return <Select 
