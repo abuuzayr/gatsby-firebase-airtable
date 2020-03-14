@@ -76,6 +76,7 @@ export const dateFields = [
 
 export const numberFields = [
     'Unit',
+    'Postal Code'
 ]
 
 export const currencyFields = [
