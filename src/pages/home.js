@@ -227,7 +227,7 @@ const HomePageBase = (props) => {
           const rows = body.rows.map(row => {
             if (cpy && cpy !== 'All') {
               if (!row.fields['Company']) return false
-              if (row.fields['Company'] && row.fields['Company'][0] !== cpy) return false
+              if (row.fields['CX'] && row.fields['CX'][0] !== cpy) return false
             }
             return {
               ...row.fields,

@@ -1,5 +1,6 @@
 export const fields = {
     'Appointments': [
+        'CX',
         'Appointment name',
         'Stage',
         'Appointment date & time',
@@ -102,6 +103,7 @@ export const options = {
 
 export const identifiers = {
     'PX': ['Product', 'Model'],
+    'CX': ['Company', 'Company'],
 }
 
 export const computedFields = {
