@@ -3,6 +3,7 @@ import ReactModal from 'react-modal';
 import Select from 'react-select'
 import { DatePicker } from 'rsuite'
 import '../../../node_modules/rsuite/dist/styles/rsuite-default.min.css'
+import { CompanyContext } from '../Company'
 import SELECTIONS from '../../constants/selections'
 import ZONES from '../../constants/zones'
 import { 
@@ -69,15 +70,14 @@ const toDatetimeLocal = (str) => {
 }
 
 const defaultData = {
-    fields: {
-        'PX': [],
-        'Unit': 1,
-        'Discount': 0,
-    }
+    'PX': [],
+    'Unit': 1,
+    'Discount': 0,
 }
 
 const Modal = (props) => {
     const [modalIsOpen, setIsOpen] = useState(false)
+    const [company, setCompany] = useState(false)
     const [data, setData] = useState({ ...defaultData })
     const [options, setOptions] = useState({})
     const { addToast, removeToast } = useToasts()
@@ -85,6 +85,17 @@ const Modal = (props) => {
     const openModal = () => {
         setIsOpen(true);
     }
+    
+    useEffect(() => {
+        if (!(company && company.companies.length)) return
+        if (data && (!data['CX'] || !data['CX'].length)) {
+            if (company.company.value && company.company.value !== 'All') {
+                updateData('CX', company.company.value)
+            } else {
+                updateData('CX', company.companies.filter(c => c.fields['Company'] !== 'All')[0].id)
+            }
+        }
+    }, [company])
 
     useEffect(() => {
         if (!options || !Object.keys(options).length) return
@@ -130,7 +141,7 @@ const Modal = (props) => {
                     const body = await result.json()
                     if (body.rows[0]) setData({
                         id: body.rows[0]['id'],
-                        ...body.rows[0]['fields']
+                        ...body.rows[0]['fields'],
                     })
                 }
             } catch (e) {
@@ -252,7 +263,9 @@ const Modal = (props) => {
         })
         dateFields.forEach(field => {
             if (cleanData[field] && typeof cleanData === 'object') {
-                cleanData[field] = cleanData[field].getFullYear() + '-' + cleanData[field].getMonth() + 1 + '-' + cleanData[field].getDate()
+                try {
+                    cleanData[field] = cleanData[field].getFullYear() + '-' + cleanData[field].getMonth() + 1 + '-' + cleanData[field].getDate()
+                } catch {}
             }
         })
         // Remove null fields
@@ -308,7 +321,6 @@ const Modal = (props) => {
         })
     }
 
-    if (Object.keys(options).length) console.log("options: ", options)
     return (
         <div>
             {
@@ -326,137 +338,142 @@ const Modal = (props) => {
                 contentLabel="Record modal"
                 closeTimeoutMS={2000}
             >
-                <div className="panel">
-                    <div className="panel-heading">{
-                        props.mode + ' record ' + (props.title ? `: ${props.title}` : '')
-                    }</div>
-                    {
-                        props.mode !== 'Delete' &&
-                        <>
+                <CompanyContext.Consumer>
+                    {company => {
+                        setCompany(company)
+                        return <div className="panel">
+                            <div className="panel-heading">{
+                                props.mode + ' record ' + (props.title ? `: ${props.title}` : '')
+                            }</div>
                             {
-                                data ? fields[props.type].map(f => (
-                                    <div className={['CX', 'SX'].includes(f) ? 'is-hidden' : 'panel-block'} key={f}>
-                                        <div className="level-left">
-                                            {
-                                                Object.keys(identifiers).includes(f) ?
-                                                    identifiers[f][0] : f
-                                            }
+                                props.mode !== 'Delete' &&
+                                <>
+                                    {
+                                        data ? fields[props.type].map(f => (
+                                            <div className={[].includes(f) ? 'is-hidden' : 'panel-block'} key={f}>
+                                                <div className="level-left">
+                                                    {
+                                                        Object.keys(identifiers).includes(f) ?
+                                                            identifiers[f][0] : f
+                                                    }
+                                                </div>
+                                                {
+                                                    ['Edit', 'View', 'New'].includes(props.mode) &&
+                                                    ((Object.keys(optionsObj).includes(f) || selectFields.includes(f)) ?
+                                                        <Select
+                                                            options={options[f]}
+                                                            isLoading={!Object.keys(options).length}
+                                                            isDisabled={!Object.keys(options).length || props.mode === 'View'}
+                                                            styles={{
+                                                                container: provided => ({
+                                                                    ...provided,
+                                                                    width: '100%'
+                                                                })
+                                                            }}
+                                                            onChange={val => {
+                                                                updateData(f, val)
+                                                            }}
+                                                            value={
+                                                                data[f] && data[f].hasOwnProperty('value') ?
+                                                                    data[f] :
+                                                                    {
+                                                                        value: data[f],
+                                                                        label: getLabel(data[f], f)
+                                                                    }
+                                                            }
+                                                            readOnly={readOnlyFields.includes(f) || props.mode === 'View'}
+                                                        >
+                                                        </Select> :
+                                                        <>
+                                                            {
+                                                                currencyFields.includes(f) && <label style={{ 'marginRight': 10 }}>$</label>
+                                                            }
+                                                            {
+
+                                                                datetimeFields.includes(f) || dateFields.includes(f) ?
+                                                                    <DatePicker
+                                                                        onChange={date => updateData(f, date)}
+                                                                        value={data[f] ? new Date(data[f]) : null}
+                                                                        format={datetimeFields.includes(f) ? "YYYY-MM-DD HH:mm" : "YYYY-MM-DD"}
+                                                                        ranges={[
+                                                                            {
+                                                                                label: datetimeFields.includes(f) ? "Now" : "Today",
+                                                                                value: new Date()
+                                                                            }
+                                                                        ]}
+                                                                    /> :
+                                                                    <input
+                                                                        className={`input ${!data[f] ? 'is-warning' : ''} ${props.mode === 'View' ? 'is-disabled' : ''}`}
+                                                                        value={
+                                                                            data[f] ?
+                                                                                (currencyFields.includes(f) && parseFloat(data[f]).toFixed(2)) ||
+                                                                                data[f] :
+                                                                                data[f] || ''
+                                                                        }
+                                                                        onChange={e => {
+                                                                            updateData(f, e.currentTarget.value)
+                                                                        }}
+                                                                        readOnly={readOnlyFields.includes(f) || props.mode === 'View'}
+                                                                        {...getInputType(f)}
+                                                                    />
+                                                            }
+                                                        </>)
+                                                }
+                                            </div>
+                                        )) :
+                                        <div className="panel-block">
+                                            Loading...
+                                        </div>
+                                    }
+                                    <div className="level">
+                                        <div className={props.mode !== 'View' ? 'level-left' : 'level-item'}>
+                                            <button
+                                                className={`button is-danger ${props.mode === 'View' && 'is-fullwidth'}`}
+                                                disabled={data ? '' : 'disabled'}
+                                                onClick={closeModal}>
+                                                Close
+                                            </button>
                                         </div>
                                         {
-                                            ['Edit', 'View', 'New'].includes(props.mode) &&
-                                            ((Object.keys(optionsObj).includes(f) || selectFields.includes(f)) ?
-                                                <Select
-                                                    options={options[f]}
-                                                    isLoading={!Object.keys(options).length}
-                                                    isDisabled={!Object.keys(options).length || props.mode === 'View'}
-                                                    styles={{
-                                                        container: provided => ({
-                                                            ...provided,
-                                                            width: '100%'
-                                                        })
-                                                    }}
-                                                    onChange={val => {
-                                                        updateData(f, val)
-                                                    }}
-                                                    value={
-                                                        data[f] && data[f].hasOwnProperty('value') ?
-                                                            data[f] :
-                                                            {
-                                                                value: data[f],
-                                                                label: getLabel(data[f], f)
-                                                            }
-                                                    }
-                                                    readOnly={readOnlyFields.includes(f) || props.mode === 'View'}
-                                                >
-                                                </Select> :
-                                                <>
-                                                    {
-                                                        currencyFields.includes(f) && <label style={{ 'marginRight': 10 }}>$</label>
-                                                    }
-                                                    {
-
-                                                        datetimeFields.includes(f) || dateFields.includes(f) ?
-                                                            <DatePicker
-                                                                onChange={date => updateData(f, date)}
-                                                                value={data[f] ? new Date(data[f]) : null}
-                                                                format={datetimeFields.includes(f) ? "YYYY-MM-DD HH:mm" : "YYYY-MM-DD"}
-                                                                ranges={[
-                                                                    {
-                                                                        label: datetimeFields.includes(f) ? "Now" : "Today",
-                                                                        value: new Date()
-                                                                    }
-                                                                ]}
-                                                            /> :
-                                                            <input
-                                                                className={`input ${!data[f] ? 'is-warning' : ''} ${props.mode === 'View' ? 'is-disabled' : ''}`}
-                                                                value={
-                                                                    data[f] ?
-                                                                        (currencyFields.includes(f) && parseFloat(data[f]).toFixed(2)) ||
-                                                                        data[f] :
-                                                                        data[f] || ''
-                                                                }
-                                                                onChange={e => {
-                                                                    updateData(f, e.currentTarget.value)
-                                                                }}
-                                                                readOnly={readOnlyFields.includes(f) || props.mode === 'View'}
-                                                                {...getInputType(f)}
-                                                            />
-                                                    }
-                                                </>)
+                                            props.mode !== 'View' &&
+                                            <div className="level-right">
+                                                <button
+                                                    className="button is-warning"
+                                                    disabled={data ? '' : 'disabled'}
+                                                    onClick={handleSave}>
+                                                    Save &amp; close
+                                                </button>
+                                            </div>
                                         }
                                     </div>
-                                )) :
-                                <div className="panel-block">
-                                    Loading...
-                                </div>
+                                </>
                             }
-                            <div className="level">
-                                <div className={props.mode !== 'View' ? 'level-left' : 'level-item'}>
-                                    <button
-                                        className={`button is-danger ${props.mode === 'View' && 'is-fullwidth'}`}
-                                        disabled={data ? '' : 'disabled'}
-                                        onClick={closeModal}>
-                                        Close
-                                    </button>
-                                </div>
-                                {
-                                    props.mode !== 'View' &&
-                                    <div className="level-right">
-                                        <button
-                                            className="button is-warning"
-                                            disabled={data ? '' : 'disabled'}
-                                            onClick={handleSave}>
-                                            Save &amp; close
-                                        </button>
+                            {
+                                props.mode === 'Delete' &&
+                                <>
+                                    <div className="panel-block">Are you sure?</div>
+                                    <div className="level">
+                                        <div className="level-left">
+                                            <button
+                                                className="button is-success"
+                                                onClick={closeModal}>
+                                                Cancel
+                                            </button>
+                                        </div>
+                                        <div className="level-right">
+                                            <button
+                                                className="button is-danger"
+                                                onClick={deleteRecord}>
+                                                Confirm Delete
+                                            </button>
+                                        </div>
                                     </div>
-                                }
-                            </div>
-                        </>
-                    }
-                    {
-                        props.mode === 'Delete' &&
-                        <>
-                            <div className="panel-block">Are you sure?</div>
-                            <div className="level">
-                                <div className="level-left">
-                                    <button
-                                        className="button is-success"
-                                        onClick={closeModal}>
-                                        Cancel
-                                    </button>
-                                </div>
-                                <div className="level-right">
-                                    <button
-                                        className="button is-danger"
-                                        onClick={deleteRecord}>
-                                        Confirm Delete
-                                    </button>
-                                </div>
-                            </div>
-                        </>
-                    }
-                    {props.children}
-                </div>
+                                </>
+                            }
+                            {props.children}
+                        </div>
+                    }}
+                </CompanyContext.Consumer>
             </ReactModal>
         </div>
     );
