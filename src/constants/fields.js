@@ -61,6 +61,7 @@ export const readOnlyFields = [
     'GST',
     'Grand Total',
     'Price',
+    'Zone'
 ]
 
 export const datetimeFields = [
