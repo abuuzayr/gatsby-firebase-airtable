@@ -4,6 +4,7 @@ import Select from 'react-select'
 import { DatePicker } from 'rsuite'
 import '../../../node_modules/rsuite/dist/styles/rsuite-default.min.css'
 import SELECTIONS from '../../constants/selections'
+import ZONES from '../../constants/zones'
 import { 
     fields,
     readOnlyFields,
@@ -94,7 +95,7 @@ const Modal = (props) => {
             const product = options['PX'].filter(p => p.value === data['PX'][0])[0]
             price = product ? product['Price'] : 0
         } else {
-            price = data['PX']['fields']['Price'] || 0
+            price = data['PX'] ? data['PX']['fields']['Price'] : 0
         }
         const subTotal = unit * price - discount
         const GST = 0.07 * subTotal
@@ -108,13 +109,29 @@ const Modal = (props) => {
         data['Discount']
     ])
 
+    useEffect(() => {
+        if (data['Postal Code'] && data['Postal Code'].length === 6) {
+            const area = data['Postal Code'].slice(0,2)
+            let zone = 'Invalid Postal Code'
+            Object.values(ZONES).forEach((zones, index) => {
+                if (zones.includes(area)) zone = Object.keys(ZONES)[index]
+            })
+            updateData('Zone', zone)
+        } else {
+            updateData('Zone', 'Invalid Postal Code')
+        }
+    }, [data['Postal Code']])
+
     const getData = async (type, id) => {
         if (props.mode === 'Edit' || props.mode === 'View') {
             try {
                 const result = await fetch(`${process.env.GATSBY_STDLIB_URL}/getRawTableData?name=${type}&id=${id}`)
                 if (result.status === 200) {
                     const body = await result.json()
-                    if (body.rows[0]) setData(body.rows[0]['fields'])
+                    if (body.rows[0]) setData({
+                        id: body.rows[0]['id'],
+                        ...body.rows[0]['fields']
+                    })
                 }
             } catch (e) {
                 console.error(e)
@@ -160,7 +177,6 @@ const Modal = (props) => {
     }
 
     const updateData = (key, value) => {
-        if (!value) return
         setData(prevData => ({
             ...prevData,
             [key]: datetimeFields.includes(key) ? new Date(value).toISOString() : value
@@ -207,6 +223,8 @@ const Modal = (props) => {
     const handleSave = async () => {
         const savingToast = addToast('Saving...', { appearance: 'info' })
         const cleanData = { ...data }
+        // Remove id from clean data
+        delete cleanData['id']
         // Remove computed fields
         computedFields[props.type] && computedFields[props.type].forEach(field => {
             delete cleanData[field]
@@ -230,6 +248,11 @@ const Modal = (props) => {
         currencyFields.forEach(field => {
             if (cleanData[field]) {
                 cleanData[field] = parseFloat(cleanData[field])
+            }
+        })
+        dateFields.forEach(field => {
+            if (cleanData[field] && typeof cleanData === 'object') {
+                cleanData[field] = cleanData[field].getFullYear() + '-' + cleanData[field].getMonth() + 1 + '-' + cleanData[field].getDate()
             }
         })
         // Remove null fields
