@@ -43,7 +43,7 @@
 .ReactModal__Overlay {
     z-index: 99;
     opacity: 0;
-    transition: opacity 1000ms ease-in-out;
+    transition: opacity 500ms ease-in-out;
 }
 
 .ReactModal__Content {
