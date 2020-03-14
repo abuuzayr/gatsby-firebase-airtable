@@ -87,16 +87,15 @@ const Modal = (props) => {
 
     useEffect(() => {
         if (!options || !Object.keys(options).length) return
-        const unit = data.fields['Unit'] || 1
-        const discount = data.fields['Discount'] || 0
+        const unit = data['Unit'] || 1
+        const discount = data['Discount'] || 0
         let price = 0
-        if (Array.isArray(data.fields['PX'])) {
-            const product = options['PX'].filter(p => p.value === data.fields['PX'][0])[0]
-            price = product ? product.fields['Price'] : 0
+        if (Array.isArray(data['PX'])) {
+            const product = options['PX'].filter(p => p.value === data['PX'][0])[0]
+            price = product ? product['Price'] : 0
         } else {
-            price = data.fields['PX']['fields']['Price'] || 0
+            price = data['PX']['fields']['Price'] || 0
         }
-        console.log(price)
         const subTotal = unit * price - discount
         const GST = 0.07 * subTotal
         updateData('Price', price)
@@ -104,11 +103,10 @@ const Modal = (props) => {
         updateData('Grand Total', subTotal + GST)
     }, [
         options,
-        data.fields['PX'],
-        data.fields['Unit'],
-        data.fields['Discount']
+        data['PX'],
+        data['Unit'],
+        data['Discount']
     ])
-
 
     const getData = async (type, id) => {
         if (props.mode === 'Edit' || props.mode === 'View') {
@@ -116,7 +114,7 @@ const Modal = (props) => {
                 const result = await fetch(`${process.env.GATSBY_STDLIB_URL}/getRawTableData?name=${type}&id=${id}`)
                 if (result.status === 200) {
                     const body = await result.json()
-                    if (body.rows[0]) setData(body.rows[0])
+                    if (body.rows[0]) setData(body.rows[0]['fields'])
                 }
             } catch (e) {
                 console.error(e)
@@ -165,10 +163,7 @@ const Modal = (props) => {
         if (!value) return
         setData(prevData => ({
             ...prevData,
-            fields: {
-                ...prevData.fields,
-                [key]: datetimeFields.includes(key) ? new Date(value).toISOString() : value
-            }
+            [key]: datetimeFields.includes(key) ? new Date(value).toISOString() : value
         }))
     }
 
@@ -211,7 +206,7 @@ const Modal = (props) => {
 
     const handleSave = async () => {
         const savingToast = addToast('Saving...', { appearance: 'info' })
-        const cleanData = { ...data.fields }
+        const cleanData = { ...data }
         // Remove computed fields
         computedFields[props.type] && computedFields[props.type].forEach(field => {
             delete cleanData[field]
@@ -341,11 +336,11 @@ const Modal = (props) => {
                                                         updateData(f, val)
                                                     }}
                                                     value={
-                                                        data.fields[f] && data.fields[f].hasOwnProperty('value') ?
-                                                            data.fields[f] :
+                                                        data[f] && data[f].hasOwnProperty('value') ?
+                                                            data[f] :
                                                             {
-                                                                value: data.fields[f],
-                                                                label: getLabel(data.fields[f], f)
+                                                                value: data[f],
+                                                                label: getLabel(data[f], f)
                                                             }
                                                     }
                                                     readOnly={readOnlyFields.includes(f) || props.mode === 'View'}
@@ -360,7 +355,7 @@ const Modal = (props) => {
                                                         datetimeFields.includes(f) || dateFields.includes(f) ?
                                                             <DatePicker
                                                                 onChange={date => updateData(f, date)}
-                                                                value={data.fields[f] ? new Date(data.fields[f]) : null}
+                                                                value={data[f] ? new Date(data[f]) : null}
                                                                 format={datetimeFields.includes(f) ? "YYYY-MM-DD HH:mm" : "YYYY-MM-DD"}
                                                                 ranges={[
                                                                     {
@@ -370,12 +365,12 @@ const Modal = (props) => {
                                                                 ]}
                                                             /> :
                                                             <input
-                                                                className={`input ${!data.fields[f] ? 'is-warning' : ''} ${props.mode === 'View' ? 'is-disabled' : ''}`}
+                                                                className={`input ${!data[f] ? 'is-warning' : ''} ${props.mode === 'View' ? 'is-disabled' : ''}`}
                                                                 value={
-                                                                    data.fields[f] ?
-                                                                        (currencyFields.includes(f) && parseFloat(data.fields[f]).toFixed(2)) ||
-                                                                        data.fields[f] :
-                                                                        data.fields[f] || ''
+                                                                    data[f] ?
+                                                                        (currencyFields.includes(f) && parseFloat(data[f]).toFixed(2)) ||
+                                                                        data[f] :
+                                                                        data[f] || ''
                                                                 }
                                                                 onChange={e => {
                                                                     updateData(f, e.currentTarget.value)
