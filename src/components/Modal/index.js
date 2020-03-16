@@ -104,7 +104,7 @@ const Modal = (props) => {
         let price = 0
         if (Array.isArray(data['PX'])) {
             const product = options['PX'].filter(p => p.value === data['PX'][0])[0]
-            price = product ? product['Price'] : 0
+            price = product ? product['fields']['Price'] : 0
         } else {
             price = data['PX'] ? data['PX']['fields']['Price'] : 0
         }
@@ -188,9 +188,20 @@ const Modal = (props) => {
     }
 
     const updateData = (key, value) => {
+        if (currencyFields.includes(key) && key !== 'Discount') {
+            value = parseFloat(value)
+            if (Number.isNaN(value) || !value) {
+                value = ''
+            } else {
+                value = value.toFixed(2)
+            }
+        }
+        if (datetimeFields.includes(key)) {
+            value = new Date(value).toISOString()
+        }
         setData(prevData => ({
             ...prevData,
-            [key]: datetimeFields.includes(key) ? new Date(value).toISOString() : value
+            [key]: value
         }))
     }
 
@@ -404,12 +415,7 @@ const Modal = (props) => {
                                                                     /> :
                                                                     <input
                                                                         className={`input ${!data[f] ? 'is-warning' : ''} ${props.mode === 'View' ? 'is-disabled' : ''}`}
-                                                                        value={
-                                                                            data[f] ?
-                                                                                (currencyFields.includes(f) && parseFloat(data[f]).toFixed(2)) ||
-                                                                                data[f] :
-                                                                                data[f] || ''
-                                                                        }
+                                                                        value={data[f]}
                                                                         onChange={e => {
                                                                             updateData(f, e.currentTarget.value)
                                                                         }}
