@@ -65,6 +65,9 @@
             .rs-picker-toggle-wrapper {
                 display: block;
                 width: 100%;
+                .rs-picker-toggle, .rs-picker-toggle-custom {
+                    z-index: 0;
+                }
             }
         }
         .level {
