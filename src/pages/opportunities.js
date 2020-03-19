@@ -105,7 +105,6 @@ const AppointmentsPageBase = (props) => {
         'Contact details',
         'AG no.',
         'Agreement date & time',
-        'Sales remarks',
         'Product',
         'Price',
         'Unit',
@@ -301,7 +300,7 @@ const AppointmentsPageBase = (props) => {
                       <a style={{ 'verticalAlign': 'middle' }}>
                         <Modal 
                           button={
-                            <><FiPlus style={{ 'verticalAlign': 'middle' }} /> Add new appointment</>
+                            <><FiPlus style={{ 'verticalAlign': 'middle' }} /> Add new customer</>
                           }
                           type="Appointments"
                           user={authUser}
