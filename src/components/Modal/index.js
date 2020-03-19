@@ -187,13 +187,15 @@ const Modal = (props) => {
         props.onCloseModal && props.onCloseModal()
     }
 
-    const updateData = (key, value) => {
-        if (currencyFields.includes(key) && key !== 'Discount') {
-            value = parseFloat(value)
-            if (Number.isNaN(value) || !value) {
-                value = ''
-            } else {
-                value = value.toFixed(2)
+    const updateData = (key, value, blur) => {
+        if (currencyFields.includes(key)) {
+            if (blur || (!blur &&  readOnlyFields.includes(key))) {
+                value = parseFloat(value)
+                if (Number.isNaN(value) || !value) {
+                    value = ''
+                } else {
+                    value = value.toFixed(2)
+                }
             }
         }
         if (datetimeFields.includes(key)) {
@@ -418,6 +420,9 @@ const Modal = (props) => {
                                                                         value={data[f]}
                                                                         onChange={e => {
                                                                             updateData(f, e.currentTarget.value)
+                                                                        }}
+                                                                        onBlur={e => {
+                                                                            updateData(f, e.currentTarget.value, true)
                                                                         }}
                                                                         readOnly={readOnlyFields.includes(f) || props.mode === 'View'}
                                                                         {...getInputType(f)}
