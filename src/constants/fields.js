@@ -24,7 +24,6 @@ export const fields = {
         'Discount',
         'GST',
         'Grand Total',
-        'Sales remarks',
     ],
     'Products': [
         'Model',
