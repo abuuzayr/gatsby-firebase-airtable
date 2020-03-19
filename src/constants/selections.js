@@ -44,12 +44,24 @@ export const JOB = {
     "Relocating": "#ffffff",
 }
 
+export const SOURCE = {
+    "FaceBook": "#ffffff",
+    "Google": "#ffffff",
+    "Walk in": "#ffffff",
+    "Referral": "#ffffff",
+    "Interior Designer": "#ffffff",
+    "Roadshow 1": "#ffffff",
+    "Roadshow 2": "#ffffff",
+    "Roadshow 3": "#ffffff",
+}
+
 const SELECTIONS = {
     STAGES,
     STATUS,
     JOB,
     PAYMENT_STATUS,
-    PAYMENT_MODE
+    PAYMENT_MODE,
+    SOURCE
 }
 
 export default SELECTIONS
