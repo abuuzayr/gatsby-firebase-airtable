@@ -189,7 +189,7 @@ const Modal = (props) => {
 
     const updateData = (key, value, blur) => {
         if (currencyFields.includes(key)) {
-            if (blur || (!blur &&  readOnlyFields.includes(key))) {
+            if (blur || (!blur && readOnlyFields.includes(key))) {
                 value = parseFloat(value)
                 if (Number.isNaN(value) || !value) {
                     value = ''
