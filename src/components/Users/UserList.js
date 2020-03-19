@@ -80,7 +80,7 @@ class UserList extends Component {
     const columns = [
       { key: "id", name: "ID", width: 35 },
       { key: "email", name: "Email", resizable: true },
-      { key: "username", name: "Username", resizable: true },
+      { key: "username", name: "Name", resizable: true },
       { key: "role", name: "Role", resizable: true }
     ];
 
