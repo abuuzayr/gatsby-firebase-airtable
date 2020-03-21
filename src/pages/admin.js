@@ -1,19 +1,20 @@
 import React, { Fragment } from 'react';
 import { compose } from 'recompose';
 
-import Layout from '../components/layout';
 import {
   withAuthorization,
   withEmailVerification,
 } from '../components/Session';
 import { UserList } from '../components/Users';
 import { ROLES } from '../constants/roles';
+import { UsersContext } from '../components/layout'
 
 const AdminPageBase = () => (
   <Fragment>
     <div className="title is-3">Users list</div>
-
-    <UserList />
+    <UsersContext.Consumer>
+      {users => <UserList users={users} />}
+    </UsersContext.Consumer>
   </Fragment>
 );
 
