@@ -17,7 +17,7 @@ import { UsersContext } from '../components/layout'
 
 const largeFields = [
   'Agreement date & time',
-  'Product',
+  'Products',
   'Payments',
   'Install / Maintenance',
   'Email',
@@ -96,8 +96,8 @@ const HomePageBase = (props) => {
         'Relationship',
         'AG no.',
         'Agreement date & time',
-        'Product',
-        'Price',
+        'Products',
+        'Total Price',
         'Unit',
         'Subtotal',
         'Discount',
@@ -283,8 +283,8 @@ const HomePageBase = (props) => {
         }
       })
       // Add sales remarks row
-      const productIndex = labels.map(l => l.key).indexOf('Product')
-      labels.splice(productIndex - 1, 0, {
+      const productIndex = labels.map(l => l.key).indexOf('Products')
+      labels.splice(productIndex, 0, {
         key: 'Sales Remarks',
         name: 'Sales Remarks',
         width: 180,
