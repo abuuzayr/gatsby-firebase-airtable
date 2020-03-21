@@ -7,15 +7,16 @@ import {
 } from '../components/Session'
 import { CompanyContext } from '../components/Company'
 import DataGrid from 'react-data-grid'
-import { FiEyeOff, FiFilter, FiSearch, FiArrowUp, FiArrowDown, FiPlus, FiEdit, FiTrash2, FiMaximize2 } from 'react-icons/fi'
+import { FiEyeOff, FiFilter, FiSearch, FiArrowUp, FiArrowDown, FiPlus, FiEdit, FiTrash2, FiMaximize2, FiMoreHorizontal } from 'react-icons/fi'
 import { AiOutlineSortAscending } from 'react-icons/ai'
 import Modal from '../components/Modal'
 import { STAGES } from '../constants/selections'
 import { datetimeFields, currencyFields } from '../constants/fields'
+import { Tooltip, Whisper } from 'rsuite'
+import { UsersContext } from '../components/layout'
 
 const largeFields = [
   'Agreement date & time',
-  'Sales remarks',
   'Product',
   'Payments',
   'Install / Maintenance',
@@ -34,13 +35,185 @@ const HomePageBase = (props) => {
   const [rows, setRows] = useState([])
   const [initialRows, setInitialRows] = useState([])
   const [trigger, setTrigger] = useState(false)
+  // const [remarks, setRemarks] = useState([])
   const [sort, setSort] = useState({
     column: '',
     direction: ''
   })
   const { authUser } = props
 
-  const transformLabels = labels => {
+  useEffect(() => {
+    async function getStats() {
+      try {
+        const result = await fetch(`${process.env.GATSBY_STDLIB_URL}/getHomeStats`)
+        if (result.status === 200) {
+          const body = await result.json()
+          setStats(body.stats)
+        }
+      } catch (e) {
+        console.error(e)
+      }
+    }
+    getStats()
+  }, [])
+
+  useEffect(() => {
+    async function getAppointments() {
+      if (!(company && company.companies && authUser)) return
+
+      // Get remarks first
+      let remarks = []
+      try {
+        const result = await fetch(`${process.env.GATSBY_STDLIB_URL}/getOptions`)
+        if (result.status === 200) {
+          const body = await result.json()
+          remarks = body.rows['Remarks']
+        }
+      } catch (e) {
+        console.error(e)
+      }
+
+      // Get Appointments
+      const role = Object.keys(authUser.roles)[0]
+      const cpy = company.company && company.company.value
+      const headers = [
+        'Appointment name',
+        'Company',
+        'Assigned to',
+        'Stage',
+        'Appointment date & time',
+        'Name',
+        'Contact',
+        'Customer company',
+        'Email',
+        'DOB',
+        'Address',
+        'House Unit',
+        'Postal Code',
+        'Zone',
+        'Name 2',
+        'Contact 2',
+        'Relationship',
+        'AG no.',
+        'Agreement date & time',
+        'Product',
+        'Price',
+        'Unit',
+        'Subtotal',
+        'Discount',
+        'GST',
+        'Grand Total',
+        'Payments',
+        'Total paid',
+        'Outstanding',
+        'Install / Maintenance',
+        'Creator'
+      ]
+      try {
+        const result = await fetch(`${process.env.GATSBY_STDLIB_URL}/getRawTableData?name=Appointments`)
+        if (result.status === 200) {
+          const body = await result.json()
+          const labelFields = headers.map(key => {
+            const obj = {
+              key,
+              name: key,
+              sortable: true,
+              width: 100,
+              resizable: true
+            }
+            if (key === 'Appointment name') {
+              obj.frozen = true
+              obj.width = 250
+              obj.formatter = (props) => (
+                <div className="level">
+                  <div className="level-left">{props.value}</div>
+                  <div className="level-right">
+                    <UsersContext.Consumer>
+                      {users => (
+                        <Modal
+                          button={<FiMaximize2 className="expand" />}
+                          id={props.row.id}
+                          type="Appointments"
+                          mode="View"
+                          users={users}
+                        >
+                        </Modal>
+                      )}
+                    </UsersContext.Consumer>
+                  </div>
+                </div>
+              )
+            }
+            if (key === 'Stage') {
+              obj.formatter = ({ value }) => {
+                const stageColor = STAGES[value] ? STAGES[value] : STAGES['default']
+                if (value) {
+                  return (
+                    <button
+                      className="button is-rounded is-small"
+                      style={{
+                        'backgroundColor': stageColor
+                      }}
+                    >
+                      {value}
+                    </button>
+                  )
+                } else {
+                  return value
+                }
+              }
+            }
+            if (key === 'Creator') {
+              obj.formatter = ({ value }) => {
+                if (value) {
+                  return (
+                    <UsersContext.Consumer>
+                      {users => {
+                        const user = users.filter(u => u.uid === value)[0]
+                        return user ? `${user.username} (${user.email})` : ''
+                      }}
+                    </UsersContext.Consumer>
+                  )
+                } else {
+                  return ''
+                }
+              }
+            }
+            if (datetimeFields.includes(key)) {
+              obj.formatter = ({ value }) => value ? new Date(value).toLocaleString() : ''
+            }
+            if (currencyFields.includes(key)) {
+              obj.formatter = ({ value }) => value ? `$${parseFloat(value).toFixed(2)}` : ''
+            }
+            if (largeFields.includes(key)) {
+              obj.width = 180
+            }
+            return obj
+          })
+          if (labels.length === 0) {
+            setLabels(transformLabels(labelFields, remarks))
+          }
+          const rows = body.rows.map(row => {
+            if (cpy && cpy !== 'All') {
+              if (!row.fields['Company']) return false
+              if (row.fields['CX'] && row.fields['CX'][0] !== cpy) return false
+            }
+            return {
+              ...row.fields,
+              id: row.id
+            }
+          }).filter(Boolean)
+          setRows(rows)
+          setInitialRows(rows)
+        }
+      } catch (e) {
+        console.error(e)
+      }
+    }
+    getAppointments()
+  }, [company, authUser, trigger])
+
+  const transformLabels = (labels, remarks) => {
     if (!labels.map(l => l.key).includes('count')) {
       labels.unshift({
         key: 'count',
@@ -70,15 +243,20 @@ const HomePageBase = (props) => {
         formatter: ({ row }) => {
           return <div className="level actions">
             <div className="level-item">
-              <Modal 
-                button={<FiEdit />} 
-                id={row.id} 
-                type="Appointments"
-                user={authUser}
-                mode="Edit"
-                onCloseModal={() => setTrigger(p => !p)}
-              >
-              </Modal>
+              <UsersContext.Consumer>
+                {users => (
+                  <Modal 
+                    button={<FiEdit />} 
+                    id={row.id} 
+                    type="Appointments"
+                    user={authUser}
+                    users={users}
+                    mode="Edit"
+                    onCloseModal={() => setTrigger(p => !p)}
+                  >
+                  </Modal>
+                )}
+              </UsersContext.Consumer>
             </div>
           </div>
         }
@@ -104,145 +282,74 @@ const HomePageBase = (props) => {
           </div>
         }
       })
+      // Add sales remarks row
+      const productIndex = labels.map(l => l.key).indexOf('Product')
+      labels.splice(productIndex - 1, 0, {
+        key: 'Sales Remarks',
+        name: 'Sales Remarks',
+        width: 180,
+        formatter: ({ row }) => {
+          const rm = remarks.filter(r => r.fields['Appointments'].includes(row.id))
+          if (rm.length > 0) {
+            rm.sort((a, b) => {
+              const aDate = new Date(a).getTime()
+              const bDate = new Date(b).getTime()
+              return bDate - aDate
+            })
+          }
+          return <div className="level actions">
+            <div className="level-left">
+              <div className="level-item">
+                {
+                  rm.length ? rm[0]['fields']['Text'] : 'No remarks'
+                }
+              </div>
+            </div>
+            <div className="level-right">
+              <div className="level-item">
+                <UsersContext.Consumer>
+                  {users => (
+                    <Modal
+                      button={
+                        <Whisper placement="top" speaker={<Tooltip>See all remarks</Tooltip>}>
+                          <FiMoreHorizontal />
+                        </Whisper>
+                      }
+                      id={row.id}
+                      type="Appointments"
+                      mode="View"
+                      users={users}
+                    >
+                    </Modal>
+                  )}
+                </UsersContext.Consumer>
+              </div>
+              <div className="level-item">
+                <UsersContext.Consumer>
+                  {users => (
+                    <Modal
+                      button={
+                        <Whisper placement="top" speaker={<Tooltip>Add new remark</Tooltip>}>
+                          <FiPlus />
+                        </Whisper>
+                      }
+                      id={row.id}
+                      user={authUser}
+                      users={users}
+                      type="Remarks"
+                      mode="New"
+                    >
+                    </Modal>
+                  )}
+                </UsersContext.Consumer>
+              </div>
+            </div>
+          </div>
+        }
+      })
     }
     return labels
   }
-
-  useEffect(() => {
-    async function getStats () {
-      try {
-        const result = await fetch(`${process.env.GATSBY_STDLIB_URL}/getHomeStats`)
-        if (result.status === 200) {
-          const body = await result.json()
-          setStats(body.stats)
-        }
-      } catch (e) {
-        console.error(e)
-      }
-    }
-    getStats()
-  }, [])
-
-  useEffect(() => {
-    async function getAppointments() {
-      if (!(company && company.companies && authUser)) return 
-      // const role = Object.keys(authUser.roles)[0]
-      const cpy = company.company && company.company.value
-      const headers = [
-        'Appointment name',
-        'Company',
-        'Salesperson',
-        'Stage',
-        'Appointment date & time',
-        'Name',
-        'Contact',
-        'Customer company',
-        'Email',
-        'DOB',
-        'Address',
-        'House Unit',
-        'Postal Code',
-        'Zone',
-        'Name 2',
-        'Contact 2',
-        'Relationship',
-        'AG no.',
-        'Agreement date & time',
-        'Sales remarks',
-        'Product',
-        'Price',
-        'Unit',
-        'Subtotal',
-        'Discount',
-        'GST',
-        'Grand Total',
-        'Payments',
-        'Total paid',
-        'Outstanding',
-        'Install / Maintenance',
-      ]
-      try {
-        const result = await fetch(`${process.env.GATSBY_STDLIB_URL}/getRawTableData?name=Appointments`)
-        if (result.status === 200) {
-          const body = await result.json()
-          const labelFields = headers.map(key => {
-            const obj = {
-              key,
-              name: key,
-              sortable: true,
-              width: 100,
-              resizable: true
-            }
-            if (key === 'Appointment name') {
-              obj.frozen = true
-              obj.width = 250
-              obj.formatter = (props) => (
-                <div className="level">
-                  <div className="level-left">{props.value}</div>
-                  <div className="level-right">
-                    <Modal
-                      button={<FiMaximize2 className="expand"/>}
-                      id={props.row.id}
-                      type="Appointments"
-                      mode="View"
-                    >
-                    </Modal>
-                  </div>
-                </div>
-              )
-            }
-            if (key === 'Stage') {
-              obj.formatter = ({ value }) => {
-                const stageColor = STAGES[value] ? STAGES[value] : STAGES['default']
-                if (value) {
-                  return (
-                    <button 
-                      className="button is-rounded is-small"
-                      style={{
-                        'backgroundColor': stageColor
-                      }}
-                    >
-                      {value}
-                    </button>
-                  )
-                } else {
-                  return value
-                }
-              }
-            }
-            if (datetimeFields.includes(key)) {
-              obj.formatter = ({ value }) => value ? new Date(value).toLocaleString() : ''
-            }
-            if (currencyFields.includes(key)) {
-              obj.formatter = ({ value }) => value ? `$${parseFloat(value).toFixed(2)}` : ''
-            }
-            if (largeFields.includes(key)) {
-              obj.width = 180
-            }
-            return obj
-          })
-          if (labels.length === 0) {
-            setLabels(transformLabels(labelFields))
-          }
-          const rows = body.rows.map(row => {
-            if (cpy && cpy !== 'All') {
-              if (!row.fields['Company']) return false
-              if (row.fields['CX'] && row.fields['CX'][0] !== cpy) return false
-            }
-            return {
-              ...row.fields,
-              id: row.id
-            }
-          }).filter(Boolean)
-          setRows(rows)
-          setInitialRows(rows)
-        }
-      } catch (e) {
-        console.error(e)
-      }
-    }
-    getAppointments()
-  }, [company, authUser, trigger])
 
   const sortRows = (initialRows, sortColumn, sortDirection) => rows => {
     const comparer = (a, b) => {
@@ -301,109 +408,114 @@ const HomePageBase = (props) => {
             }
           })
           return (
-            <>
-              <section className="info-tiles">
-                <div className="tile is-ancestor has-text-centered">
-                  <div className="tile is-parent">
-                    <article className="tile is-child box">
-                      <p className="title">{stats.fresh}</p>
-                      <p className="subtitle">New appointments</p>
-                    </article>
-                  </div>
-                  <div className="tile is-parent">
-                    <article className="tile is-child box">
-                      <p className="title">{stats.appointments}</p>
-                      <p className="subtitle">Total appointments</p>
-                    </article>
-                  </div>
-                  <div className="tile is-parent">
-                    <article className="tile is-child box">
-                      <p className="title">{stats.closed}</p>
-                      <p className="subtitle">Closed appointments</p>
-                    </article>
-                  </div>
-                  <div className="tile is-parent">
-                    <article className="tile is-child box">
-                      <p className="title">${stats.sales && stats.sales.toFixed(2)}</p>
-                      <p className="subtitle">Total sales</p>
-                    </article>
-                  </div>
-                </div>
-              </section>
-              {
-                rows.length &&
-                columns.length ?
-                  <>
-                    <div className="rdg-head">
-                      <div className="level">
-                        <div className="level-left">
-                          <div className="level-item">
-                            <FiEyeOff /> 
-                            <span>Hide fields</span>
-                          </div>
-                          <div className="level-item">
-                            <FiFilter />
-                            <span>Filter</span>
-                          </div>
-                          <div className="level-item">
-                            <AiOutlineSortAscending />
-                            <span>Sort</span>
-                          </div>
-                          <div style={{ 'margin': '10px 0', 'fontWeight': 700 }}>
-                            <a style={{ 'verticalAlign': 'middle' }} href="#">
-                              <Modal
-                                button={
-                                  <><FiPlus style={{ 'verticalAlign': 'middle' }} /> Add new appointment</>
-                                }
-                                type="Appointments"
-                                user={authUser}
-                                mode="New"
-                                onCloseModal={() => setTrigger(p => !p)}
-                              ></Modal>
-                            </a>
-                          </div>
-                        </div>
-                        <div className="level-right">
-                          <div className="level-item">
-                            <FiSearch />
-                          </div>
-                        </div>
+            <UsersContext.Consumer>
+              {users => (
+                <>
+                  <section className="info-tiles">
+                    <div className="tile is-ancestor has-text-centered">
+                      <div className="tile is-parent">
+                        <article className="tile is-child box">
+                          <p className="title">{stats.fresh}</p>
+                          <p className="subtitle">New appointments</p>
+                        </article>
+                      </div>
+                      <div className="tile is-parent">
+                        <article className="tile is-child box">
+                          <p className="title">{stats.appointments}</p>
+                          <p className="subtitle">Total appointments</p>
+                        </article>
+                      </div>
+                      <div className="tile is-parent">
+                        <article className="tile is-child box">
+                          <p className="title">{stats.closed}</p>
+                          <p className="subtitle">Closed appointments</p>
+                        </article>
+                      </div>
+                      <div className="tile is-parent">
+                        <article className="tile is-child box">
+                          <p className="title">${stats.sales && stats.sales.toFixed(2)}</p>
+                          <p className="subtitle">Total sales</p>
+                        </article>
                       </div>
                     </div>
-                    <DataGrid
-                      columns={columns}
-                      rowGetter={i => { return { count: i + 1, ...rows[i] } }}
-                      rowsCount={rows.length}
-                      minHeight={500}
-                      minColumnWidth={20}
-                      onGridSort={(sortColumn, sortDirection) => {
-                        let direction = sortDirection
-                        switch (sort.direction) {
-                          case 'ASC':
-                            direction = 'DESC'
-                            break
-                          case 'DESC':
-                            direction = 'NONE'
-                            break
-                          case 'NONE':
-                            direction = 'ASC'
-                            break
-                          default:
-                            break
-                        }
-                        setRows(sortRows(initialRows, sortColumn, direction))
-                        setSort(prev => {
-                          return {
-                            column: sortColumn,
-                            direction
-                          }
-                        })
-                      }}
-                    />
-                  </> :
-                  <div>Loading...</div>
-              }
-            </>
+                  </section>
+                  {
+                    rows.length &&
+                    columns.length ?
+                      <>
+                        <div className="rdg-head">
+                          <div className="level">
+                            <div className="level-left">
+                              <div className="level-item">
+                                <FiEyeOff /> 
+                                <span>Hide fields</span>
+                              </div>
+                              <div className="level-item">
+                                <FiFilter />
+                                <span>Filter</span>
+                              </div>
+                              <div className="level-item">
+                                <AiOutlineSortAscending />
+                                <span>Sort</span>
+                              </div>
+                              <div style={{ 'margin': '10px 0', 'fontWeight': 700 }}>
+                                <a style={{ 'verticalAlign': 'middle' }} href="#">
+                                  <Modal
+                                    button={
+                                      <><FiPlus style={{ 'verticalAlign': 'middle' }} /> Add new customer</>
+                                    }
+                                    type="Appointments"
+                                    user={authUser}
+                                    users={users}
+                                    mode="New"
+                                    onCloseModal={() => setTrigger(p => !p)}
+                                  ></Modal>
+                                </a>
+                              </div>
+                            </div>
+                            <div className="level-right">
+                              <div className="level-item">
+                                <FiSearch />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <DataGrid
+                          columns={columns}
+                          rowGetter={i => { return { count: i + 1, ...rows[i] } }}
+                          rowsCount={rows.length}
+                          minHeight={500}
+                          minColumnWidth={20}
+                          onGridSort={(sortColumn, sortDirection) => {
+                            let direction = sortDirection
+                            switch (sort.direction) {
+                              case 'ASC':
+                                direction = 'DESC'
+                                break
+                              case 'DESC':
+                                direction = 'NONE'
+                                break
+                              case 'NONE':
+                                direction = 'ASC'
+                                break
+                              default:
+                                break
+                            }
+                            setRows(sortRows(initialRows, sortColumn, direction))
+                            setSort(prev => {
+                              return {
+                                column: sortColumn,
+                                direction
+                              }
+                            })
+                          }}
+                        />
+                      </> :
+                      <div>Loading...</div>
+                  }
+                </>
+              )}
+            </UsersContext.Consumer>
           )
         }
       }
