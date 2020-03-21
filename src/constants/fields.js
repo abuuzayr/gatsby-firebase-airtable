@@ -1,29 +1,48 @@
 export const fields = {
     'Appointments': [
-        'CX',
-        'Appointment name',
-        'Stage',
-        'Appointment date & time',
-        'Name',
-        'Contact',
-        'Customer company',
-        'Email',
-        'DOB',
-        'Address',
-        'House Unit',
-        'Postal Code',
-        'Zone',
-        'Name 2',
-        'Contact 2',
-        'Relationship',
-        'AG no.',
-        'Agreement date & time',
-        'PX',
-        'Unit',
-        'Price',
-        'Discount',
-        'GST',
-        'Grand Total',
+        'ENABLE_BLOCKS',
+        {
+            name: '',
+            fields: [
+                'CX',
+                'Appointment name',
+                'Name',
+                'Contact',
+                'Customer company',
+                'Email',
+                'DOB',
+                'Address',
+                'House Unit',
+                'Postal Code',
+                'Zone',
+                'Name 2',
+                'Contact 2',
+                'Relationship',
+                'Creator'
+            ]
+        },
+        {
+            name: 'Appointment details',
+            fields: [
+                'Source',
+                'Assign to',
+                'Stage',
+                'Appointment date & time',
+                'AG no.',
+                'Agreement date & time',
+            ]
+        },
+        {
+            name: 'Product',
+            fields: [
+                'PX',
+                'Unit',
+                'Price',
+                'Discount',
+                'GST',
+                'Grand Total',
+            ]
+        },
     ],
     'Products': [
         'Model',
@@ -57,7 +76,12 @@ export const fields = {
     ]
 }
 
+export const hiddenFields = [
+    'Creator'
+]
+
 export const readOnlyFields = [
+    'Subtotal',
     'GST',
     'Grand Total',
     'Price',
@@ -108,7 +132,6 @@ export const identifiers = {
 export const computedFields = {
     'Appointments': [
         'Price',
-        'Subtotal',
         'GST',
         'Grand Total',
         'Total paid',
@@ -131,5 +154,7 @@ export const selectFields = [
     'Status',
     'Job',
     'Payment Mode',
-    'Payment Status'
+    'Payment Status',
+    'Source',
+    'Assign to'
 ]
