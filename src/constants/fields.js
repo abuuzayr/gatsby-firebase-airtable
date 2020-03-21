@@ -37,8 +37,27 @@ export const fields = {
             fields: [
                 'PX',
                 'Unit',
-                'Price',
+                'PX1',
+                'Unit1',
+                'PX2',
+                'Unit2',
+                'PX3',
+                'Unit3',
+                'PX4',
+                'Unit4',
+                'PX5',
+                'Unit5',
+                'PX6',
+                'Unit6',
+                'PX7',
+                'Unit7',
+                'PX8',
+                'Unit8',
+                'PX9',
+                'Unit9',
+                'Total Price',
                 'Discount',
+                'Subtotal',
                 'GST',
                 'Grand Total',
             ]
@@ -85,6 +104,7 @@ export const readOnlyFields = [
     'GST',
     'Grand Total',
     'Price',
+    'Total Price',
     'Zone'
 ]
 
@@ -100,6 +120,15 @@ export const dateFields = [
 
 export const numberFields = [
     'Unit',
+    'Unit1',
+    'Unit2',
+    'Unit3',
+    'Unit4',
+    'Unit5',
+    'Unit6',
+    'Unit7',
+    'Unit8',
+    'Unit9',
     'Postal Code'
 ]
 
@@ -110,6 +139,7 @@ export const currencyFields = [
     'Subtotal',
     'Outstanding',
     'Total paid',
+    'Total Price',
     'Price',
     'Commission (sales)',
     'Commission (install)',
@@ -119,19 +149,46 @@ export const currencyFields = [
 export const options = {
     'CX': 'Companies',
     'PX': 'Products',
+    'PX1': 'Products',
+    'PX2': 'Products',
+    'PX3': 'Products',
+    'PX4': 'Products',
+    'PX5': 'Products',
+    'PX6': 'Products',
+    'PX7': 'Products',
+    'PX8': 'Products',
+    'PX9': 'Products',
     'Payments': 'Payments',
     'Install / Maintenance': 'Maintenance',
     'SX': 'Salespeople',
 }
 
 export const identifiers = {
-    'PX': ['Product', 'Model'],
+    'PX': ['Product 1', 'Model'],
+    'PX1': ['Product 2', 'Model'],
+    'PX2': ['Product 3', 'Model'],
+    'PX3': ['Product 4', 'Model'],
+    'PX4': ['Product 5', 'Model'],
+    'PX5': ['Product 6', 'Model'],
+    'PX6': ['Product 7', 'Model'],
+    'PX7': ['Product 8', 'Model'],
+    'PX8': ['Product 9', 'Model'],
+    'PX9': ['Product 10', 'Model'],
+    'Unit': ['Unit'],
+    'Unit1': ['Unit'],
+    'Unit2': ['Unit'],
+    'Unit3': ['Unit'],
+    'Unit4': ['Unit'],
+    'Unit5': ['Unit'],
+    'Unit6': ['Unit'],
+    'Unit7': ['Unit'],
+    'Unit8': ['Unit'],
+    'Unit9': ['Unit'],
     'CX': ['Company', 'Company'],
 }
 
 export const computedFields = {
     'Appointments': [
-        'Price',
         'GST',
         'Grand Total',
         'Total paid',
@@ -140,7 +197,8 @@ export const computedFields = {
         'Product link',
         'Fresh',
         'Company',
-        'Product'
+        'Product',
+        'Products'
     ],
     'Payments': [
         'Total',
