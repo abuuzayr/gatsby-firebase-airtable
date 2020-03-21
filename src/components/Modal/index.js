@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ReactModal from 'react-modal';
 import Select from 'react-select'
-import { DatePicker } from 'rsuite'
+import { DatePicker, Panel } from 'rsuite'
 import '../../../node_modules/rsuite/dist/styles/rsuite-default.min.css'
 import { CompanyContext } from '../Company'
 import SELECTIONS from '../../constants/selections'
@@ -16,7 +16,8 @@ import {
     options as optionsObj,
     identifiers,
     computedFields,
-    selectFields
+    selectFields,
+    hiddenFields
 } from '../../constants/fields'
 import { useToasts } from 'react-toast-notifications'
 import Airtable from 'airtable'
@@ -81,6 +82,97 @@ const Modal = (props) => {
     const [data, setData] = useState({ ...defaultData })
     const [options, setOptions] = useState({})
     const { addToast, removeToast } = useToasts()
+
+    let formFields = fields[props.type]
+    const blocks = formFields && formFields[0] === 'ENABLE_BLOCKS'
+    if (blocks) {
+        formFields = formFields.slice(1)
+    }
+
+    const Field = p => {
+        const { field } = p
+        return (
+            <div className={hiddenFields.includes(field) ? 'is-hidden' : 'panel-block'}>
+                <div className="level-left">
+                    {
+                        Object.keys(identifiers).includes(field) ?
+                            identifiers[field][0] : field
+                    }
+                </div>
+                {
+                    ['Edit', 'View', 'New'].includes(props.mode) &&
+                    ((Object.keys(optionsObj).includes(field) || selectFields.includes(field)) ?
+                        <Select
+                            options={options[field]}
+                            isLoading={!Object.keys(options).length}
+                            styles={{
+                                container: provided => ({ ...provided, width: '100%' }),
+                                menuList: provided => ({ 
+                                    ...provided, 
+                                    maxHeight: 100,
+                                }),
+                                option: provided => ({
+                                    ...provided,
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    maxWidth: '100%',
+                                    wordBreak: 'break-all',
+                                    whiteSpace: 'nowrap'
+                                }),
+                            }}
+                            onChange={val => {
+                                updateData(field, val)
+                            }}
+                            value={
+                                data[field] && data[field].hasOwnProperty('value') ?
+                                    data[field] :
+                                    {
+                                        value: data[field],
+                                        label: getLabel(data[field], field)
+                                    }
+                            }
+                            isDisabled={
+                                !Object.keys(options).length ||
+                                (readOnlyFields.includes(field) || props.mode === 'View') ||
+                                (field === 'Assign to' && data['Creator'] !== props.user.uid && props.user.roles.ADMIN !== 'ADMIN')
+                            }
+                        >
+                        </Select> :
+                        <>
+                            {
+                                currencyFields.includes(field) && <label style={{ 'marginRight': 10 }}>$</label>
+                            }
+                            {
+
+                                datetimeFields.includes(field) || dateFields.includes(field) ?
+                                    <DatePicker
+                                        onChange={date => updateData(field, date)}
+                                        value={data[field] ? new Date(data[field]) : null}
+                                        format={datetimeFields.includes(field) ? "YYYY-MM-DD HH:mm" : "YYYY-MM-DD"}
+                                        ranges={[
+                                            {
+                                                label: datetimeFields.includes(field) ? "Now" : "Today",
+                                                value: new Date()
+                                            }
+                                        ]}
+                                    /> :
+                                    <input
+                                        value={data[field] || ''}
+                                        onChange={e => {
+                                            updateData(field, e.currentTarget.value)
+                                        }}
+                                        onBlur={e => {
+                                            updateData(field, e.currentTarget.value, true)
+                                        }}
+                                        {...getInputProps(field, props)}
+                                    />
+                            }
+                        </>
+                    )
+                }
+            </div>
+        )
+    }
 
     const openModal = () => {
         setIsOpen(true);
@@ -161,6 +253,10 @@ const Modal = (props) => {
                 Object.keys(optionsObj).map(option => {
                     obj[option] = buildOptions(body.rows[optionsObj[option]], option)
                 })
+                const userOptions = props.users.map(user => ({
+                    value: user.uid,
+                    label: `${user.username} (${user.email})`
+                }))
                 setOptions({ 
                     ...obj, 
                     Stage: selections['STAGES'],
@@ -168,6 +264,8 @@ const Modal = (props) => {
                     Job: selections['JOB'],
                     'Payment Mode': selections['PAYMENT_MODE'],
                     'Payment Status': selections['PAYMENT_STATUS'],
+                    Source: selections['SOURCE'],
+                    'Assign to': userOptions
                 })
             }
         } catch (e) {
@@ -226,10 +324,12 @@ const Modal = (props) => {
         }))
     }
 
-    const getInputType = field => {
+    const getInputProps = (field, props) => {
         const obj = {
-            type: 'text'
+            type: 'text',
+            className: 'input'
         }
+        // input types
         if (datetimeFields.includes(field)) obj.type = 'datetime-local'
         if (dateFields.includes(field)) obj.type = 'date'
         if (numberFields.includes(field) || currencyFields.includes(field)) obj.type = 'number'
@@ -240,6 +340,13 @@ const Modal = (props) => {
         if (currencyFields.includes(field)) {
             obj.min = "0.01"
             obj.step = "1.00"
+        }
+        // input classes
+        if (!data[field] && props.mode === 'Edit') obj.className += ' is-warning'
+        if (props.mode === 'View') obj.className += ' is-disabled'
+        // set readonly prop
+        if (readOnlyFields.includes(field) || props.mode === 'View') {
+            obj['readOnly'] = true
         }
         return obj
     }
@@ -288,6 +395,10 @@ const Modal = (props) => {
             if (cleanData[field] && cleanData[field].length === 1 && !cleanData[field][0]) toDelete = true
             if (toDelete) delete cleanData[field]
         })
+        // Add creator field
+        if (props.mode === 'New') {
+            cleanData['Creator'] = props.user.uid
+        }
         // Save the record!
         if (data.hasOwnProperty('id')) {
             base(props.type).update([{ id: data.id, fields: cleanData }], function (err, records) {
@@ -362,76 +473,26 @@ const Modal = (props) => {
                                 props.mode !== 'Delete' &&
                                 <>
                                     {
-                                        data ? fields[props.type].map(f => (
-                                            <div className={[].includes(f) ? 'is-hidden' : 'panel-block'} key={f}>
-                                                <div className="level-left">
-                                                    {
-                                                        Object.keys(identifiers).includes(f) ?
-                                                            identifiers[f][0] : f
+                                        data ? 
+                                        <>
+                                            {
+                                                blocks ? 
+                                                formFields.map(block => {
+                                                    if (block.name) {
+                                                        return <Panel header={block.name} collapsible>
+                                                            {
+                                                                block.fields.map(f => <Field key={f} field={f} />)
+                                                            }
+                                                        </Panel>
+                                                    } else {
+                                                        return block.fields.map(f => <Field key={f} field={f} />)
                                                     }
-                                                </div>
-                                                {
-                                                    ['Edit', 'View', 'New'].includes(props.mode) &&
-                                                    ((Object.keys(optionsObj).includes(f) || selectFields.includes(f)) ?
-                                                        <Select
-                                                            options={options[f]}
-                                                            isLoading={!Object.keys(options).length}
-                                                            isDisabled={!Object.keys(options).length || props.mode === 'View'}
-                                                            styles={{
-                                                                container: provided => ({
-                                                                    ...provided,
-                                                                    width: '100%'
-                                                                })
-                                                            }}
-                                                            onChange={val => {
-                                                                updateData(f, val)
-                                                            }}
-                                                            value={
-                                                                data[f] && data[f].hasOwnProperty('value') ?
-                                                                    data[f] :
-                                                                    {
-                                                                        value: data[f],
-                                                                        label: getLabel(data[f], f)
-                                                                    }
-                                                            }
-                                                            readOnly={readOnlyFields.includes(f) || props.mode === 'View'}
-                                                        >
-                                                        </Select> :
-                                                        <>
-                                                            {
-                                                                currencyFields.includes(f) && <label style={{ 'marginRight': 10 }}>$</label>
-                                                            }
-                                                            {
-
-                                                                datetimeFields.includes(f) || dateFields.includes(f) ?
-                                                                    <DatePicker
-                                                                        onChange={date => updateData(f, date)}
-                                                                        value={data[f] ? new Date(data[f]) : null}
-                                                                        format={datetimeFields.includes(f) ? "YYYY-MM-DD HH:mm" : "YYYY-MM-DD"}
-                                                                        ranges={[
-                                                                            {
-                                                                                label: datetimeFields.includes(f) ? "Now" : "Today",
-                                                                                value: new Date()
-                                                                            }
-                                                                        ]}
-                                                                    /> :
-                                                                    <input
-                                                                        className={`input ${!data[f] ? 'is-warning' : ''} ${props.mode === 'View' ? 'is-disabled' : ''}`}
-                                                                        value={data[f]}
-                                                                        onChange={e => {
-                                                                            updateData(f, e.currentTarget.value)
-                                                                        }}
-                                                                        onBlur={e => {
-                                                                            updateData(f, e.currentTarget.value, true)
-                                                                        }}
-                                                                        readOnly={readOnlyFields.includes(f) || props.mode === 'View'}
-                                                                        {...getInputType(f)}
-                                                                    />
-                                                            }
-                                                        </>)
-                                                }
-                                            </div>
-                                        )) :
+                                                }) :
+                                                formFields.map(f => {
+                                                    return <Field field={f} />
+                                                }) 
+                                            }
+                                        </> :
                                         <div className="panel-block">
                                             Loading...
                                         </div>
