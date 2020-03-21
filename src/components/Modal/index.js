@@ -72,7 +72,25 @@ const toDatetimeLocal = (str) => {
 
 const defaultData = {
     'PX': [],
+    'PX1': [],
+    'PX2': [],
+    'PX3': [],
+    'PX4': [],
+    'PX5': [],
+    'PX6': [],
+    'PX7': [],
+    'PX8': [],
+    'PX9': [],
     'Unit': 1,
+    'Unit1': 1,
+    'Unit2': 1,
+    'Unit3': 1,
+    'Unit4': 1,
+    'Unit5': 1,
+    'Unit6': 1,
+    'Unit7': 1,
+    'Unit8': 1,
+    'Unit9': 1,
     'Discount': 0,
 }
 
@@ -191,24 +209,57 @@ const Modal = (props) => {
 
     useEffect(() => {
         if (!options || !Object.keys(options).length) return
-        const unit = data['Unit'] || 1
+        const products = [
+            { unit: data['Unit'] || 1, price: 0},
+            { unit: data['Unit1'] || 1, price: 0},
+            { unit: data['Unit2'] || 1, price: 0},
+            { unit: data['Unit3'] || 1, price: 0},
+            { unit: data['Unit4'] || 1, price: 0},
+            { unit: data['Unit5'] || 1, price: 0},
+            { unit: data['Unit6'] || 1, price: 0},
+            { unit: data['Unit7'] || 1, price: 0},
+            { unit: data['Unit8'] || 1, price: 0},
+            { unit: data['Unit9'] || 1, price: 0},
+        ]
         const discount = data['Discount'] || 0
-        let price = 0
-        if (Array.isArray(data['PX'])) {
-            const product = options['PX'].filter(p => p.value === data['PX'][0])[0]
-            price = product ? product['fields']['Price'] : 0
-        } else {
-            price = data['PX'] ? data['PX']['fields']['Price'] : 0
+        for (let i = 0; i < 10; i ++) {
+            const px = i > 0 ? 'PX' + i : 'PX'
+            if (Array.isArray(data[px])) {
+                const product = options[px].filter(p => p.value === data[px][0])[0]
+                products[i]['price'] = product ? product['fields']['Price'] : 0
+            } else {
+                products[i]['price'] = data[px] ? data[px]['fields']['Price'] : 0
+            }
         }
-        const subTotal = unit * price - discount
+        const totalPrice = products.reduce((acc, curr) => acc += curr.unit * curr.price, 0)
+        const subTotal = totalPrice - discount
         const GST = 0.07 * subTotal
-        updateData('Price', price)
+        updateData('Total Price', totalPrice)
+        updateData('Subtotal', subTotal)
         updateData('GST', GST)
         updateData('Grand Total', subTotal + GST)
     }, [
         options,
         data['PX'],
         data['Unit'],
+        data['PX1'],
+        data['Unit1'],
+        data['PX2'],
+        data['Unit2'],
+        data['PX3'],
+        data['Unit3'],
+        data['PX4'],
+        data['Unit4'],
+        data['PX5'],
+        data['Unit5'],
+        data['PX6'],
+        data['Unit6'],
+        data['PX7'],
+        data['Unit7'],
+        data['PX8'],
+        data['Unit8'],
+        data['PX9'],
+        data['Unit9'],
         data['Discount']
     ])
 
