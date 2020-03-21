@@ -9,11 +9,18 @@ import Select from 'react-select'
 import { CompanyContext } from './Company'
 import { ToastProvider } from 'react-toast-notifications'
 
+import { withFirebase } from './Firebase';
+
+export const UsersContext = React.createContext([]);
+
 class Layout extends Component {
+
   state = {
     firebase: null,
     companies: [],
-    company: ''
+    company: '',
+    users: [],
+    loading: false
   };
 
   setCompany = (company) => {
@@ -27,8 +34,20 @@ class Layout extends Component {
 
     Promise.all([app, auth, database]).then(values => {
       const firebase = getFirebase(values[0]);
+      firebase.users().on('value', snapshot => {
+        const usersObject = snapshot.val();
 
-      this.setState({ firebase });
+        const usersList = Object.keys(usersObject).map(key => ({
+          ...usersObject[key],
+          uid: key,
+        }));
+
+        this.setState({
+          users: usersList,
+          loading: false,
+          firebase
+        });
+      });
     });
 
     try {
@@ -47,16 +66,22 @@ class Layout extends Component {
     }
   }
 
+  componentWillUnmount() {
+    this.state.firebase.users().off();
+  }
+
   render() {
-    const { company, companies } = this.state
+    const { company, companies, users } = this.state
     return (
       <FirebaseContext.Provider value={this.state.firebase}>
         <CompanyContext.Provider value={{ company, companies, setCompany: this.setCompany }}>
-          <ToastProvider>
-            <AppWithAuthentication 
-              {...this.props}
-            />
-          </ToastProvider>
+          <UsersContext.Provider value={users}>
+            <ToastProvider>
+              <AppWithAuthentication 
+                {...this.props}
+              />
+            </ToastProvider>
+          </UsersContext.Provider>
         </CompanyContext.Provider>
       </FirebaseContext.Provider>
     );
@@ -136,4 +161,4 @@ const AppWithAuthentication = withAuthentication(props => {
   )
 });
 
-export default Layout;
+export default withFirebase(Layout);
