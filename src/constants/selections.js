@@ -45,7 +45,7 @@ export const JOB = {
 }
 
 export const SOURCE = {
-    "FaceBook": "#ffffff",
+    "Facebook": "#ffffff",
     "Google": "#ffffff",
     "Walk in": "#ffffff",
     "Referral": "#ffffff",
