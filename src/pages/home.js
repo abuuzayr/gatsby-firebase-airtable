@@ -14,7 +14,7 @@ import { STAGES } from '../constants/selections'
 import { datetimeFields, currencyFields } from '../constants/fields'
 import { Tooltip, Whisper } from 'rsuite'
 import { UsersContext } from '../components/layout'
-import { ExpandRow } from '../helpers/labelFormatters'
+import { ExpandRow, ColoredCell } from '../helpers/labelFormatters'
 
 const largeFields = [
   'Agreement date & time',
@@ -124,26 +124,10 @@ const HomePageBase = (props) => {
             if (key === 'Appointment name') {
               obj.frozen = true
               obj.width = 250
-              obj.formatter = (props) => <ExpandRow { ...props } />
+              obj.formatter = props => <ExpandRow { ...props } />
             }
             if (key === 'Stage') {
-              obj.formatter = ({ value }) => {
-                const stageColor = STAGES[value] ? STAGES[value] : STAGES['default']
-                if (value) {
-                  return (
-                    <button
-                      className="button is-rounded is-small"
-                      style={{
-                        'backgroundColor': stageColor
-                      }}
-                    >
-                      {value}
-                    </button>
-                  )
-                } else {
-                  return value
-                }
-              }
+              obj.formatter = props => <ColoredCell { ...props } colors={STAGES} />
             }
             if (key === 'Creator') {
               obj.formatter = ({ value }) => {

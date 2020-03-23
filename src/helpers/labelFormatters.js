@@ -22,3 +22,22 @@ export const ExpandRow = props => (
         </div>
     </div>
 )
+
+export const ColoredCell = props => {
+    const { colors, value } = props
+    const color = colors[value] ? colors[value] : colors['default']
+    if (value) {
+        return (
+            <button
+                className="button is-rounded is-small"
+                style={{
+                    'backgroundColor': color
+                }}
+            >
+                {value}
+            </button>
+        )
+    } else {
+        return value
+    }
+}
