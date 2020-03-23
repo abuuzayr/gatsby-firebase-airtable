@@ -7,14 +7,14 @@ import {
 } from '../components/Session'
 import { CompanyContext } from '../components/Company'
 import DataGrid from 'react-data-grid'
-import { FiEyeOff, FiFilter, FiSearch, FiArrowUp, FiArrowDown, FiPlus, FiEdit, FiTrash2, FiMoreHorizontal } from 'react-icons/fi'
+import { FiEyeOff, FiFilter, FiSearch, FiArrowUp, FiArrowDown, FiPlus, FiTrash2, FiMoreHorizontal } from 'react-icons/fi'
 import { AiOutlineSortAscending } from 'react-icons/ai'
 import Modal from '../components/Modal'
 import { STAGES } from '../constants/selections'
 import { datetimeFields, currencyFields } from '../constants/fields'
 import { Tooltip, Whisper } from 'rsuite'
 import { UsersContext } from '../components/layout'
-import { ExpandRow, ColoredCell, CreatorCell, MultiRecordCell, CountCell } from '../helpers/labelFormatters'
+import { ExpandRow, ColoredCell, CreatorCell, MultiRecordCell, CountCell, EditCell } from '../helpers/labelFormatters'
 
 const largeFields = [
   'Agreement date & time',
@@ -193,26 +193,7 @@ const HomePageBase = (props) => {
         name: '',
         frozen: true,
         width: 30,
-        formatter: ({ row }) => {
-          return <div className="level actions">
-            <div className="level-item">
-              <UsersContext.Consumer>
-                {users => (
-                  <Modal 
-                    button={<FiEdit />} 
-                    id={row.id} 
-                    type="Appointments"
-                    user={authUser}
-                    users={users}
-                    mode="Edit"
-                    onCloseModal={() => setTrigger(p => !p)}
-                  >
-                  </Modal>
-                )}
-              </UsersContext.Consumer>
-            </div>
-          </div>
-        }
+        formatter: props => <EditCell {...props} user={authUser} type="Appointments" onCloseModal={() => setTrigger(p => !p)} />
       })
       labels.push({
         key: 'delete',

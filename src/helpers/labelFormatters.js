@@ -3,7 +3,7 @@ import Modal from '../components/Modal'
 import { Tooltip, Whisper } from 'rsuite'
 
 import { UsersContext } from '../components/layout'
-import { FiMaximize2, FiMoreHorizontal, FiPlus } from 'react-icons/fi'
+import { FiMaximize2, FiMoreHorizontal, FiPlus, FiEdit } from 'react-icons/fi'
 
 export const ExpandRow = props => (
     <div className="level">
@@ -130,4 +130,25 @@ export const CountCell = ({ value, row, colors, colorKey }) => {
     } else {
         return value
     }
+}
+
+export const EditCell = ({ row, user, type, onCloseModal }) => {
+    return <div className="level actions">
+        <div className="level-item">
+            <UsersContext.Consumer>
+                {users => (
+                    <Modal
+                        button={<FiEdit />}
+                        id={row.id}
+                        type={type}
+                        user={user}
+                        users={users}
+                        mode="Edit"
+                        onCloseModal={onCloseModal}
+                    >
+                    </Modal>
+                )}
+            </UsersContext.Consumer>
+        </div>
+    </div>
 }
