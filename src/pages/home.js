@@ -7,14 +7,14 @@ import {
 } from '../components/Session'
 import { CompanyContext } from '../components/Company'
 import DataGrid from 'react-data-grid'
-import { FiEyeOff, FiFilter, FiSearch, FiArrowUp, FiArrowDown, FiPlus, FiTrash2, FiMoreHorizontal } from 'react-icons/fi'
+import { FiEyeOff, FiFilter, FiSearch, FiArrowUp, FiArrowDown, FiPlus, FiMoreHorizontal } from 'react-icons/fi'
 import { AiOutlineSortAscending } from 'react-icons/ai'
 import Modal from '../components/Modal'
 import { STAGES } from '../constants/selections'
 import { datetimeFields, currencyFields } from '../constants/fields'
 import { Tooltip, Whisper } from 'rsuite'
 import { UsersContext } from '../components/layout'
-import { ExpandRow, ColoredCell, CreatorCell, MultiRecordCell, CountCell, EditCell } from '../helpers/labelFormatters'
+import { ExpandRow, ColoredCell, CreatorCell, MultiRecordCell, CountCell, EditCell, DeleteCell } from '../helpers/labelFormatters'
 
 const largeFields = [
   'Agreement date & time',
@@ -199,22 +199,13 @@ const HomePageBase = (props) => {
         key: 'delete',
         name: '',
         width: 30,
-        formatter: ({ row }) => {
-          return <div className="level actions">
-            <div className="level-item">
-              <Modal
-                button={<FiTrash2 />}
-                id={row.id}
-                title={row['Appointment name']}
-                type="Appointments"
-                user={authUser}
-                mode="Delete"
-                onCloseModal={() => setTrigger(p => !p)}
-              >
-              </Modal>
-            </div>
-          </div>
-        }
+        formatter: props => <DeleteCell
+          {...props}
+          user={authUser}
+          type="Appointments"
+          titleKey="Appointment name"
+          onCloseModal={() => setTrigger(p => !p)} 
+        />
       })
       // Add sales remarks row
       const productIndex = labels.map(l => l.key).indexOf('Products')

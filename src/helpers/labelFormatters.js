@@ -3,7 +3,7 @@ import Modal from '../components/Modal'
 import { Tooltip, Whisper } from 'rsuite'
 
 import { UsersContext } from '../components/layout'
-import { FiMaximize2, FiMoreHorizontal, FiPlus, FiEdit } from 'react-icons/fi'
+import { FiMaximize2, FiMoreHorizontal, FiPlus, FiEdit, FiTrash2 } from 'react-icons/fi'
 
 export const ExpandRow = props => (
     <div className="level">
@@ -149,6 +149,23 @@ export const EditCell = ({ row, user, type, onCloseModal }) => {
                     </Modal>
                 )}
             </UsersContext.Consumer>
+        </div>
+    </div>
+}
+
+export const DeleteCell = ({ row, user, type, titleKey, onCloseModal }) => {
+    return <div className="level actions">
+        <div className="level-item">
+            <Modal
+                button={<FiTrash2 />}
+                id={row.id}
+                title={row[titleKey]}
+                type={type}
+                user={user}
+                mode="Delete"
+                onCloseModal={onCloseModal}
+            >
+            </Modal>
         </div>
     </div>
 }
