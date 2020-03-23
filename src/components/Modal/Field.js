@@ -60,7 +60,7 @@ const Field = p => {
                         isDisabled={
                             !Object.keys(options).length ||
                             (readOnlyFields.includes(fieldName) || props.mode === 'View') ||
-                            (fieldName === 'Assign to' && data['Creator'] !== props.user.uid && props.user.roles.ADMIN !== 'ADMIN')
+                            (fieldName === 'Assign to' && data['Creator'] !== props.user.uid && props.user.role !== 'ADMIN')
                         }
                     >
                     </Select> :

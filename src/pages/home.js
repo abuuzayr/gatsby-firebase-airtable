@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import { compose } from 'recompose'
-import { ROLES } from '../constants/roles'
 import {
   withAuthorization,
   withEmailVerification,
@@ -61,7 +60,7 @@ const HomePageBase = (props) => {
       }
 
       // Get Appointments
-      const role = Object.keys(authUser.roles)[0]
+      const role = authUser.role
       const cpy = company.company && company.company.value
       try {
         const result = await fetch(`${process.env.GATSBY_STDLIB_URL}/getRawTableData?name=Appointments`)

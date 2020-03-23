@@ -127,7 +127,7 @@ const AppWithAuthentication = withAuthentication(props => {
                       <CompanyContext.Consumer>
                         {
                           ({ company, companies, setCompany }) => {
-                            if (authUser && Object.keys(authUser.roles).includes('ADMIN')) {
+                            if (authUser && Object.keys(authUser.role).includes('ADMIN')) {
                               if (!companies.map(c => c.fields['Company']).includes('All')) companies.unshift({fields: {'Company': 'All'}})
                             } else if (companies.map(c => c.fields['Company']).includes('All')) {
                               companies = companies.filter(c => c.fields['Company'] !== 'All')

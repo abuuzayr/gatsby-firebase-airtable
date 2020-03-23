@@ -12,7 +12,7 @@ class UserList extends Component {
       return {
         ...user,
         id: id + 1,
-        role: user.roles ? Object.keys(user.roles)[0] : ''
+        role: user.role || 'SALES'
       }
     })
 

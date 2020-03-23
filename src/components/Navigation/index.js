@@ -4,7 +4,6 @@ import { Link } from 'gatsby';
 import { AuthUserContext } from '../Session';
 import SignOutButton from '../SignOut';
 import ROUTES from '../../constants/routes';
-import { ROLES } from '../../constants/roles';
 import { FiLogIn, FiSettings  } from 'react-icons/fi'
 import { IoMdPeople } from 'react-icons/io'
 
@@ -36,20 +35,20 @@ const NavigationAuth = ({ authUser }) => (
       <div id="topNav" className="navbar-menu">
         <div className="navbar-start">
           {
-            (authUser.roles[ROLES.SALES] || authUser.roles[ROLES.ADMIN]) &&
+            (authUser.role === 'SALES' || authUser.role === 'ADMIN') &&
             <Link className="navbar-item" to={ROUTES.HOME}>Appointments</Link>
           }
           {
-            (authUser.roles[ROLES.INSTALL] || authUser.roles[ROLES.ADMIN]) &&
+            (authUser.role === 'INSTALL' || authUser.role === 'ADMIN') &&
             <Link className="navbar-item" to={ROUTES.MAINTAINENCE}>Install / Maintenance</Link>
           }
           {
-            authUser.roles[ROLES.ADMIN] &&
+            authUser.role === 'ADMIN' &&
             <Link className="navbar-item" to={ROUTES.PAYMENTS}>Payments</Link>
           }
           <Link className="navbar-item" to={ROUTES.PRODUCTS}>Products</Link>
           { 
-            authUser.roles[ROLES.ADMIN] && 
+            authUser.role === 'ADMIN' && 
               <Link className="navbar-item" to={ROUTES.ADMIN}>Admin</Link> 
           }
         </div>

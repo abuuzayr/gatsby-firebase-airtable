@@ -6,7 +6,6 @@ import {
   withEmailVerification,
 } from '../components/Session';
 import { UserList } from '../components/Users';
-import { ROLES } from '../constants/roles';
 import { UsersContext } from '../components/layout'
 
 const AdminPageBase = () => (
@@ -19,7 +18,7 @@ const AdminPageBase = () => (
 );
 
 const condition = authUser =>
-  authUser && !!authUser.roles[ROLES.ADMIN];
+  authUser && authUser.role === 'ADMIN';
 
 const AdminPage = compose(
   withEmailVerification,

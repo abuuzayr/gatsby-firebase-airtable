@@ -24,7 +24,7 @@ const AccountPageBase = () => (
               <strong>Email:</strong> {authUser.email}
             </div>
             <div>
-              <strong>Role:</strong> {Object.keys(authUser.roles)[0]}
+              <strong>Role:</strong> {authUser.role}
             </div>
           </div>
           <div className="content">

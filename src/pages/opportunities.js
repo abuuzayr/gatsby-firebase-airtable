@@ -95,7 +95,7 @@ const AppointmentsPageBase = (props) => {
   useEffect(() => {
     async function getAppointments() {
       if (!(company && company.companies && authUser)) return 
-      // const role = Object.keys(authUser.roles)[0]
+      // const role = authUser.role
       // const cpy = company.company.value
       const fields = [
         'Appointment name',
