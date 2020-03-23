@@ -1,7 +1,9 @@
 import React from 'react'
 import Modal from '../components/Modal'
+import { Tooltip, Whisper } from 'rsuite'
+
 import { UsersContext } from '../components/layout'
-import { FiMaximize2 } from 'react-icons/fi'
+import { FiMaximize2, FiMoreHorizontal, FiPlus } from 'react-icons/fi'
 
 export const ExpandRow = props => (
     <div className="level">
@@ -52,6 +54,61 @@ export const CreatorCell = ({ value }) => {
                 }}
             </UsersContext.Consumer>
         )
+    } else {
+        return ''
+    }
+}
+
+export const MultiRecordCell = ({ value, row, key, user }) => {
+    if (value && Array.isArray(value)) {
+        return <div className="level actions">
+            <div className="level-left">
+                <div className="level-item">
+                    {
+                        value.length + ' record/s'
+                    }
+                </div>
+            </div>
+            <UsersContext.Consumer>
+                {users => (
+                    <div className="level-right">
+                        {
+                            value.length ?
+                                <div className="level-item">
+                                    <Modal
+                                        button={
+                                            <Whisper placement="top" speaker={<Tooltip>{`See all ${key}`}</Tooltip>}>
+                                                <FiMoreHorizontal />
+                                            </Whisper>
+                                        }
+                                        id={row.id}
+                                        type={key === 'Install / Maintenance' ? 'Maintenance' : key}
+                                        mode="List"
+                                        users={users}
+                                    >
+                                    </Modal>
+                                </div> :
+                                <></>
+                        }
+                        <div className="level-item">
+                            <Modal
+                                button={
+                                    <Whisper placement="top" speaker={<Tooltip>{`Add new ${key}`}</Tooltip>}>
+                                        <FiPlus />
+                                    </Whisper>
+                                }
+                                id={row.id}
+                                user={user}
+                                users={users}
+                                type={key === 'Install / Maintenance' ? 'Maintenance' : key}
+                                mode="New"
+                            >
+                            </Modal>
+                        </div>
+                    </div>
+                )}
+            </UsersContext.Consumer>
+        </div>
     } else {
         return ''
     }

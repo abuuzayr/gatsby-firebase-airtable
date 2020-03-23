@@ -14,7 +14,7 @@ import { STAGES } from '../constants/selections'
 import { datetimeFields, currencyFields } from '../constants/fields'
 import { Tooltip, Whisper } from 'rsuite'
 import { UsersContext } from '../components/layout'
-import { ExpandRow, ColoredCell, CreatorCell } from '../helpers/labelFormatters'
+import { ExpandRow, ColoredCell, CreatorCell, MultiRecordCell } from '../helpers/labelFormatters'
 
 const largeFields = [
   'Agreement date & time',
@@ -133,60 +133,7 @@ const HomePageBase = (props) => {
               obj.formatter = props => <CreatorCell {...props} />
             }
             if (key === 'Payments' || key === 'Install / Maintenance') {
-              obj.formatter = ({ value, row }) => {
-                if (value && Array.isArray(value)) {
-                  return <div className="level actions">
-                    <div className="level-left">
-                      <div className="level-item">
-                        {
-                          value.length + ' record/s'
-                        }
-                      </div>
-                    </div>
-                    <UsersContext.Consumer>
-                      {users => (
-                        <div className="level-right">
-                          {
-                            value.length ?
-                            <div className="level-item">
-                              <Modal
-                                button={
-                                  <Whisper placement="top" speaker={<Tooltip>{`See all ${key}`}</Tooltip>}>
-                                    <FiMoreHorizontal />
-                                  </Whisper>
-                                }
-                                id={row.id}
-                                type={key === 'Install / Maintenance' ? 'Maintenance' : key}
-                                mode="List"
-                                users={users}
-                              >
-                              </Modal>
-                            </div> :
-                            <></>
-                          }
-                          <div className="level-item">
-                            <Modal
-                              button={
-                                <Whisper placement="top" speaker={<Tooltip>{`Add new ${key}`}</Tooltip>}>
-                                  <FiPlus />
-                                </Whisper>
-                              }
-                              id={row.id}
-                              user={authUser}
-                              users={users}
-                              type={key === 'Install / Maintenance' ? 'Maintenance' : key}
-                              mode="New"
-                            >
-                            </Modal>
-                          </div>
-                        </div>
-                      )}
-                    </UsersContext.Consumer>
-                  </div>
-                } else {
-                  return ''
-                }
-              }
+              obj.formatter = props => <MultiRecordCell { ...props } key={key} user={authUser} />
             }
             if (datetimeFields.includes(key)) {
               obj.formatter = ({ value }) => value ? new Date(value).toLocaleString() : ''
