@@ -7,13 +7,14 @@ import {
 } from '../components/Session'
 import { CompanyContext } from '../components/Company'
 import DataGrid from 'react-data-grid'
-import { FiEyeOff, FiFilter, FiSearch, FiArrowUp, FiArrowDown, FiPlus, FiEdit, FiTrash2, FiMaximize2, FiMoreHorizontal } from 'react-icons/fi'
+import { FiEyeOff, FiFilter, FiSearch, FiArrowUp, FiArrowDown, FiPlus, FiEdit, FiTrash2, FiMoreHorizontal } from 'react-icons/fi'
 import { AiOutlineSortAscending } from 'react-icons/ai'
 import Modal from '../components/Modal'
 import { STAGES } from '../constants/selections'
 import { datetimeFields, currencyFields } from '../constants/fields'
 import { Tooltip, Whisper } from 'rsuite'
 import { UsersContext } from '../components/layout'
+import { ExpandRow } from '../helpers/labelFormatters'
 
 const largeFields = [
   'Agreement date & time',
@@ -123,25 +124,7 @@ const HomePageBase = (props) => {
             if (key === 'Appointment name') {
               obj.frozen = true
               obj.width = 250
-              obj.formatter = (props) => (
-                <div className="level">
-                  <div className="level-left">{props.value}</div>
-                  <div className="level-right">
-                    <UsersContext.Consumer>
-                      {users => (
-                        <Modal
-                          button={<FiMaximize2 className="expand" />}
-                          id={props.row.id}
-                          type="Appointments"
-                          mode="View"
-                          users={users}
-                        >
-                        </Modal>
-                      )}
-                    </UsersContext.Consumer>
-                  </div>
-                </div>
-              )
+              obj.formatter = (props) => <ExpandRow { ...props } />
             }
             if (key === 'Stage') {
               obj.formatter = ({ value }) => {
