@@ -222,7 +222,7 @@ const transformLabels = (user, labels, onCloseModal, includeCount, remarks, rema
             })
         }
     }
-    if (!labels.map(l => l.key).includes('edit')) {
+    if (!labels.map(l => l.key).includes('edit') && onCloseModal) {
         const oppIndex = labels.map(l => l.key).indexOf('Appointment name')
         labels.splice(oppIndex, 0, {
             key: 'edit',
