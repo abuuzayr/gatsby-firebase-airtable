@@ -1,4 +1,4 @@
-const config = {
+export const config = {
   apiKey: process.env.GATSBY_API_KEY,
   authDomain: process.env.GATSBY_AUTH_DOMAIN,
   databaseURL: process.env.GATSBY_DATABASE_URL,
