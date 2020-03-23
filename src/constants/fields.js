@@ -245,3 +245,16 @@ export const selectFields = [
     'Source',
     'Assign to'
 ]
+
+export const largeFields = [
+    'Agreement date & time',
+    'Products',
+    'Payments',
+    'Install / Maintenance',
+    'Email',
+    'Customer company',
+    'Address',
+    'Name',
+    'Name 2',
+    'Appointment date & time',
+]
