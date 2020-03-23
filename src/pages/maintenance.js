@@ -8,7 +8,7 @@ import DataGrid from 'react-data-grid';
 import { FiPlus, FiEdit, FiTrash2, FiEyeOff, FiFilter, FiSearch } from 'react-icons/fi';
 import { AiOutlineSortAscending } from 'react-icons/ai';
 import Modal from '../components/Modal';
-import { currencyFields } from '../constants/fields'
+import { currencyFields, datetimeFields } from '../constants/fields'
 import { STATUS } from '../constants/selections'
 
 const hiddenFields = ['Appointments']
@@ -30,6 +30,9 @@ const MaintenancePageBase = (props) => {
       }
       if (currencyFields.includes(label.key)) {
         label.formatter = ({ value }) => value ? `$${parseFloat(value).toFixed(2)}` : ''
+      }
+      if (datetimeFields.includes(label.key)) {
+        label.formatter = ({ value }) => value ? new Date(value).toLocaleString() : ''
       }
       if (label.key === 'Status') {
         label.formatter = ({ value }) => {
