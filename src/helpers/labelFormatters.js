@@ -16,7 +16,8 @@ export const ExpandRow = props => (
                     <Modal
                         button={<FiMaximize2 className="expand" />}
                         id={props.row.id}
-                        type="Appointments"
+                        type={props.type}
+                        title={props.type}
                         mode="View"
                         users={users}
                     >
@@ -87,6 +88,7 @@ export const MultiRecordCell = ({ value, row, type, user, text, onCloseModal }) 
                                         type={type === 'Install / Maintenance' ? 'Maintenance' : type}
                                         mode="List"
                                         users={users}
+                                        title={type}
                                     >
                                     </Modal>
                                 </div> :
@@ -102,6 +104,7 @@ export const MultiRecordCell = ({ value, row, type, user, text, onCloseModal }) 
                                 rowId={row.id}
                                 user={user}
                                 users={users}
+                                title={type}
                                 type={type === 'Install / Maintenance' ? 'Maintenance' : type}
                                 mode="New"
                                 onCloseModal={onCloseModal}
@@ -144,6 +147,7 @@ export const EditCell = ({ row, user, type, onCloseModal }) => {
                         button={<FiEdit />}
                         id={row.id}
                         type={type}
+                        title={type}
                         user={user}
                         users={users}
                         mode="Edit"
@@ -186,7 +190,7 @@ const transformLabels = (user, labels, onCloseModal, includeCount, remarks, rema
             case 'Appointment name':
                 obj.frozen = true
                 obj.width = 250
-                obj.formatter = props => <ExpandRow {...props} />
+                obj.formatter = props => <ExpandRow {...props} type="Appointments" />
                 break
             case 'Stage':
                 obj.formatter = props => <ColoredCell {...props} colors={STAGES} />
