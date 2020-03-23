@@ -35,8 +35,8 @@ export const headers = {
 
 export const listLabels = {
     'Remarks': [
-        'Date & Time',
-        'User',
+        'Timestamp',
+        'Creator',
         'Text'
     ],
     'Payments': [

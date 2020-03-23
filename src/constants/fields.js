@@ -118,11 +118,19 @@ export const fields = {
         'Outstanding',
         'Remarks',
         'Payment Status'
+    ],
+    'Remarks': [
+        'Timestamp',
+        'Creator',
+        'Type',
+        'Text'
     ]
 }
 
 export const hiddenFields = [
-    'Creator'
+    'Creator',
+    'Timestamp',
+    'Type'
 ]
 
 export const readOnlyFields = [
