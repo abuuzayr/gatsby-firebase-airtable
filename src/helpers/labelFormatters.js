@@ -2,6 +2,8 @@ import React from 'react'
 import Modal from '../components/Modal'
 import { Tooltip, Whisper } from 'rsuite'
 
+import { STAGES } from '../constants/selections'
+import { datetimeFields, currencyFields, largeFields } from '../constants/fields'
 import { UsersContext } from '../components/layout'
 import { FiMaximize2, FiMoreHorizontal, FiPlus, FiEdit, FiTrash2 } from 'react-icons/fi'
 
@@ -60,7 +62,6 @@ export const CreatorCell = ({ value }) => {
 }
 
 export const MultiRecordCell = ({ value, row, type, user, text }) => {
-    console.log(type)
     if (value && Array.isArray(value)) {
         return <div className="level actions">
             <div className="level-left">
@@ -170,3 +171,110 @@ export const DeleteCell = ({ row, user, type, titleKey, onCloseModal }) => {
         </div>
     </div>
 }
+
+const transformLabels = (user, labels, onCloseModal, includeCount, remarks, remarksIndex) => {
+    labels = labels.map(key => {
+        const obj = {
+            key,
+            name: key,
+            sortable: true,
+            width: 100,
+            resizable: true
+        }
+        switch (key) {
+            case 'Appointment name':
+                obj.frozen = true
+                obj.width = 250
+                obj.formatter = props => <ExpandRow {...props} />
+                break
+            case 'Stage':
+                obj.formatter = props => <ColoredCell {...props} colors={STAGES} />
+                break
+            case 'Creator':
+                obj.formatter = props => <CreatorCell {...props} />
+                break
+            case 'Payments':
+            case 'Install / Maintenance':
+                obj.formatter = props => <MultiRecordCell {...props} type={key} user={user} />
+                break
+            default:
+                break
+        }
+        if (datetimeFields.includes(key)) {
+            obj.formatter = ({ value }) => value ? new Date(value).toLocaleString() : ''
+        }
+        if (currencyFields.includes(key)) {
+            obj.formatter = ({ value }) => value ? `$${parseFloat(value).toFixed(2)}` : ''
+        }
+        if (largeFields.includes(key)) {
+            obj.width = 180
+        }
+        return obj
+    })
+    if (includeCount) {
+        if (!labels.map(l => l.key).includes('count')) {
+            labels.unshift({
+                key: 'count',
+                name: '',
+                width: 40,
+                frozen: true,
+                formatter: props => <CountCell {...props} colors={STAGES} colorKey="Stage" />
+            })
+        }
+    }
+    if (!labels.map(l => l.key).includes('edit')) {
+        const oppIndex = labels.map(l => l.key).indexOf('Appointment name')
+        labels.splice(oppIndex, 0, {
+            key: 'edit',
+            name: '',
+            frozen: true,
+            width: 30,
+            formatter: props => <EditCell
+                {...props}
+                user={user}
+                type="Appointments"
+                onCloseModal={onCloseModal}
+            />
+        })
+        labels.push({
+            key: 'delete',
+            name: '',
+            width: 30,
+            formatter: props => <DeleteCell
+                {...props}
+                user={user}
+                type="Appointments"
+                titleKey="Appointment name"
+                onCloseModal={onCloseModal}
+            />
+        })
+        if (remarks && remarksIndex) {
+            // Add remarks row
+            labels.splice(remarksIndex, 0, {
+                key: 'Remarks',
+                name: 'Remarks',
+                width: 180,
+                formatter: (props) => {
+                    const rm = remarks.filter(r => r.fields['Appointments'].includes(props.row.id))
+                    if (rm.length > 0) {
+                        rm.sort((a, b) => {
+                            const aDate = new Date(a).getTime()
+                            const bDate = new Date(b).getTime()
+                            return bDate - aDate
+                        })
+                    }
+                    return <MultiRecordCell
+                        {...props}
+                        value={rm}
+                        text={rm.length ? rm[0]['fields']['Text'] : 'No remarks'}
+                        type="Remarks"
+                        user={user}
+                    />
+                }
+            })
+        }
+    }
+    return labels
+}
+
+export default transformLabels

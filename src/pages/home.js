@@ -7,27 +7,12 @@ import {
 } from '../components/Session'
 import { CompanyContext } from '../components/Company'
 import DataGrid from 'react-data-grid'
-import { FiEyeOff, FiFilter, FiSearch, FiArrowUp, FiArrowDown, FiPlus, FiMoreHorizontal } from 'react-icons/fi'
+import { FiEyeOff, FiFilter, FiSearch, FiArrowUp, FiArrowDown, FiPlus } from 'react-icons/fi'
 import { AiOutlineSortAscending } from 'react-icons/ai'
 import Modal from '../components/Modal'
-import { STAGES } from '../constants/selections'
-import { datetimeFields, currencyFields } from '../constants/fields'
-import { Tooltip, Whisper } from 'rsuite'
+import { datetimeFields } from '../constants/fields'
 import { UsersContext } from '../components/layout'
-import { ExpandRow, ColoredCell, CreatorCell, MultiRecordCell, CountCell, EditCell, DeleteCell } from '../helpers/labelFormatters'
-
-const largeFields = [
-  'Agreement date & time',
-  'Products',
-  'Payments',
-  'Install / Maintenance',
-  'Email',
-  'Customer company',
-  'Address',
-  'Name',
-  'Name 2',
-  'Appointment date & time',
-]
+import transformLabels from '../helpers/labelFormatters'
 
 const HomePageBase = (props) => {
   const [stats, setStats] = useState({})
@@ -114,7 +99,16 @@ const HomePageBase = (props) => {
         if (result.status === 200) {
           const body = await result.json()
           if (labels.length === 0) {
-            setLabels(transformLabels(headers, true, remarks))
+            setLabels(
+              transformLabels(
+                authUser, 
+                headers, 
+                () => setTrigger(p => !p),
+                true, 
+                remarks, 
+                labels.map(l => l.key).indexOf('Products')
+              )
+            )
           }
           const rows = body.rows.map(row => {
             if (cpy && cpy !== 'All') {
@@ -135,110 +129,6 @@ const HomePageBase = (props) => {
     }
     getAppointments()
   }, [company, authUser, trigger])
-
-  const transformLabels = (labels, includeCount, remarks) => {
-    labels = labels.map(key => {
-      const obj = {
-        key,
-        name: key,
-        sortable: true,
-        width: 100,
-        resizable: true
-      }
-      switch (key) {
-        case 'Appointment name':
-          obj.frozen = true
-          obj.width = 250
-          obj.formatter = props => <ExpandRow {...props} />
-          break
-        case 'Stage':
-          obj.formatter = props => <ColoredCell {...props} colors={STAGES} />
-          break
-        case 'Creator':
-          obj.formatter = props => <CreatorCell {...props} />
-          break
-        case 'Payments':
-        case 'Install / Maintenance':
-          obj.formatter = props => <MultiRecordCell {...props} type={key} user={authUser} />
-          break
-        default:
-          break
-      }
-      if (datetimeFields.includes(key)) {
-        obj.formatter = ({ value }) => value ? new Date(value).toLocaleString() : ''
-      }
-      if (currencyFields.includes(key)) {
-        obj.formatter = ({ value }) => value ? `$${parseFloat(value).toFixed(2)}` : ''
-      }
-      if (largeFields.includes(key)) {
-        obj.width = 180
-      }
-      return obj
-    })
-    if (includeCount) {
-      if (!labels.map(l => l.key).includes('count')) {
-        labels.unshift({
-          key: 'count',
-          name: '',
-          width: 40,
-          frozen: true,
-          formatter: props => <CountCell { ...props } colors={STAGES} colorKey="Stage" />
-        })
-      }      
-    }
-    if (!labels.map(l => l.key).includes('edit')) {
-      const oppIndex = labels.map(l => l.key).indexOf('Appointment name')
-      labels.splice(oppIndex, 0, {
-        key: 'edit',
-        name: '',
-        frozen: true,
-        width: 30,
-        formatter: props => <EditCell
-          {...props}
-          user={authUser}
-          type="Appointments"
-          onCloseModal={() => setTrigger(p => !p)}
-        />
-      })
-      labels.push({
-        key: 'delete',
-        name: '',
-        width: 30,
-        formatter: props => <DeleteCell
-          {...props}
-          user={authUser}
-          type="Appointments"
-          titleKey="Appointment name"
-          onCloseModal={() => setTrigger(p => !p)} 
-        />
-      })
-      // Add sales remarks row
-      const productIndex = labels.map(l => l.key).indexOf('Products')
-      labels.splice(productIndex, 0, {
-        key: 'Sales Remarks',
-        name: 'Sales Remarks',
-        width: 180,
-        formatter: (props) => {
-          const rm = remarks.filter(r => r.fields['Appointments'].includes(props.row.id))
-          if (rm.length > 0) {
-            rm.sort((a, b) => {
-              const aDate = new Date(a).getTime()
-              const bDate = new Date(b).getTime()
-              return bDate - aDate
-            })
-          }
-          return <MultiRecordCell
-            {...props}
-            value={rm}
-            text={rm.length ? rm[0]['fields']['Text'] : 'No remarks'}
-            type="Remarks"
-            user={authUser} 
-          />
-        }
-      })
-    }
-    return labels
-  }
 
   const sortRows = (initialRows, sortColumn, sortDirection) => rows => {
     const comparer = (a, b) => {
