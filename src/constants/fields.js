@@ -146,6 +146,7 @@ export const datetimeFields = [
     'Appointment date & time',
     'Agreement date & time',
     'Date & Time',
+    'Timestamp',
 ]
 
 export const dateFields = [
