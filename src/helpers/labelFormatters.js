@@ -61,7 +61,7 @@ export const CreatorCell = ({ value }) => {
     }
 }
 
-export const MultiRecordCell = ({ value, row, type, user, text }) => {
+export const MultiRecordCell = ({ value, row, type, user, text, onCloseModal }) => {
     if (value && Array.isArray(value)) {
         return <div className="level actions">
             <div className="level-left">
@@ -99,11 +99,12 @@ export const MultiRecordCell = ({ value, row, type, user, text }) => {
                                         <FiPlus />
                                     </Whisper>
                                 }
-                                id={row.id}
+                                rowId={row.id}
                                 user={user}
                                 users={users}
                                 type={type === 'Install / Maintenance' ? 'Maintenance' : type}
                                 mode="New"
+                                onCloseModal={onCloseModal}
                             >
                             </Modal>
                         </div>
@@ -195,7 +196,7 @@ const transformLabels = (user, labels, onCloseModal, includeCount, remarks, rema
                 break
             case 'Payments':
             case 'Install / Maintenance':
-                obj.formatter = props => <MultiRecordCell {...props} type={key} user={user} />
+                obj.formatter = props => <MultiRecordCell {...props} type={key} user={user} onCloseModal={onCloseModal} />
                 break
             default:
                 break
@@ -269,6 +270,7 @@ const transformLabels = (user, labels, onCloseModal, includeCount, remarks, rema
                         text={rm.length ? rm[0]['fields']['Text'] : 'No remarks'}
                         type="Remarks"
                         user={user}
+                        onCloseModal={onCloseModal}
                     />
                 }
             })
