@@ -14,7 +14,7 @@ import { STAGES } from '../constants/selections'
 import { datetimeFields, currencyFields } from '../constants/fields'
 import { Tooltip, Whisper } from 'rsuite'
 import { UsersContext } from '../components/layout'
-import { ExpandRow, ColoredCell } from '../helpers/labelFormatters'
+import { ExpandRow, ColoredCell, CreatorCell } from '../helpers/labelFormatters'
 
 const largeFields = [
   'Agreement date & time',
@@ -130,20 +130,7 @@ const HomePageBase = (props) => {
               obj.formatter = props => <ColoredCell { ...props } colors={STAGES} />
             }
             if (key === 'Creator') {
-              obj.formatter = ({ value }) => {
-                if (value) {
-                  return (
-                    <UsersContext.Consumer>
-                      {users => {
-                        const user = users.filter(u => u.uid === value)[0]
-                        return user ? `${user.username} (${user.email})` : ''
-                      }}
-                    </UsersContext.Consumer>
-                  )
-                } else {
-                  return ''
-                }
-              }
+              obj.formatter = props => <CreatorCell {...props} />
             }
             if (key === 'Payments' || key === 'Install / Maintenance') {
               obj.formatter = ({ value, row }) => {

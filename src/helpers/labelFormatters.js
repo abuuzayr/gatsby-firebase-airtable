@@ -41,3 +41,18 @@ export const ColoredCell = props => {
         return value
     }
 }
+
+export const CreatorCell = ({ value }) => {
+    if (value) {
+        return (
+            <UsersContext.Consumer>
+                {users => {
+                    const user = users.filter(u => u.uid === value)[0]
+                    return user ? `${user.username} (${user.email})` : ''
+                }}
+            </UsersContext.Consumer>
+        )
+    } else {
+        return ''
+    }
+}
