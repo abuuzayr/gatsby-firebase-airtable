@@ -113,10 +113,6 @@ export const fields = {
         'Date',
         'Bank',
         'Detail',
-        'Total',
-        'Total paid',
-        'Outstanding',
-        'Remarks',
         'Payment Status'
     ],
     'Remarks': [
