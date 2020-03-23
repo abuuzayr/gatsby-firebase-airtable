@@ -62,6 +62,32 @@ export const fields = {
                 'Grand Total',
             ]
         },
+        {
+            name: 'Payment',
+            prefix: true,
+            mode: 'New',
+            fields: [
+                'ID',
+                'Payment Mode',
+                'Amount',
+                'Date',
+                'Bank',
+                'Detail',
+                'Payment Status'
+            ]
+        },
+        {
+            name: 'Installation',
+            prefix: true,
+            mode: 'New',
+            fields: [
+                'Job',
+                'Unit',
+                'Date & Time',
+                'Amount to collect',
+                'Mode',
+            ]
+        },
     ],
     'Products': [
         'Model',
@@ -75,7 +101,7 @@ export const fields = {
         'Job',
         'Unit',
         'Date & Time',
-        'Amount',
+        'Amount to collect',
         'Mode',
         'Remarks',
         'Status'
@@ -116,6 +142,8 @@ export const datetimeFields = [
 
 export const dateFields = [
     'DOB',
+    'Date',
+    'Payment---Date'
 ]
 
 export const numberFields = [
@@ -144,6 +172,7 @@ export const currencyFields = [
     'Commission (sales)',
     'Commission (install)',
     'Amount',
+    'Amount to collect',
 ]
 
 export const options = {
