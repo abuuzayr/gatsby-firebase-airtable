@@ -587,16 +587,16 @@ const Modal = (props) => {
                                         </div>
                                     }
                                     <div className="level">
-                                        <div className={['View', 'List'].includes(props.mode) ? 'level-left' : 'level-item'}>
+                                        <div className={!['View', 'List'].includes(props.mode) ? 'level-left' : 'level-item'}>
                                             <button
-                                                className={`button is-danger ${props.mode === 'View' && 'is-fullwidth'}`}
+                                                className={`button is-danger ${['View', 'List'].includes(props.mode) && 'is-fullwidth'}`}
                                                 disabled={data ? '' : 'disabled'}
                                                 onClick={closeModal}>
                                                 Close
                                             </button>
                                         </div>
                                         {
-                                            ['View', 'List'].includes(props.mode) &&
+                                            !['View', 'List'].includes(props.mode) &&
                                             <div className="level-right">
                                                 <button
                                                     className="button is-warning"
