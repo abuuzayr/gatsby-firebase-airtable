@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ReactModal from 'react-modal';
-import Select from 'react-select'
-import { DatePicker, Panel } from 'rsuite'
+import Field from './Field'
+import { Panel } from 'rsuite'
 import '../../../node_modules/rsuite/dist/styles/rsuite-default.min.css'
 import { CompanyContext } from '../Company'
 import SELECTIONS from '../../constants/selections'
@@ -17,10 +17,11 @@ import {
     identifiers,
     computedFields,
     selectFields,
-    hiddenFields
 } from '../../constants/fields'
+import { FiPlus } from 'react-icons/fi'
 import { useToasts } from 'react-toast-notifications'
 import Airtable from 'airtable'
+import DataGrid from 'react-data-grid'
 
 const base = new Airtable({ 
     apiKey: process.env.GATSBY_AIRTABLE_APIKEY 
@@ -99,98 +100,14 @@ const Modal = (props) => {
     const [company, setCompany] = useState(false)
     const [data, setData] = useState({ ...defaultData })
     const [options, setOptions] = useState({})
+    const [hidden, setHidden] = useState(false)
+    const [inputFields, setInputFields] = useState(false)
     const { addToast, removeToast } = useToasts()
 
-    let formFields = fields[props.type]
-    const blocks = formFields && formFields[0] === 'ENABLE_BLOCKS'
-    if (blocks) {
-        formFields = formFields.slice(1)
-    }
-
-    const Field = p => {
-        const { field } = p
-        return (
-            <div className={hiddenFields.includes(field) ? 'is-hidden' : 'panel-block'}>
-                <div className="level-left">
-                    {
-                        Object.keys(identifiers).includes(field) ?
-                            identifiers[field][0] : field
-                    }
-                </div>
-                {
-                    ['Edit', 'View', 'New'].includes(props.mode) &&
-                    ((Object.keys(optionsObj).includes(field) || selectFields.includes(field)) ?
-                        <Select
-                            options={options[field]}
-                            isLoading={!Object.keys(options).length}
-                            styles={{
-                                container: provided => ({ ...provided, width: '100%' }),
-                                menuList: provided => ({ 
-                                    ...provided, 
-                                    maxHeight: 100,
-                                }),
-                                option: provided => ({
-                                    ...provided,
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    maxWidth: '100%',
-                                    wordBreak: 'break-all',
-                                    whiteSpace: 'nowrap'
-                                }),
-                            }}
-                            onChange={val => {
-                                updateData(field, val)
-                            }}
-                            value={
-                                data[field] && data[field].hasOwnProperty('value') ?
-                                    data[field] :
-                                    {
-                                        value: data[field],
-                                        label: getLabel(data[field], field)
-                                    }
-                            }
-                            isDisabled={
-                                !Object.keys(options).length ||
-                                (readOnlyFields.includes(field) || props.mode === 'View') ||
-                                (field === 'Assign to' && data['Creator'] !== props.user.uid && props.user.roles.ADMIN !== 'ADMIN')
-                            }
-                        >
-                        </Select> :
-                        <>
-                            {
-                                currencyFields.includes(field) && <label style={{ 'marginRight': 10 }}>$</label>
-                            }
-                            {
-
-                                datetimeFields.includes(field) || dateFields.includes(field) ?
-                                    <DatePicker
-                                        onChange={date => updateData(field, date)}
-                                        value={data[field] ? new Date(data[field]) : null}
-                                        format={datetimeFields.includes(field) ? "YYYY-MM-DD HH:mm" : "YYYY-MM-DD"}
-                                        ranges={[
-                                            {
-                                                label: datetimeFields.includes(field) ? "Now" : "Today",
-                                                value: new Date()
-                                            }
-                                        ]}
-                                    /> :
-                                    <input
-                                        value={data[field] || ''}
-                                        onChange={e => {
-                                            updateData(field, e.currentTarget.value)
-                                        }}
-                                        onBlur={e => {
-                                            updateData(field, e.currentTarget.value, true)
-                                        }}
-                                        {...getInputProps(field, props)}
-                                    />
-                            }
-                        </>
-                    )
-                }
-            </div>
-        )
-    }
+    useEffect(() => {
+        let formFields = fields[props.type]
+        setInputFields(formFields)
+    }, [])
 
     const openModal = () => {
         setIsOpen(true);
@@ -277,22 +194,34 @@ const Modal = (props) => {
     }, [data['Postal Code']])
 
     const getData = async (type, id) => {
-        if (props.mode === 'Edit' || props.mode === 'View') {
+        let obj = {}
+        if (['Edit', 'View', 'List'].includes(props.mode)) {
             try {
-                const result = await fetch(`${process.env.GATSBY_STDLIB_URL}/getRawTableData?name=${type}&id=${id}`)
+                let fetchUrl = `${process.env.GATSBY_STDLIB_URL}/getRawTableData?name=${type}`
+                if (id && props.mode !== 'List') fetchUrl += `&id=${id}`
+                const result = await fetch(fetchUrl)
                 if (result.status === 200) {
                     const body = await result.json()
-                    if (body.rows[0]) setData({
-                        id: body.rows[0]['id'],
-                        ...body.rows[0]['fields'],
-                    })
+                    if (props.mode === 'List') {
+                        obj = body.rows
+                    } else {
+                        if (body.rows[0]) {
+                            obj = {
+                                id: body.rows[0]['id'],
+                                ...body.rows[0]['fields'],
+                            }
+                        }
+                    }
                 }
             } catch (e) {
                 console.error(e)
             }
         } else {
-            setData(props.id ? { id: props.id, ...defaultData } : { ...defaultData })
+            obj = props.id ? { id: props.id, ...defaultData } : { ...defaultData }
         }
+        if (props.mode === 'List' && id) obj = obj.filter(o => o.fields['Appointments'].includes(id))
+        setData(obj)
+        return obj
     }
 
     const getOptions = async () => {
@@ -326,8 +255,15 @@ const Modal = (props) => {
 
     const afterOpenModal = async () => {
         if (props.type) {
-            await getData(props.type, props.id)
+            const rData = await getData(props.type, props.id)
             await getOptions()
+            if (props.type === 'Appointments' && !hidden) {
+                console.log('mapping here')
+                const blankPXFields = inputFields.find(f => f.name && f.name === 'Product').fields.map(field => {
+                    if (field.includes('PX') && !(rData[field] && rData[field].length)) return field.split('PX')[1]
+                }).filter(Boolean)
+                if (JSON.stringify(hidden) !== JSON.stringify(blankPXFields)) setHidden(blankPXFields)
+            }
         }
     }
 
@@ -337,6 +273,7 @@ const Modal = (props) => {
     }
 
     const updateData = (key, value, blur) => {
+        if (props.mode === 'List') return
         if (currencyFields.includes(key)) {
             if (blur || (!blur && readOnlyFields.includes(key))) {
                 value = parseFloat(value)
@@ -402,8 +339,7 @@ const Modal = (props) => {
         return obj
     }
 
-    const handleSave = async () => {
-        const savingToast = addToast('Saving...', { appearance: 'info' })
+    const getCleanData = (data, addCreator) => {
         const cleanData = { ...data }
         // Remove id from clean data
         delete cleanData['id']
@@ -433,10 +369,10 @@ const Modal = (props) => {
             }
         })
         dateFields.forEach(field => {
-            if (cleanData[field] && typeof cleanData === 'object') {
+            if (cleanData[field] && typeof cleanData[field] === 'object') {
                 try {
-                    cleanData[field] = cleanData[field].getFullYear() + '-' + cleanData[field].getMonth() + 1 + '-' + cleanData[field].getDate()
-                } catch {}
+                    cleanData[field] = cleanData[field].getFullYear() + '-' + (cleanData[field].getMonth() + 1) + '-' + cleanData[field].getDate()
+                } catch { }
             }
         })
         // Remove null fields
@@ -447,8 +383,39 @@ const Modal = (props) => {
             if (toDelete) delete cleanData[field]
         })
         // Add creator field
-        if (props.mode === 'New') {
+        if (addCreator) {
             cleanData['Creator'] = props.user.uid
+        }
+
+        return cleanData
+    }
+
+    const handleSave = async () => {
+        const savingToast = addToast('Saving...', { appearance: 'info' })
+        let cleanData = {}
+        let prefixedData = {}
+        // Check if there are prefixed keys
+        if (Object.keys(data).some(d => d.includes('---'))) {
+            prefixedData = Object.keys(data).reduce((obj, key) => {
+                if (key.includes('---')) {
+                    const objKey = key.split('---')[0]
+                    if (!obj.hasOwnProperty(objKey)) obj[objKey] = {}
+                    obj[objKey][key.split('---')[1]] = data[key]
+                }
+                return obj
+            }, {})
+            Object.keys(prefixedData).forEach(key => {
+                prefixedData[key] = getCleanData(prefixedData[key])
+            })
+            const toBeCleanedData = Object.keys(data).reduce((obj, key) => {
+                if (!key.includes('---')) {
+                    obj[key] = data[key]
+                }
+                return obj
+            }, {})
+            cleanData = getCleanData(toBeCleanedData, true)
+        } else {
+            cleanData = getCleanData(data, true)
         }
         // Save the record!
         if (data.hasOwnProperty('id')) {
@@ -473,6 +440,28 @@ const Modal = (props) => {
                     return
                 }
                 if (records.length > 0) {
+                    if (Object.keys(prefixedData).length) {
+                        Object.keys(prefixedData).forEach(key => {
+                            let table = key
+                            if (key === 'Payment') table = 'Payments'
+                            if (key === 'Installation') table = 'Maintenance'
+                            base(table).create([{ 
+                                fields: {
+                                    'Appointments': records.map(r => r.id), 
+                                    ...prefixedData[key]
+                                }
+                            }], function (err, records) {
+                                if (err) {
+                                    console.error(err);
+                                    addToast(`Error while saving: ${err}`, { appearance: 'error', autoDismiss: true })
+                                    return
+                                }
+                                if (records.length > 0) {
+                                    addToast(`${key} record created!`, { appearance: 'success', autoDismiss: true })
+                                }
+                            })
+                        })
+                    }
                     addToast('New record created!', { appearance: 'success', autoDismiss: true })
                     closeModal()
                 }
@@ -494,6 +483,15 @@ const Modal = (props) => {
                 closeModal()
             }
         })
+    }
+
+    const fieldProps = {
+        props,
+        options,
+        updateData,
+        data,
+        getLabel,
+        getInputProps,
     }
 
     return (
@@ -521,27 +519,61 @@ const Modal = (props) => {
                                 props.mode + ' record ' + (props.title ? `: ${props.title}` : '')
                             }</div>
                             {
-                                props.mode !== 'Delete' &&
+                                !['Delete'].includes(props.mode)  &&
                                 <>
                                     {
                                         data ? 
                                         <>
                                             {
-                                                blocks ? 
-                                                formFields.map(block => {
+                                                props.mode !== 'List' && inputFields && inputFields[0] === 'ENABLE_BLOCKS' ? 
+                                                inputFields.slice(1).map(block => {
+                                                    if (block.mode && props.mode !== block.mode) return null
                                                     if (block.name) {
-                                                        return <Panel header={block.name} collapsible>
+                                                        return <Panel header={block.name} key={block.name} collapsible>
                                                             {
-                                                                block.fields.map(f => <Field key={f} field={f} />)
+                                                                block.fields.map(f => {
+                                                                    if (f.includes('PX') && hidden && hidden.includes(f.split('PX')[1])) return null
+                                                                    if (f.includes('Unit') && hidden && hidden.includes(f.split('Unit')[1])) return null
+                                                                    if (f === 'Total Price' && hidden && hidden.length) {
+                                                                        return <>
+                                                                            <button 
+                                                                                className="button is-small is-fullwidth is-info is-light"
+                                                                                style={{
+                                                                                    margin: 10,
+                                                                                    width: 'calc(100% - 20px)'
+                                                                                }}
+                                                                                onClick={() => {
+                                                                                    setHidden(p => p.slice(1))
+                                                                                }}
+                                                                            ><FiPlus /> Add product</button>
+                                                                            <Field key={block.prefix ? `${block.name}---${f}` : f} field={block.prefix ? `${block.name}---${f}` : f} {...fieldProps } />
+                                                                        </>
+                                                                    }
+                                                                    return <Field key={block.prefix ? `${block.name}---${f}` : f} field={block.prefix ? `${block.name}---${f}` : f} {...fieldProps} />
+                                                                })
                                                             }
                                                         </Panel>
                                                     } else {
-                                                        return block.fields.map(f => <Field key={f} field={f} />)
+                                                        return block.fields.map(f => <Field key={f} field={f} {...fieldProps} />)
                                                     }
                                                 }) :
-                                                formFields.map(f => {
-                                                    return <Field field={f} />
-                                                }) 
+                                                inputFields && inputFields.map(f => <Field key={f} field={f} {...fieldProps} />) 
+                                            }
+                                            {
+                                                props.mode === 'List' && Array.isArray(data) &&
+                                                    <DataGrid
+                                                        columns={Object.keys(data[0].fields).map(key => {
+                                                            return {
+                                                                key,
+                                                                name: key,
+                                                                width: 100,
+                                                                resizable: true
+                                                            }
+                                                        })}
+                                                        rowGetter={i => data[i] && data[i].fields}
+                                                        rowsCount={data.length}
+                                                        minColumnWidth={35}
+                                                    />
                                             }
                                         </> :
                                         <div className="panel-block">
@@ -549,7 +581,7 @@ const Modal = (props) => {
                                         </div>
                                     }
                                     <div className="level">
-                                        <div className={props.mode !== 'View' ? 'level-left' : 'level-item'}>
+                                        <div className={['View', 'List'].includes(props.mode) ? 'level-left' : 'level-item'}>
                                             <button
                                                 className={`button is-danger ${props.mode === 'View' && 'is-fullwidth'}`}
                                                 disabled={data ? '' : 'disabled'}
@@ -558,7 +590,7 @@ const Modal = (props) => {
                                             </button>
                                         </div>
                                         {
-                                            props.mode !== 'View' &&
+                                            ['View', 'List'].includes(props.mode) &&
                                             <div className="level-right">
                                                 <button
                                                     className="button is-warning"
