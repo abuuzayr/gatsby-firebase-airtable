@@ -73,31 +73,31 @@ const toDatetimeLocal = (str) => {
         HH + ':' + II + ':' + SS;
 }
 
-const defaultData = {
-    'PX': [],
-    'PX1': [],
-    'PX2': [],
-    'PX3': [],
-    'PX4': [],
-    'PX5': [],
-    'PX6': [],
-    'PX7': [],
-    'PX8': [],
-    'PX9': [],
-    'Unit': 1,
-    'Unit1': 1,
-    'Unit2': 1,
-    'Unit3': 1,
-    'Unit4': 1,
-    'Unit5': 1,
-    'Unit6': 1,
-    'Unit7': 1,
-    'Unit8': 1,
-    'Unit9': 1,
-    'Discount': 0,
-}
-
 const Modal = (props) => {
+    const defaultData = props.type === 'Appointments' ? {
+        'PX': [],
+        'PX1': [],
+        'PX2': [],
+        'PX3': [],
+        'PX4': [],
+        'PX5': [],
+        'PX6': [],
+        'PX7': [],
+        'PX8': [],
+        'PX9': [],
+        'Unit': 1,
+        'Unit1': 1,
+        'Unit2': 1,
+        'Unit3': 1,
+        'Unit4': 1,
+        'Unit5': 1,
+        'Unit6': 1,
+        'Unit7': 1,
+        'Unit8': 1,
+        'Unit9': 1,
+        'Discount': 0,
+    } : {}
+
     const [modalIsOpen, setIsOpen] = useState(false)
     const [company, setCompany] = useState(false)
     const [data, setData] = useState({ ...defaultData })
@@ -418,6 +418,9 @@ const Modal = (props) => {
             cleanData = getCleanData(toBeCleanedData, true)
         } else {
             cleanData = getCleanData(data, true)
+        }
+        if (props.rowId) {
+            cleanData['Appointments'] = [props.rowId]
         }
         // Save the record!
         if (data.hasOwnProperty('id')) {
