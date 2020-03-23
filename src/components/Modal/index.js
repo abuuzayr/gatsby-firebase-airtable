@@ -183,6 +183,7 @@ const Modal = (props) => {
     ])
 
     useEffect(() => {
+        if (props.type !== 'Appointments') return
         if (data['Postal Code'] && data['Postal Code'].length === 6) {
             const area = data['Postal Code'].slice(0,2)
             let zone = 'Invalid Postal Code'
