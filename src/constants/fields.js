@@ -88,6 +88,16 @@ export const fields = {
                 'Mode',
             ]
         },
+        {
+            name: 'Remarks',
+            prefix: true,
+            multi: true,
+            mode: 'New',
+            fields: [
+                'Type',
+                'Text',
+            ]
+        },
     ],
     'Products': [
         'Model',
@@ -248,7 +258,8 @@ export const selectFields = [
     'Payment Mode',
     'Payment Status',
     'Source',
-    'Assign to'
+    'Assign to',
+    'Type'
 ]
 
 export const largeFields = [

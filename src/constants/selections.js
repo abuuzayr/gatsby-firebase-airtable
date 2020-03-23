@@ -55,13 +55,20 @@ export const SOURCE = {
     "Roadshow 3": "#ffffff",
 }
 
+export const REMARKS_TYPES = {
+    "Sales": "#ffffff",
+    "Install / Maintenance": "#ffffff",
+    "Payment": "#ffffff"
+}
+
 const SELECTIONS = {
     STAGES,
     STATUS,
     JOB,
     PAYMENT_STATUS,
     PAYMENT_MODE,
-    SOURCE
+    SOURCE,
+    REMARKS_TYPES
 }
 
 export default SELECTIONS

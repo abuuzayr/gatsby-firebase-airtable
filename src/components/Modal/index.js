@@ -248,7 +248,8 @@ const Modal = (props) => {
                     'Payment Mode': selections['PAYMENT_MODE'],
                     'Payment Status': selections['PAYMENT_STATUS'],
                     Source: selections['SOURCE'],
-                    'Assign to': userOptions
+                    'Assign to': userOptions,
+                    'Type': selections['REMARKS_TYPES']
                 })
             }
         } catch (e) {
@@ -273,6 +274,24 @@ const Modal = (props) => {
     const closeModal = () => {
         setIsOpen(false)
         props.onCloseModal && props.onCloseModal()
+    }
+
+    useEffect(() => {console.log(inputFields)}, [inputFields])
+
+    const duplicateRows = block => {
+        setInputFields(prevInputFields => {
+            const row = prevInputFields.find(field => field.name === block)
+            // find the count of duplicates
+            let count = 0
+            if (row.fields.some(f => f.includes('###'))) {
+                count = row.fields.filter(f => f.includes('###')).map(f => f.split('###')[1]).sort().pop()
+                count = parseInt(count) + 1
+            }
+            const newFields = row.fields.filter(f => !f.includes('###')).map(f => f + '###' + count)
+            row.fields = [...row.fields, ...newFields]
+            console.log(prevInputFields)
+            return prevInputFields
+        })
     }
 
     const updateData = (key, value, blur) => {
@@ -539,6 +558,7 @@ const Modal = (props) => {
                                                             return <Panel header={block.name} key={block.name} collapsible>
                                                                 {
                                                                     block.fields.map(f => {
+                                                                        const fieldName = block.prefix ? `${block.name}---${f}` : f
                                                                         if (f.includes('PX') && hidden && hidden.includes(f.split('PX')[1])) return null
                                                                         if (f.includes('Unit') && hidden && hidden.includes(f.split('Unit')[1])) return null
                                                                         if (f === 'Total Price' && hidden && hidden.length) {
@@ -553,11 +573,23 @@ const Modal = (props) => {
                                                                                         setHidden(p => p.slice(1))
                                                                                     }}
                                                                                 ><FiPlus /> Add product</button>
-                                                                                <Field key={block.prefix ? `${block.name}---${f}` : f} field={block.prefix ? `${block.name}---${f}` : f} {...fieldProps } />
+                                                                                <Field key={fieldName} field={fieldName} {...fieldProps } />
                                                                             </>
                                                                         }
-                                                                        return <Field key={block.prefix ? `${block.name}---${f}` : f} field={block.prefix ? `${block.name}---${f}` : f} {...fieldProps} />
+                                                                        return <Field key={fieldName} field={fieldName} {...fieldProps} />
                                                                     })
+                                                                }
+                                                                {
+
+                                                                    block.multi &&
+                                                                        <button
+                                                                            className="button is-small is-fullwidth is-info is-light"
+                                                                            style={{
+                                                                                margin: 10,
+                                                                                width: 'calc(100% - 20px)'
+                                                                            }}
+                                                                            onClick={() => duplicateRows(block.name)}
+                                                                        ><FiPlus /> Add {block.name}</button>
                                                                 }
                                                             </Panel>
                                                         } else {
