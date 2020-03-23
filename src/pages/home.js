@@ -11,6 +11,7 @@ import { FiEyeOff, FiFilter, FiSearch, FiArrowUp, FiArrowDown, FiPlus } from 're
 import { AiOutlineSortAscending } from 'react-icons/ai'
 import Modal from '../components/Modal'
 import { datetimeFields } from '../constants/fields'
+import { headers } from '../constants/labels'
 import { UsersContext } from '../components/layout'
 import transformLabels from '../helpers/labelFormatters'
 
@@ -62,38 +63,6 @@ const HomePageBase = (props) => {
       // Get Appointments
       const role = Object.keys(authUser.roles)[0]
       const cpy = company.company && company.company.value
-      const headers = [
-        'Appointment name',
-        'Company',
-        'Assigned to',
-        'Stage',
-        'Appointment date & time',
-        'Name',
-        'Contact',
-        'Customer company',
-        'Email',
-        'DOB',
-        'Address',
-        'House Unit',
-        'Postal Code',
-        'Zone',
-        'Name 2',
-        'Contact 2',
-        'Relationship',
-        'AG no.',
-        'Agreement date & time',
-        'Products',
-        'Total Price',
-        'Discount',
-        'Subtotal',
-        'GST',
-        'Grand Total',
-        'Payments',
-        'Total paid',
-        'Outstanding',
-        'Install / Maintenance',
-        'Creator'
-      ]
       try {
         const result = await fetch(`${process.env.GATSBY_STDLIB_URL}/getRawTableData?name=Appointments`)
         if (result.status === 200) {
@@ -102,7 +71,7 @@ const HomePageBase = (props) => {
             setLabels(
               transformLabels(
                 authUser, 
-                headers, 
+                headers['Appointments'], 
                 () => setTrigger(p => !p),
                 true, 
                 remarks, 
