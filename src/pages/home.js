@@ -98,9 +98,8 @@ const HomePageBase = (props) => {
         'Agreement date & time',
         'Products',
         'Total Price',
-        'Unit',
-        'Subtotal',
         'Discount',
+        'Subtotal',
         'GST',
         'Grand Total',
         'Payments',
@@ -174,6 +173,62 @@ const HomePageBase = (props) => {
                       }}
                     </UsersContext.Consumer>
                   )
+                } else {
+                  return ''
+                }
+              }
+            }
+            if (key === 'Payments' || key === 'Install / Maintenance') {
+              obj.formatter = ({ value, row }) => {
+                if (value && Array.isArray(value)) {
+                  return <div className="level actions">
+                    <div className="level-left">
+                      <div className="level-item">
+                        {
+                          value.length + ' record/s'
+                        }
+                      </div>
+                    </div>
+                    <UsersContext.Consumer>
+                      {users => (
+                        <div className="level-right">
+                          {
+                            value.length ?
+                            <div className="level-item">
+                              <Modal
+                                button={
+                                  <Whisper placement="top" speaker={<Tooltip>{`See all ${key}`}</Tooltip>}>
+                                    <FiMoreHorizontal />
+                                  </Whisper>
+                                }
+                                id={row.id}
+                                type={key === 'Install / Maintenance' ? 'Maintenance' : key}
+                                mode="List"
+                                users={users}
+                              >
+                              </Modal>
+                            </div> :
+                            <></>
+                          }
+                          <div className="level-item">
+                            <Modal
+                              button={
+                                <Whisper placement="top" speaker={<Tooltip>{`Add new ${key}`}</Tooltip>}>
+                                  <FiPlus />
+                                </Whisper>
+                              }
+                              id={row.id}
+                              user={authUser}
+                              users={users}
+                              type={key === 'Install / Maintenance' ? 'Maintenance' : key}
+                              mode="New"
+                            >
+                            </Modal>
+                          </div>
+                        </div>
+                      )}
+                    </UsersContext.Consumer>
+                  </div>
                 } else {
                   return ''
                 }
@@ -305,28 +360,28 @@ const HomePageBase = (props) => {
                 }
               </div>
             </div>
-            <div className="level-right">
-              <div className="level-item">
-                <UsersContext.Consumer>
-                  {users => (
-                    <Modal
-                      button={
-                        <Whisper placement="top" speaker={<Tooltip>See all remarks</Tooltip>}>
-                          <FiMoreHorizontal />
-                        </Whisper>
-                      }
-                      id={row.id}
-                      type="Appointments"
-                      mode="View"
-                      users={users}
-                    >
-                    </Modal>
-                  )}
-                </UsersContext.Consumer>
-              </div>
-              <div className="level-item">
-                <UsersContext.Consumer>
-                  {users => (
+            <UsersContext.Consumer>
+              {users => (
+                <div className="level-right">
+                  {
+                    rm.length ?
+                      <div className="level-item">
+                        <Modal
+                          button={
+                            <Whisper placement="top" speaker={<Tooltip>See all remarks</Tooltip>}>
+                              <FiMoreHorizontal />
+                            </Whisper>
+                          }
+                          id={row.id}
+                          type="Remarks"
+                          mode="List"
+                          users={users}
+                        >
+                        </Modal>
+                      </div> :
+                      <></>
+                  }
+                  <div className="level-item">
                     <Modal
                       button={
                         <Whisper placement="top" speaker={<Tooltip>Add new remark</Tooltip>}>
@@ -340,10 +395,10 @@ const HomePageBase = (props) => {
                       mode="New"
                     >
                     </Modal>
-                  )}
-                </UsersContext.Consumer>
-              </div>
-            </div>
+                  </div>
+                </div>
+              )}
+            </UsersContext.Consumer>
           </div>
         }
       })
