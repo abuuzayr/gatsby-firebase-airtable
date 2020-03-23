@@ -159,7 +159,7 @@ const HomePageBase = (props) => {
           break
         case 'Payments':
         case 'Install / Maintenance':
-          obj.formatter = props => <MultiRecordCell {...props} key={key} user={authUser} />
+          obj.formatter = props => <MultiRecordCell {...props} type={key} user={authUser} />
           break
         default:
           break
@@ -193,7 +193,12 @@ const HomePageBase = (props) => {
         name: '',
         frozen: true,
         width: 30,
-        formatter: props => <EditCell {...props} user={authUser} type="Appointments" onCloseModal={() => setTrigger(p => !p)} />
+        formatter: props => <EditCell
+          {...props}
+          user={authUser}
+          type="Appointments"
+          onCloseModal={() => setTrigger(p => !p)}
+        />
       })
       labels.push({
         key: 'delete',
@@ -213,8 +218,8 @@ const HomePageBase = (props) => {
         key: 'Sales Remarks',
         name: 'Sales Remarks',
         width: 180,
-        formatter: ({ row }) => {
-          const rm = remarks.filter(r => r.fields['Appointments'].includes(row.id))
+        formatter: (props) => {
+          const rm = remarks.filter(r => r.fields['Appointments'].includes(props.row.id))
           if (rm.length > 0) {
             rm.sort((a, b) => {
               const aDate = new Date(a).getTime()
@@ -222,54 +227,13 @@ const HomePageBase = (props) => {
               return bDate - aDate
             })
           }
-          return <div className="level actions">
-            <div className="level-left">
-              <div className="level-item">
-                {
-                  rm.length ? rm[0]['fields']['Text'] : 'No remarks'
-                }
-              </div>
-            </div>
-            <UsersContext.Consumer>
-              {users => (
-                <div className="level-right">
-                  {
-                    rm.length ?
-                      <div className="level-item">
-                        <Modal
-                          button={
-                            <Whisper placement="top" speaker={<Tooltip>See all remarks</Tooltip>}>
-                              <FiMoreHorizontal />
-                            </Whisper>
-                          }
-                          id={row.id}
-                          type="Remarks"
-                          mode="List"
-                          users={users}
-                        >
-                        </Modal>
-                      </div> :
-                      <></>
-                  }
-                  <div className="level-item">
-                    <Modal
-                      button={
-                        <Whisper placement="top" speaker={<Tooltip>Add new remark</Tooltip>}>
-                          <FiPlus />
-                        </Whisper>
-                      }
-                      id={row.id}
-                      user={authUser}
-                      users={users}
-                      type="Remarks"
-                      mode="New"
-                    >
-                    </Modal>
-                  </div>
-                </div>
-              )}
-            </UsersContext.Consumer>
-          </div>
+          return <MultiRecordCell
+            {...props}
+            value={rm}
+            text={rm.length ? rm[0]['fields']['Text'] : 'No remarks'}
+            type="Remarks"
+            user={authUser} 
+          />
         }
       })
     }

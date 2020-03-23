@@ -59,13 +59,14 @@ export const CreatorCell = ({ value }) => {
     }
 }
 
-export const MultiRecordCell = ({ value, row, key, user }) => {
+export const MultiRecordCell = ({ value, row, type, user, text }) => {
+    console.log(type)
     if (value && Array.isArray(value)) {
         return <div className="level actions">
             <div className="level-left">
                 <div className="level-item">
                     {
-                        value.length + ' record/s'
+                        text ? text : value.length + ' record/s'
                     }
                 </div>
             </div>
@@ -77,12 +78,12 @@ export const MultiRecordCell = ({ value, row, key, user }) => {
                                 <div className="level-item">
                                     <Modal
                                         button={
-                                            <Whisper placement="top" speaker={<Tooltip>{`See all ${key}`}</Tooltip>}>
+                                            <Whisper placement="top" speaker={<Tooltip>{`See all ${type}`}</Tooltip>}>
                                                 <FiMoreHorizontal />
                                             </Whisper>
                                         }
                                         id={row.id}
-                                        type={key === 'Install / Maintenance' ? 'Maintenance' : key}
+                                        type={type === 'Install / Maintenance' ? 'Maintenance' : type}
                                         mode="List"
                                         users={users}
                                     >
@@ -93,14 +94,14 @@ export const MultiRecordCell = ({ value, row, key, user }) => {
                         <div className="level-item">
                             <Modal
                                 button={
-                                    <Whisper placement="top" speaker={<Tooltip>{`Add new ${key}`}</Tooltip>}>
+                                    <Whisper placement="top" speaker={<Tooltip>{`Add new ${type}`}</Tooltip>}>
                                         <FiPlus />
                                     </Whisper>
                                 }
                                 id={row.id}
                                 user={user}
                                 users={users}
-                                type={key === 'Install / Maintenance' ? 'Maintenance' : key}
+                                type={type === 'Install / Maintenance' ? 'Maintenance' : type}
                                 mode="New"
                             >
                             </Modal>
