@@ -113,3 +113,21 @@ export const MultiRecordCell = ({ value, row, key, user }) => {
         return ''
     }
 }
+
+export const CountCell = ({ value, row, colors, colorKey }) => {
+    if (colors && colorKey) {
+        const color = colors[row[colorKey]] ? colors[row[colorKey]] : '#fff'
+        return <div
+            style={{
+                'textAlign': 'center',
+                'borderRight': '5px solid ' + color,
+                'marginRight': -8,
+                'paddingRight': 2
+            }}
+        >
+            {value}
+        </div>
+    } else {
+        return value
+    }
+}

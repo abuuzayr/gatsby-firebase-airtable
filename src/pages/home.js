@@ -14,7 +14,7 @@ import { STAGES } from '../constants/selections'
 import { datetimeFields, currencyFields } from '../constants/fields'
 import { Tooltip, Whisper } from 'rsuite'
 import { UsersContext } from '../components/layout'
-import { ExpandRow, ColoredCell, CreatorCell, MultiRecordCell } from '../helpers/labelFormatters'
+import { ExpandRow, ColoredCell, CreatorCell, MultiRecordCell, CountCell } from '../helpers/labelFormatters'
 
 const largeFields = [
   'Agreement date & time',
@@ -113,41 +113,8 @@ const HomePageBase = (props) => {
         const result = await fetch(`${process.env.GATSBY_STDLIB_URL}/getRawTableData?name=Appointments`)
         if (result.status === 200) {
           const body = await result.json()
-          const labelFields = headers.map(key => {
-            const obj = {
-              key,
-              name: key,
-              sortable: true,
-              width: 100,
-              resizable: true
-            }
-            if (key === 'Appointment name') {
-              obj.frozen = true
-              obj.width = 250
-              obj.formatter = props => <ExpandRow { ...props } />
-            }
-            if (key === 'Stage') {
-              obj.formatter = props => <ColoredCell { ...props } colors={STAGES} />
-            }
-            if (key === 'Creator') {
-              obj.formatter = props => <CreatorCell {...props} />
-            }
-            if (key === 'Payments' || key === 'Install / Maintenance') {
-              obj.formatter = props => <MultiRecordCell { ...props } key={key} user={authUser} />
-            }
-            if (datetimeFields.includes(key)) {
-              obj.formatter = ({ value }) => value ? new Date(value).toLocaleString() : ''
-            }
-            if (currencyFields.includes(key)) {
-              obj.formatter = ({ value }) => value ? `$${parseFloat(value).toFixed(2)}` : ''
-            }
-            if (largeFields.includes(key)) {
-              obj.width = 180
-            }
-            return obj
-          })
           if (labels.length === 0) {
-            setLabels(transformLabels(labelFields, remarks))
+            setLabels(transformLabels(headers, true, remarks))
           }
           const rows = body.rows.map(row => {
             if (cpy && cpy !== 'All') {
@@ -169,27 +136,57 @@ const HomePageBase = (props) => {
     getAppointments()
   }, [company, authUser, trigger])
 
-  const transformLabels = (labels, remarks) => {
-    if (!labels.map(l => l.key).includes('count')) {
-      labels.unshift({
-        key: 'count',
-        name: '',
-        width: 40,
-        frozen: true,
-        formatter: ({ value, row }) => {
-          const stageColor = STAGES[row['Stage']] ? STAGES[row['Stage']] : '#fff'
-          return <div
-            style={{
-              'textAlign': 'center',
-              'borderRight': '5px solid ' + stageColor,
-              'marginRight': -8,
-              'paddingRight': 2
-            }}
-          >
-            {value}
-          </div>
-        }
-      })
+  const transformLabels = (labels, includeCount, remarks) => {
+    labels = labels.map(key => {
+      const obj = {
+        key,
+        name: key,
+        sortable: true,
+        width: 100,
+        resizable: true
+      }
+      switch (key) {
+        case 'Appointment name':
+          obj.frozen = true
+          obj.width = 250
+          obj.formatter = props => <ExpandRow {...props} />
+          break
+        case 'Stage':
+          obj.formatter = props => <ColoredCell {...props} colors={STAGES} />
+          break
+        case 'Creator':
+          obj.formatter = props => <CreatorCell {...props} />
+          break
+        case 'Payments':
+        case 'Install / Maintenance':
+          obj.formatter = props => <MultiRecordCell {...props} key={key} user={authUser} />
+          break
+        default:
+          break
+      }
+      if (datetimeFields.includes(key)) {
+        obj.formatter = ({ value }) => value ? new Date(value).toLocaleString() : ''
+      }
+      if (currencyFields.includes(key)) {
+        obj.formatter = ({ value }) => value ? `$${parseFloat(value).toFixed(2)}` : ''
+      }
+      if (largeFields.includes(key)) {
+        obj.width = 180
+      }
+      return obj
+    })
+    if (includeCount) {
+      if (!labels.map(l => l.key).includes('count')) {
+        labels.unshift({
+          key: 'count',
+          name: '',
+          width: 40,
+          frozen: true,
+          formatter: props => <CountCell { ...props } colors={STAGES} colorKey="Stage" />
+        })
+      }      
+    }
+    if (!labels.map(l => l.key).includes('edit')) {
       const oppIndex = labels.map(l => l.key).indexOf('Appointment name')
       labels.splice(oppIndex, 0, {
         key: 'edit',
