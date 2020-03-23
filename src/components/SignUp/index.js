@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import { Link, navigate } from 'gatsby';
+import firebase from 'firebase'
 
 import { withFirebase } from '../Firebase';
+import { config } from '../Firebase/firebase'
 import ROUTES from '../../constants/routes';
 import { ROLES } from '../../constants/roles';
 import { FiPlus } from 'react-icons/fi';
@@ -34,24 +36,20 @@ class SignUpFormBase extends Component {
 
   onSubmit = event => {
     const { username, email, passwordOne, role } = this.state;
-    const roles = {};
 
-    if (role) {
-      roles[ROLES[role]] = ROLES[role];
-    }
+    if (!role) role = 'SALES'
 
-    this.props.firebase
-      .doCreateUserWithEmailAndPassword(email, passwordOne)
-      .then(authUser => {
+    const secondaryApp = firebase.initializeApp(config, "Secondary");
+
+    secondaryApp.auth().createUserWithEmailAndPassword(email, passwordOne)
+      .then(userData => {
+        userData.user.sendEmailVerification();
         // Create a user in your Firebase realtime database
-        return this.props.firebase.user(authUser.user.uid).set({
+        return firebase.database().ref('users/' + userData.user.uid).set({
           username,
           email,
-          roles,
+          role
         });
-      })
-      .then(() => {
-        return this.props.firebase.doSendEmailVerification();
       })
       .then(() => {
         this.setState({ ...INITIAL_STATE });
@@ -64,6 +62,8 @@ class SignUpFormBase extends Component {
 
         this.setState({ error });
       });
+
+    secondaryApp.auth().signOut();
 
     event.preventDefault();
   };
