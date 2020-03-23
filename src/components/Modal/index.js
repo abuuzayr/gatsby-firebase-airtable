@@ -18,6 +18,8 @@ import {
     computedFields,
     selectFields,
 } from '../../constants/fields'
+import { listLabels } from '../../constants/labels'
+import transformLabels from '../../helpers/labelFormatters'
 import { FiPlus } from 'react-icons/fi'
 import { useToasts } from 'react-toast-notifications'
 import Airtable from 'airtable'
@@ -525,55 +527,59 @@ const Modal = (props) => {
                                         data ? 
                                         <>
                                             {
-                                                props.mode !== 'List' && inputFields && inputFields[0] === 'ENABLE_BLOCKS' ? 
-                                                inputFields.slice(1).map(block => {
-                                                    if (block.mode && props.mode !== block.mode) return null
-                                                    if (block.name) {
-                                                        return <Panel header={block.name} key={block.name} collapsible>
-                                                            {
-                                                                block.fields.map(f => {
-                                                                    if (f.includes('PX') && hidden && hidden.includes(f.split('PX')[1])) return null
-                                                                    if (f.includes('Unit') && hidden && hidden.includes(f.split('Unit')[1])) return null
-                                                                    if (f === 'Total Price' && hidden && hidden.length) {
-                                                                        return <>
-                                                                            <button 
-                                                                                className="button is-small is-fullwidth is-info is-light"
-                                                                                style={{
-                                                                                    margin: 10,
-                                                                                    width: 'calc(100% - 20px)'
-                                                                                }}
-                                                                                onClick={() => {
-                                                                                    setHidden(p => p.slice(1))
-                                                                                }}
-                                                                            ><FiPlus /> Add product</button>
-                                                                            <Field key={block.prefix ? `${block.name}---${f}` : f} field={block.prefix ? `${block.name}---${f}` : f} {...fieldProps } />
-                                                                        </>
-                                                                    }
-                                                                    return <Field key={block.prefix ? `${block.name}---${f}` : f} field={block.prefix ? `${block.name}---${f}` : f} {...fieldProps} />
-                                                                })
+                                                props.mode !== 'List' ?
+                                                    inputFields && inputFields[0] === 'ENABLE_BLOCKS' ? 
+                                                    inputFields.slice(1).map(block => {
+                                                        if (block.mode && props.mode !== block.mode) return null
+                                                        if (block.name) {
+                                                            return <Panel header={block.name} key={block.name} collapsible>
+                                                                {
+                                                                    block.fields.map(f => {
+                                                                        if (f.includes('PX') && hidden && hidden.includes(f.split('PX')[1])) return null
+                                                                        if (f.includes('Unit') && hidden && hidden.includes(f.split('Unit')[1])) return null
+                                                                        if (f === 'Total Price' && hidden && hidden.length) {
+                                                                            return <>
+                                                                                <button 
+                                                                                    className="button is-small is-fullwidth is-info is-light"
+                                                                                    style={{
+                                                                                        margin: 10,
+                                                                                        width: 'calc(100% - 20px)'
+                                                                                    }}
+                                                                                    onClick={() => {
+                                                                                        setHidden(p => p.slice(1))
+                                                                                    }}
+                                                                                ><FiPlus /> Add product</button>
+                                                                                <Field key={block.prefix ? `${block.name}---${f}` : f} field={block.prefix ? `${block.name}---${f}` : f} {...fieldProps } />
+                                                                            </>
+                                                                        }
+                                                                        return <Field key={block.prefix ? `${block.name}---${f}` : f} field={block.prefix ? `${block.name}---${f}` : f} {...fieldProps} />
+                                                                    })
+                                                                }
+                                                            </Panel>
+                                                        } else {
+                                                            return block.fields.map(f => <Field key={f} field={f} {...fieldProps} />)
+                                                        }
+                                                    }) :
+                                                    inputFields && inputFields.map(f => <Field key={f} field={f} {...fieldProps} />) :
+                                                Array.isArray(data) &&
+                                                <DataGrid
+                                                    columns={transformLabels(
+                                                        props.authUser,
+                                                        listLabels[props.type],
+                                                        null,
+                                                        true
+                                                    )}
+                                                    rowGetter={i => {
+                                                        if (data[i]) {
+                                                            return { 
+                                                                count: i + 1, 
+                                                                ...data[i].fields 
                                                             }
-                                                        </Panel>
-                                                    } else {
-                                                        return block.fields.map(f => <Field key={f} field={f} {...fieldProps} />)
-                                                    }
-                                                }) :
-                                                inputFields && inputFields.map(f => <Field key={f} field={f} {...fieldProps} />) 
-                                            }
-                                            {
-                                                props.mode === 'List' && Array.isArray(data) &&
-                                                    <DataGrid
-                                                        columns={Object.keys(data[0].fields).map(key => {
-                                                            return {
-                                                                key,
-                                                                name: key,
-                                                                width: 100,
-                                                                resizable: true
-                                                            }
-                                                        })}
-                                                        rowGetter={i => data[i] && data[i].fields}
-                                                        rowsCount={data.length}
-                                                        minColumnWidth={35}
-                                                    />
+                                                        }
+                                                    }}
+                                                    rowsCount={data.length}
+                                                    minColumnWidth={35}
+                                                />
                                             }
                                         </> :
                                         <div className="panel-block">
