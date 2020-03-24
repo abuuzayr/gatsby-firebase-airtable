@@ -262,7 +262,6 @@ const Modal = (props) => {
             const rData = await getData(props.type, props.id)
             await getOptions()
             if (props.type === 'Appointments' && !hidden) {
-                console.log('mapping here')
                 const blankPXFields = inputFields.find(f => f.name && f.name === 'Product').fields.map(field => {
                     if (field.includes('PX') && !(rData[field] && rData[field].length)) return field.split('PX')[1]
                 }).filter(Boolean)
@@ -275,8 +274,6 @@ const Modal = (props) => {
         setIsOpen(false)
         props.onCloseModal && props.onCloseModal()
     }
-
-    useEffect(() => {console.log(inputFields)}, [inputFields])
 
     const duplicateRows = block => {
         setInputFields(prevInputFields => {
