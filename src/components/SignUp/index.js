@@ -44,7 +44,7 @@ class SignUpFormBase extends Component {
       .then(userData => {
         userData.user.sendEmailVerification();
         // Create a user in your Firebase realtime database
-        return this.state.database.ref('users/' + userData.user.uid).set({
+        return this.state.firebase.database().ref('users/' + userData.user.uid).set({
           username,
           email,
           role
@@ -67,9 +67,9 @@ class SignUpFormBase extends Component {
     event.preventDefault();
   };
 
-  componentDidMount() {
-    const firebase = import('firebase')
-    const secondaryApp = firebase.initializeApp(config, "Secondary");
+  async componentDidMount() {
+    const firebase = await import('firebase')
+    const secondaryApp = firebase.apps.length === 2 ? firebase.app("Secondary") : firebase.initializeApp(config, "Secondary");
     this.setState({
       firebase,
       secondaryApp
@@ -78,10 +78,6 @@ class SignUpFormBase extends Component {
 
   onChange = event => {
     this.setState({ [event.target.name]: event.target.value });
-  };
-
-  onChangeCheckbox = event => {
-    this.setState({ [event.target.name]: event.target.checked });
   };
 
   render() {
@@ -135,7 +131,7 @@ class SignUpFormBase extends Component {
           <select
             name="role"
             value={role}
-            onChange={this.onChangeCheckbox}
+            onChange={this.onChange}
           >
             {
               Object.keys(ROLES).map(role => (
