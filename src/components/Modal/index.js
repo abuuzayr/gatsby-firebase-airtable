@@ -129,58 +129,71 @@ const Modal = (props) => {
     useEffect(() => {
         if (!options || !Object.keys(options).length) return
         const products = [
-            { unit: data['Unit'] || 1, price: 0},
-            { unit: data['Unit1'] || 1, price: 0},
-            { unit: data['Unit2'] || 1, price: 0},
-            { unit: data['Unit3'] || 1, price: 0},
-            { unit: data['Unit4'] || 1, price: 0},
-            { unit: data['Unit5'] || 1, price: 0},
-            { unit: data['Unit6'] || 1, price: 0},
-            { unit: data['Unit7'] || 1, price: 0},
-            { unit: data['Unit8'] || 1, price: 0},
-            { unit: data['Unit9'] || 1, price: 0},
+            { unit: data['Unit'] || 1, price: data['Price'] || 0, discount: data['Discount'] || 0, total: data['Total'] || 0},
+            { unit: data['Unit1'] || 1, price: data['Price1'] || 0, discount: data['Discount1'] || 0, total: data['Total1'] || 0},
+            { unit: data['Unit2'] || 1, price: data['Price2'] || 0, discount: data['Discount2'] || 0, total: data['Total2'] || 0},
+            { unit: data['Unit3'] || 1, price: data['Price3'] || 0, discount: data['Discount3'] || 0, total: data['Total3'] || 0},
+            { unit: data['Unit4'] || 1, price: data['Price4'] || 0, discount: data['Discount4'] || 0, total: data['Total4'] || 0},
+            { unit: data['Unit5'] || 1, price: data['Price5'] || 0, discount: data['Discount5'] || 0, total: data['Total5'] || 0},
+            { unit: data['Unit6'] || 1, price: data['Price6'] || 0, discount: data['Discount6'] || 0, total: data['Total6'] || 0},
+            { unit: data['Unit7'] || 1, price: data['Price7'] || 0, discount: data['Discount7'] || 0, total: data['Total7'] || 0},
+            { unit: data['Unit8'] || 1, price: data['Price8'] || 0, discount: data['Discount8'] || 0, total: data['Total8'] || 0},
+            { unit: data['Unit9'] || 1, price: data['Price9'] || 0, discount: data['Discount9'] || 0, total: data['Total9'] || 0},
         ]
-        const discount = data['Discount'] || 0
         for (let i = 0; i < 10; i ++) {
             const px = i > 0 ? 'PX' + i : 'PX'
-            if (Array.isArray(data[px])) {
-                const product = options[px].filter(p => p.value === data[px][0])[0]
-                products[i]['price'] = product ? product['fields']['Price'] : 0
-            } else {
-                products[i]['price'] = data[px] ? data[px]['fields']['Price'] : 0
-            }
+            // // Only update if price is not altered
+            // if (!products[i]['price']) {
+                if (Array.isArray(data[px])) {
+                    const product = options[px].find(p => p.value === data[px][0])
+                    products[i]['price'] = product ? product['fields']['Price'] : 0
+                } else {
+                    products[i]['price'] = data[px] ? data[px]['fields']['Price'] : 0
+                }
+            // }
+            updateData(`Price${i ? i : ''}`, products[i]['price'] * products[i]['unit'])
+            products[i]['total'] = products[i]['unit'] * products[i]['price'] - products[i]['discount']
+            updateData(`Total${i ? i : ''}`, products[i]['total'])
         }
-        const totalPrice = products.reduce((acc, curr) => acc += curr.unit * curr.price, 0)
-        const subTotal = totalPrice - discount
+        const subTotal = products.reduce((acc, curr) => acc += curr.total, 0)
         const GST = 0.07 * subTotal
-        updateData('Total Price', totalPrice)
         updateData('Subtotal', subTotal)
         updateData('GST', GST)
         updateData('Grand Total', subTotal + GST)
     }, [
-        options,
-        data['PX'],
-        data['Unit'],
-        data['PX1'],
-        data['Unit1'],
-        data['PX2'],
-        data['Unit2'],
-        data['PX3'],
-        data['Unit3'],
-        data['PX4'],
-        data['Unit4'],
-        data['PX5'],
-        data['Unit5'],
-        data['PX6'],
-        data['Unit6'],
-        data['PX7'],
-        data['Unit7'],
-        data['PX8'],
-        data['Unit8'],
-        data['PX9'],
-        data['Unit9'],
-        data['Discount']
-    ])
+            options,
+            data['PX'],
+            data['Unit'],
+            data['Discount'],
+            data['PX1'],
+            data['Unit1'],
+            data['Discount1'],
+            data['PX2'],
+            data['Unit2'],
+            data['Discount2'],
+            data['PX3'],
+            data['Unit3'],
+            data['Discount3'],
+            data['PX4'],
+            data['Unit4'],
+            data['Discount4'],
+            data['PX5'],
+            data['Unit5'],
+            data['Discount5'],
+            data['PX6'],
+            data['Unit6'],
+            data['Discount6'],
+            data['PX7'],
+            data['Unit7'],
+            data['Discount7'],
+            data['PX8'],
+            data['Unit8'],
+            data['Discount8'],
+            data['PX9'],
+            data['Unit9'],
+            data['Discount9'],
+        ]
+    )
 
     useEffect(() => {
         if (props.type !== 'Appointments') return
@@ -558,7 +571,10 @@ const Modal = (props) => {
                                                                         const fieldName = block.prefix ? `${block.name}---${f}` : f
                                                                         if (f.includes('PX') && hidden && hidden.includes(f.split('PX')[1])) return null
                                                                         if (f.includes('Unit') && hidden && hidden.includes(f.split('Unit')[1])) return null
-                                                                        if (f === 'Total Price' && hidden && hidden.length) {
+                                                                        if (f.includes('Discount') && hidden && hidden.includes(f.split('Discount')[1])) return null
+                                                                        if (f.includes('Price') && hidden && hidden.includes(f.split('Price')[1])) return null
+                                                                        if (f.includes('Total') && hidden && hidden.includes(f.split('Total')[1])) return null
+                                                                        if (f === 'Subtotal' && hidden && hidden.length) {
                                                                             return <>
                                                                                 <button 
                                                                                     className="button is-small is-fullwidth is-info is-light"
@@ -573,7 +589,10 @@ const Modal = (props) => {
                                                                                 <Field key={fieldName} field={fieldName} {...fieldProps } />
                                                                             </>
                                                                         }
-                                                                        return <Field key={fieldName} field={fieldName} {...fieldProps} />
+                                                                        return <>
+                                                                            { f.includes('PX') && f !== 'PX' && <hr/> }
+                                                                            <Field key={fieldName} field={fieldName} {...fieldProps} />
+                                                                        </>
                                                                     })
                                                                 }
                                                                 {
