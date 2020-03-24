@@ -28,29 +28,12 @@ class Layout extends Component {
   }
 
   async componentDidMount() {
-    const app = import('firebase/app');
-    const auth = import('firebase/auth');
-    const database = import('firebase/database');
+    const app = await import('firebase/app');
+    const auth = await import('firebase/auth');
+    const database = await import('firebase/database');
 
-    Promise.all([app, auth, database]).then(values => {
-      const firebase = getFirebase(values[0]);
-      this.setState({ firebase },
-        () => {
-          firebase.users().on('value', snapshot => {
-            const usersObject = snapshot.val();
-
-            const usersList = Object.keys(usersObject).map(key => ({
-              ...usersObject[key],
-              uid: key,
-            }));
-
-            this.setState({
-              users: usersList,
-              loading: false,
-            });
-          });
-        });
-    });
+    const firebase = getFirebase(app, auth, database);
+    this.setState({ firebase });
 
     try {
       const companies = await fetch(`${process.env.GATSBY_STDLIB_URL}/getRawTableData?name=Companies`)
@@ -66,6 +49,25 @@ class Layout extends Component {
     } catch (e) {
       console.error(e)
     }
+  }
+
+  componentDidUpdate() {
+    this.state.firebase.users().on('value', snapshot => {
+      const usersObject = snapshot.val();
+
+      const usersList = Object.keys(usersObject).map(key => ({
+        ...usersObject[key],
+        uid: key,
+      }));
+
+      if (JSON.stringify(this.state.users) !== JSON.stringify(usersList)) {
+        this.setState({
+          users: usersList,
+          loading: false,
+        });
+      }
+
+    });
   }
 
   componentWillUnmount() {
