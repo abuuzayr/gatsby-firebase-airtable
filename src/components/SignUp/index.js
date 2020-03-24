@@ -14,6 +14,8 @@ const INITIAL_STATE = {
   passwordTwo: '',
   role: 'SALES',
   error: null,
+  firebase: null,
+  secondaryApp: null
 };
 
 const ERROR_CODE_ACCOUNT_EXISTS = 'auth/email-already-in-use';
@@ -30,14 +32,11 @@ class SignUpFormBase extends Component {
   constructor(props) {
     super(props);
 
-    this.state = { 
-      ...INITIAL_STATE,
-      secondaryApp: null
-    };
+    this.state = { ...INITIAL_STATE };
   }
 
   onSubmit = event => {
-    const { username, email, passwordOne, role } = this.state;
+    let { username, email, passwordOne, role } = this.state;
 
     if (!role) role = 'SALES'
 
@@ -45,7 +44,7 @@ class SignUpFormBase extends Component {
       .then(userData => {
         userData.user.sendEmailVerification();
         // Create a user in your Firebase realtime database
-        return firebase.database().ref('users/' + userData.user.uid).set({
+        return this.state.database.ref('users/' + userData.user.uid).set({
           username,
           email,
           role
@@ -72,6 +71,7 @@ class SignUpFormBase extends Component {
     const firebase = import('firebase')
     const secondaryApp = firebase.initializeApp(config, "Secondary");
     this.setState({
+      firebase,
       secondaryApp
     })
   }
