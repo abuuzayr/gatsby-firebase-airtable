@@ -34,20 +34,22 @@ class Layout extends Component {
 
     Promise.all([app, auth, database]).then(values => {
       const firebase = getFirebase(values[0]);
-      firebase.users().on('value', snapshot => {
-        const usersObject = snapshot.val();
+      this.setState({ firebase },
+        () => {
+          firebase.users().on('value', snapshot => {
+            const usersObject = snapshot.val();
 
-        const usersList = Object.keys(usersObject).map(key => ({
-          ...usersObject[key],
-          uid: key,
-        }));
+            const usersList = Object.keys(usersObject).map(key => ({
+              ...usersObject[key],
+              uid: key,
+            }));
 
-        this.setState({
-          users: usersList,
-          loading: false,
-          firebase
+            this.setState({
+              users: usersList,
+              loading: false,
+            });
+          });
         });
-      });
     });
 
     try {
