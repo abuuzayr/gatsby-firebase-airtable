@@ -52,22 +52,24 @@ class Layout extends Component {
   }
 
   componentDidUpdate() {
-    this.state.firebase.users().on('value', snapshot => {
-      const usersObject = snapshot.val();
-
-      const usersList = Object.keys(usersObject).map(key => ({
-        ...usersObject[key],
-        uid: key,
-      }));
-
-      if (JSON.stringify(this.state.users) !== JSON.stringify(usersList)) {
-        this.setState({
-          users: usersList,
-          loading: false,
-        });
-      }
-
-    });
+    if (this.state.firebase) {
+      this.state.firebase.users().on('value', snapshot => {
+        const usersObject = snapshot.val();
+  
+        const usersList = Object.keys(usersObject).map(key => ({
+          ...usersObject[key],
+          uid: key,
+        }));
+  
+        if (JSON.stringify(this.state.users) !== JSON.stringify(usersList)) {
+          this.setState({
+            users: usersList,
+            loading: false,
+          });
+        }
+  
+      });
+    }
   }
 
   componentWillUnmount() {
