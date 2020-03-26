@@ -62,6 +62,18 @@ export const CreatorCell = ({ value }) => {
     }
 }
 
+export const TextCell = ({ value }) => (
+    <div style={{
+        'overflow': 'scroll',
+        'height': 50,
+        'padding': '7px 0px',
+        'white-space': 'pre-wrap',
+        'line-height': '1em',
+    }}>
+        {value}
+    </div>
+)
+
 export const MultiRecordCell = ({ value, row, type, user, text, onCloseModal }) => {
     if (value && Array.isArray(value)) {
         return <div className="level actions">
@@ -191,6 +203,10 @@ const transformLabels = (user, labels, onCloseModal, includeCount, remarks, rema
                 obj.frozen = true
                 obj.width = 250
                 obj.formatter = props => <ExpandRow {...props} type="Appointments" />
+                break
+            case 'Text':
+                obj.width = 300
+                obj.formatter = props => <TextCell {...props} />
                 break
             case 'Stage':
                 obj.formatter = props => <ColoredCell {...props} colors={STAGES} />
