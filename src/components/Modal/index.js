@@ -209,6 +209,17 @@ const Modal = (props) => {
         }
     }, [data['Postal Code']])
 
+    useEffect(() => {
+        let collect = 0
+        if (!isNaN(parseFloat(data['Grand Total'])) && !isNaN(parseFloat(data['Payment---Amount']))) {
+            collect = parseFloat(data['Grand Total']) - parseFloat(data['Payment---Amount'])
+        }
+        updateData('Installation---Amount to collect', collect.toFixed(2))
+    }, [
+        data['Grand Total'],
+        data['Payment---Amount'],
+    ])
+
     const getData = async (type, id) => {
         let obj = {}
         if (['Edit', 'View', 'List'].includes(props.mode)) {
@@ -463,7 +474,6 @@ const Modal = (props) => {
                 }
                 if (records.length > 0) {
                     addToast('Saved!', { appearance: 'success', autoDismiss: true })
-                    closeModal()
                 }
             })
         } else {
@@ -498,7 +508,6 @@ const Modal = (props) => {
                         })
                     }
                     addToast('New record created!', { appearance: 'success', autoDismiss: true })
-                    closeModal()
                 }
             })
         }
@@ -654,7 +663,7 @@ const Modal = (props) => {
                                                     className="button is-warning"
                                                     disabled={data ? '' : 'disabled'}
                                                     onClick={handleSave}>
-                                                    Save &amp; close
+                                                    Save
                                                 </button>
                                             </div>
                                         }
