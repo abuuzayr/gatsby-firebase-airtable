@@ -24,6 +24,7 @@ import { FiPlus } from 'react-icons/fi'
 import { useToasts } from 'react-toast-notifications'
 import Airtable from 'airtable'
 import DataGrid from 'react-data-grid'
+import Remarks from '../Remarks'
 
 const base = new Airtable({ 
     apiKey: process.env.GATSBY_AIRTABLE_APIKEY 
@@ -104,6 +105,7 @@ const Modal = (props) => {
     const [options, setOptions] = useState({})
     const [hidden, setHidden] = useState(false)
     const [inputFields, setInputFields] = useState(false)
+    const [recordID, setrecordID] = useState(props.id)
     const { addToast, removeToast } = useToasts()
 
     useEffect(() => {
@@ -244,7 +246,7 @@ const Modal = (props) => {
                 console.error(e)
             }
         } else {
-            obj = props.id ? { id: props.id, ...defaultData } : { ...defaultData }
+            obj = recordID ? { id: recordID, ...defaultData } : { ...defaultData }
         }
         if (props.mode === 'List' && id) obj = obj.filter(o => o.fields['Appointments'].includes(id))
         setData(obj)
@@ -283,7 +285,7 @@ const Modal = (props) => {
 
     const afterOpenModal = async () => {
         if (props.type) {
-            const rData = await getData(props.type, props.id)
+            const rData = await getData(props.type, recordID)
             await getOptions()
             if (props.type === 'Appointments' && !hidden) {
                 const blankPXFields = inputFields.find(f => f.name && f.name === 'Product').fields.map(field => {
@@ -508,6 +510,7 @@ const Modal = (props) => {
                         })
                     }
                     addToast('New record created!', { appearance: 'success', autoDismiss: true })
+                    setrecordID(records[0].id)
                 }
             })
         }
@@ -515,7 +518,7 @@ const Modal = (props) => {
 
     const deleteRecord = () => {
         const savingToast = addToast('Deleting...', { appearance: 'info' })
-        base(props.type).destroy([props.id], function (err, records) {
+        base(props.type).destroy([recordID], function (err, records) {
             removeToast(savingToast)
             if (err) {
                 console.error(err);
@@ -604,18 +607,6 @@ const Modal = (props) => {
                                                                         </>
                                                                     })
                                                                 }
-                                                                {
-
-                                                                    block.multi &&
-                                                                        <button
-                                                                            className="button is-small is-fullwidth is-info is-light"
-                                                                            style={{
-                                                                                margin: 10,
-                                                                                width: 'calc(100% - 20px)'
-                                                                            }}
-                                                                            onClick={() => duplicateRows(block.name)}
-                                                                        ><FiPlus /> Add {block.name}</button>
-                                                                }
                                                             </Panel>
                                                         } else {
                                                             return block.fields.map(f => <Field key={f} field={f} {...fieldProps} />)
@@ -625,7 +616,7 @@ const Modal = (props) => {
                                                 Array.isArray(data) &&
                                                 <DataGrid
                                                     columns={transformLabels(
-                                                        props.authUser,
+                                                        props.user,
                                                         listLabels[props.type],
                                                         null,
                                                         true
@@ -646,6 +637,26 @@ const Modal = (props) => {
                                         <div className="panel-block">
                                             Loading...
                                         </div>
+                                    }
+                                    {
+                                        recordID ? 
+                                        <Remarks
+                                            user={props.user}
+                                            id={recordID}
+                                            options={options}
+                                            getLabel={getLabel}
+                                            getInputProps={getInputProps}
+                                        /> :
+                                        <Panel header="Remarks" collapsible defaultExpanded={true}>
+                                            <p style={{
+                                                'width': '100%',
+                                                'textAlign': 'center',
+                                                'border': '1px solid #ddd',
+                                                'padding': '10px',
+                                                'color': '#999',
+                                                'fontWeight': 'normal',
+                                            }}>Click Save to add Remarks</p>
+                                        </Panel>
                                     }
                                     <div className="level">
                                         <div className={!['View', 'List'].includes(props.mode) ? 'level-left' : 'level-item'}>
