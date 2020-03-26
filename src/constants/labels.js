@@ -35,6 +35,7 @@ export const headers = {
 
 export const listLabels = {
     'Remarks': [
+        'Type',
         'Text',
         'Creator',
         'Timestamp',
