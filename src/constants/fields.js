@@ -153,8 +153,7 @@ export const fields = {
 
 export const hiddenFields = [
     'Creator',
-    'Timestamp',
-    'Type'
+    'Timestamp'
 ]
 
 export const readOnlyFields = [
