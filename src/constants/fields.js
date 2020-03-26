@@ -329,4 +329,5 @@ export const largeFields = [
     'Name',
     'Name 2',
     'Appointment date & time',
+    'Timestamp'
 ]
