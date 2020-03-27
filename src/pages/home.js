@@ -72,9 +72,9 @@ const HomePageBase = (props) => {
                 authUser, 
                 headers['Appointments'], 
                 () => setTrigger(p => !p),
-                true, 
-                remarks, 
-                labels.map(l => l.key).indexOf('Products')
+                true,
+                100,
+                remarks
               )
             )
           }
@@ -97,6 +97,33 @@ const HomePageBase = (props) => {
     }
     getAppointments()
   }, [company, authUser, trigger])
+
+  useEffect(() => {
+    async function updateRemarks() {
+      // Get remarks first
+      let remarks = []
+      try {
+        const result = await fetch(`${process.env.GATSBY_STDLIB_URL}/getOptions`)
+        if (result.status === 200) {
+          const body = await result.json()
+          remarks = body.rows['Remarks']
+        }
+      } catch (e) {
+        console.error(e)
+      }
+      setLabels(
+        transformLabels(
+          authUser,
+          headers['Appointments'],
+          () => setTrigger(p => !p),
+          true,
+          100,
+          remarks
+        )
+      )
+    }
+    updateRemarks()
+  }, [trigger])
 
   const sortRows = (initialRows, sortColumn, sortDirection) => rows => {
     const comparer = (a, b) => {
