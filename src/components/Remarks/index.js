@@ -127,7 +127,7 @@ const Remarks = (props) => {
                         'width': '100%',
                         'textAlign': 'center',
                         'border': '1px solid #ddd',
-                        'padding': '10px',
+                        'padding': 10,
                         'color': '#999',
                     }}>No remarks</div>
             }
