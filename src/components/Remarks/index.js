@@ -31,7 +31,6 @@ const Remarks = (props) => {
 
     useEffect(() => {
         async function getRemarks() {
-            if (!user) return
             try {
                 const result = await fetch(`${process.env.GATSBY_STDLIB_URL}/getRawTableData?name=Remarks`)
                 if (result.status === 200) {
@@ -55,13 +54,13 @@ const Remarks = (props) => {
         getRemarks()
     }, [user, trigger])
 
-    const isExpanded = () => {
-        if (!(data.rows.length && data.labels.length)) {
-            return {
-                expanded: !(data.rows.length && data.labels.length)
-            }
-        }
-    }
+    useEffect(() => {
+        if (!props.setExpandedProps) return
+        props.setExpandedProps(
+            data.rows.length && data.labels.length ?
+            {} :  { expanded: true }
+        )
+    }, [data])
 
     const fieldProps = {
         props: {
@@ -100,7 +99,7 @@ const Remarks = (props) => {
     }
 
     return (
-        <Panel header="Remarks" collapsible {...isExpanded() }>
+        <>
             {
                 data.rows.length &&
                     data.labels.length ?
@@ -123,19 +122,33 @@ const Remarks = (props) => {
                         'color': '#999',
                     }}>No remarks</div>
             }
-            <div style={{ 'marginBottom': 10 }} />
-            <Field field="Type" {...fieldProps} />
-            <Field field="Text" {...fieldProps} />
-            <button
-                className="button is-small is-fullwidth is-info is-light"
-                style={{
-                    margin: 10,
-                    width: 'calc(100% - 20px)'
-                }}
-                onClick={addRemark}
-            ><FiPlus /> Add Remark</button>
-        </Panel>
+            {
+                props.editing &&
+                <>
+                    <div style={{ 'marginBottom': 10 }} />
+                    <Field field="Type" {...fieldProps} />
+                    <Field field="Text" {...fieldProps} />
+                    <button
+                        className="button is-small is-fullwidth is-info is-light"
+                        style={{
+                            margin: 10,
+                            width: 'calc(100% - 20px)'
+                        }}
+                        onClick={addRemark}
+                    ><FiPlus /> Add Remark</button>
+                </>
+            }
+        </>
     )
 };
 
-export default Remarks
+const RemarksWithPanel = (props) => {
+    const [expandedProps, setExpandedProps] = useState({})
+    return props.showPanel ? 
+        <Panel header="Remarks" collapsible {...expandedProps}>
+            <Remarks {...props} setExpandedProps={setExpandedProps} />
+        </Panel> :
+        <Remarks {...props} />
+}
+
+export default RemarksWithPanel
