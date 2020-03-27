@@ -14,6 +14,7 @@ const base = new Airtable({
 }).base(process.env.GATSBY_AIRTABLE_BASE);
 
 const Remarks = (props) => {
+    const showTypeColumn = ['Appointments', 'Remarks'].includes(props.type)
     const [trigger, setTrigger] = useState(false)
     const [data, setData] = useState({
         labels: [],
@@ -21,12 +22,12 @@ const Remarks = (props) => {
     })
     const [remarksData, setRemarksData] = useState({
         'Type': {
-            value: 'Sales',
-            label: 'Sales'
+            value: showTypeColumn ? 'Sales' : props.type,
+            label: showTypeColumn ? 'Sales' : props.type
         },
         'Text': ''
     })
-    const { user, options, getLabel, getInputProps, id } = props
+    const { user, options, getLabel, getInputProps, id, setExpandedProps, editing } = props
     const { addToast } = useToasts()
 
     useEffect(() => {
@@ -36,8 +37,16 @@ const Remarks = (props) => {
                 if (result.status === 200) {
                     const body = await result.json()
                     setData({
-                        labels: transformLabels(user, listLabels['Remarks'], null, true),
-                        rows: body.rows.filter(r => r.fields['Appointments'].includes(id)).map((row, index) => {
+                        labels: transformLabels(
+                            user, 
+                            showTypeColumn ? ['Type', ...listLabels['Remarks']] : listLabels['Remarks'], 
+                            null, 
+                            true
+                        ),
+                        rows: body.rows.filter(r => {
+                            if (showTypeColumn)  return r.fields['Appointments'].includes(id)
+                            return r.fields['Appointments'].includes(id) && r.fields['Type'] === props.type
+                        }).map((row, index) => {
                             return {
                                 ...row.fields,
                                 index: index + 1,
@@ -55,8 +64,8 @@ const Remarks = (props) => {
     }, [user, trigger])
 
     useEffect(() => {
-        if (!props.setExpandedProps) return
-        props.setExpandedProps(
+        if (!setExpandedProps) return
+        setExpandedProps(
             data.rows.length && data.labels.length ?
             {} :  { expanded: true }
         )
@@ -123,10 +132,13 @@ const Remarks = (props) => {
                     }}>No remarks</div>
             }
             {
-                props.editing &&
+                editing &&
                 <>
                     <div style={{ 'marginBottom': 10 }} />
-                    <Field field="Type" {...fieldProps} />
+                    {
+                        showTypeColumn &&
+                        <Field field="Type" {...fieldProps} />
+                    }
                     <Field field="Text" {...fieldProps} />
                     <button
                         className="button is-small is-fullwidth is-info is-light"
