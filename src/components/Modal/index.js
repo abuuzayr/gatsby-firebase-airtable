@@ -490,7 +490,13 @@ const Modal = (props) => {
                     addToast('New record created!', { appearance: 'success', autoDismiss: true })
                     if (props.type === 'Appointments' && props.mode === 'New') {
                         setrecordID(records[0].id)
-                    } 
+                    }
+                    setData(p => {
+                        return {
+                            ...p,
+                            id: records[0].id
+                        }
+                    })
                 }
             })
         }
@@ -498,7 +504,7 @@ const Modal = (props) => {
 
     const deleteRecord = () => {
         const savingToast = addToast('Deleting...', { appearance: 'info' })
-        base(props.type).destroy([recordID], function (err, records) {
+        base(props.type).destroy([props.id], function (err, records) {
             removeToast(savingToast)
             if (err) {
                 console.error(err);
@@ -520,6 +526,8 @@ const Modal = (props) => {
         getLabel,
         getInputProps,
     }
+
+    const closeButtonOnly = ['View', 'List'].includes(props.mode) || props.type === 'Remarks'
 
     return (
         <div>
@@ -643,16 +651,16 @@ const Modal = (props) => {
                                             </Panel>)
                                     }
                                     <div className="level">
-                                        <div className={!['View', 'List'].includes(props.mode) ? 'level-left' : 'level-item'}>
+                                        <div className={!closeButtonOnly ? 'level-left' : 'level-item'}>
                                             <button
-                                                className={`button is-danger ${['View', 'List'].includes(props.mode) && 'is-fullwidth'}`}
+                                                className={`button is-danger ${closeButtonOnly && 'is-fullwidth'}`}
                                                 disabled={data ? '' : 'disabled'}
                                                 onClick={closeModal}>
                                                 Close
                                             </button>
                                         </div>
                                         {
-                                            !['View', 'List'].includes(props.mode) &&
+                                            !closeButtonOnly &&
                                             <div className="level-right">
                                                 <button
                                                     className="button is-warning"
