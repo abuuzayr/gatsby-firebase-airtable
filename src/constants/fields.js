@@ -156,7 +156,6 @@ export const readOnlyFields = [
     'Subtotal',
     'GST',
     'Grand Total',
-    'Price',
     'Total Price',
     'Zone',
     'Total',
