@@ -16,10 +16,12 @@ export const ExpandRow = props => (
                     <Modal
                         button={<FiMaximize2 className="expand" />}
                         id={props.row.id}
+                        rowId={props.row.id}
                         type={props.type}
                         title={props.type}
                         mode="View"
                         users={users}
+                        showRemarks
                     >
                     </Modal>
                 )}
@@ -97,10 +99,12 @@ export const MultiRecordCell = ({ value, row, type, user, text, onCloseModal }) 
                                             </Whisper>
                                         }
                                         id={row.id}
+                                        rowId={row.id}
                                         type={type === 'Install / Maintenance' ? 'Maintenance' : type}
                                         mode="List"
                                         users={users}
                                         title={type}
+                                        showRemarks
                                     >
                                     </Modal>
                                 </div> :
@@ -120,6 +124,7 @@ export const MultiRecordCell = ({ value, row, type, user, text, onCloseModal }) 
                                 type={type === 'Install / Maintenance' ? 'Maintenance' : type}
                                 mode="New"
                                 onCloseModal={onCloseModal}
+                                showRemarks
                             >
                             </Modal>
                         </div>
@@ -158,12 +163,14 @@ export const EditCell = ({ row, user, type, onCloseModal }) => {
                     <Modal
                         button={<FiEdit />}
                         id={row.id}
+                        rowId={row.id}
                         type={type}
                         title={type}
                         user={user}
                         users={users}
                         mode="Edit"
                         onCloseModal={onCloseModal}
+                        showRemarks
                     >
                     </Modal>
                 )}
