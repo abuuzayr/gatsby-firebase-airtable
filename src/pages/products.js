@@ -1,14 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { compose } from 'recompose';
+import React, { useState, useEffect } from 'react'
+import { compose } from 'recompose'
 import {
   withAuthorization,
   withEmailVerification,
-} from '../components/Session';
-import DataGrid from 'react-data-grid';
-import { FiPlus, FiEdit, FiTrash2, FiEyeOff, FiFilter, FiSearch } from 'react-icons/fi';
-import { AiOutlineSortAscending } from 'react-icons/ai';
-import Modal from '../components/Modal';
-import { currencyFields } from '../constants/fields'
+} from '../components/Session'
+import DataGrid from 'react-data-grid'
+import { FiPlus, FiEdit, FiTrash2, FiEyeOff, FiFilter, FiSearch } from 'react-icons/fi'
+import { AiOutlineSortAscending } from 'react-icons/ai'
+import Modal from '../components/Modal'
+import { headers } from '../constants/labels'
+import transformLabels from '../helpers/labelFormatters'
 
 const hiddenFields = ['Appointments']
 
@@ -20,79 +21,6 @@ const ProductPageBase = (props) => {
   })
   const { authUser } = props
 
-  const transformLabels = labels => {
-    labels = labels.filter(label => !hiddenFields.includes(label.key))
-    labels = labels.map(label => {
-      if (label.key === 'Model') {
-        label.frozen = true
-        label.width = 250
-      }
-      if (currencyFields.includes(label.key)) {
-        label.formatter = ({ value }) => value ? `$${parseFloat(value).toFixed(2)}` : ''
-      }
-      return label
-    })
-    labels.unshift({
-      key: 'index',
-      name: '',
-      width: 30,
-      frozen: true,
-      formatter: ({ value }) => {
-        return <div
-          style={{
-            'textAlign': 'center',
-          }}
-        >
-          {value}
-        </div>
-      }
-    })
-    const modelIndex = labels.map(l => l.key).indexOf('Model')
-    labels.splice(modelIndex, 0, {
-      key: 'edit',
-      name: '',
-      frozen: true,
-      width: 30,
-      formatter: ({ row }) => {
-        return <div className="level actions">
-          <div className="level-item">
-            <Modal
-              button={<FiEdit />}
-              id={row.id}
-              type="Products"
-              user={authUser}
-              mode="Edit"
-              onCloseModal={() => setTrigger(p => !p)}
-            >
-            </Modal>
-          </div>
-        </div>
-      }
-    })
-    labels.push({
-      key: 'delete',
-      name: '',
-      width: 30,
-      formatter: ({ row }) => {
-        return <div className="level actions">
-          <div className="level-item">
-            <Modal
-              button={<FiTrash2 />}
-              id={row.id}
-              title={row['Model']}
-              type="Products"
-              user={authUser}
-              mode="Delete"
-              onCloseModal={() => setTrigger(p => !p)}
-            >
-            </Modal>
-          </div>
-        </div>
-      }
-    })
-    return labels
-  }
-
   useEffect(() => {
     async function getProducts() {
       if (!authUser) return
@@ -100,16 +28,14 @@ const ProductPageBase = (props) => {
         const result = await fetch(`${process.env.GATSBY_STDLIB_URL}/getRawTableData?name=Products`)
         if (result.status === 200) {
           const body = await result.json()
-          const labels = Object.keys(body.rows[0].fields).map(key => {
-            return {
-              key,
-              name: key,
-              width: 180,
-              resizable: true
-            }
-          })
           setData({ 
-            labels: transformLabels(labels), 
+            labels: transformLabels(
+              authUser,
+              headers['Products'],
+              () => setTrigger(p => !p),
+              true,
+              180
+            ), 
             rows: body.rows.map((row, index) => {
               return {
                 ...row.fields,
@@ -170,7 +96,7 @@ const ProductPageBase = (props) => {
             </div>
             <DataGrid
               columns={data.labels}
-              rowGetter={i => data.rows[i]}
+              rowGetter={i => { return { count: i + 1, ...data.rows[i] } }}
               rowsCount={data.rows.length}
               minHeight={500}
               minColumnWidth={35}
