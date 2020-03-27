@@ -144,10 +144,6 @@ export const fields = {
         'Payment Status'
     ],
     'Remarks': [
-        'Timestamp',
-        'Creator',
-        'Type',
-        'Text'
     ]
 }
 
