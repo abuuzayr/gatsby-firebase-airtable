@@ -216,6 +216,7 @@ const HomePageBase = (props) => {
                                     users={users}
                                     mode="New"
                                     onCloseModal={() => setTrigger(p => !p)}
+                                    showRemarks
                                   ></Modal>
                                 </a>
                               </div>
