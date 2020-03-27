@@ -69,8 +69,8 @@ export const TextCell = ({ value }) => (
         'overflow': 'scroll',
         'height': 50,
         'padding': '7px 0px',
-        'white-space': 'pre-wrap',
-        'line-height': '1em',
+        'whiteSpace': 'pre-wrap',
+        'lineHeight': '1em',
     }}>
         {value}
     </div>
@@ -105,6 +105,7 @@ export const MultiRecordCell = ({ value, row, type, user, text, onCloseModal }) 
                                         users={users}
                                         title={type}
                                         showRemarks
+                                        onCloseModal={onCloseModal}
                                     >
                                     </Modal>
                                 </div> :
@@ -196,13 +197,13 @@ export const DeleteCell = ({ row, user, type, titleKey, onCloseModal }) => {
     </div>
 }
 
-const transformLabels = (user, labels, onCloseModal, includeCount, remarks, remarksIndex) => {
+const transformLabels = (user, labels, onCloseModal, includeCount, colWidth, remarks, remarksIndex) => {
     labels = labels.map(key => {
         const obj = {
             key,
             name: key,
             sortable: true,
-            width: 100,
+            width: colWidth || 100,
             resizable: true
         }
         switch (key) {
@@ -224,6 +225,10 @@ const transformLabels = (user, labels, onCloseModal, includeCount, remarks, rema
             case 'Payments':
             case 'Install / Maintenance':
                 obj.formatter = props => <MultiRecordCell {...props} type={key} user={user} onCloseModal={onCloseModal} />
+                break
+            case 'Model':
+                obj.frozen = true
+                obj.width = 250
                 break
             default:
                 break
@@ -250,9 +255,9 @@ const transformLabels = (user, labels, onCloseModal, includeCount, remarks, rema
             })
         }
     }
-    if (!labels.map(l => l.key).includes('edit') && onCloseModal) {
-        const oppIndex = labels.map(l => l.key).indexOf('Appointment name')
-        labels.splice(oppIndex, 0, {
+    if (!!onCloseModal) {
+        const added = labels.map(l => l.key).includes('edit') ? 1 : 0
+        labels.splice(1, added, {
             key: 'edit',
             name: '',
             frozen: true,
@@ -264,7 +269,7 @@ const transformLabels = (user, labels, onCloseModal, includeCount, remarks, rema
                 onCloseModal={onCloseModal}
             />
         })
-        labels.push({
+        labels.splice(labels.length - added, 1, {
             key: 'delete',
             name: '',
             width: 30,
@@ -276,9 +281,9 @@ const transformLabels = (user, labels, onCloseModal, includeCount, remarks, rema
                 onCloseModal={onCloseModal}
             />
         })
-        if (remarks && remarksIndex) {
+        if (remarks) {
             // Add remarks row
-            labels.splice(remarksIndex, 0, {
+            labels.splice(labels.map(l => l.key).indexOf('delete') - added, added, {
                 key: 'Remarks',
                 name: 'Remarks',
                 width: 180,
