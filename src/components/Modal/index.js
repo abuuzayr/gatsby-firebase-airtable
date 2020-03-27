@@ -105,7 +105,7 @@ const Modal = (props) => {
     const [options, setOptions] = useState({})
     const [hidden, setHidden] = useState(false)
     const [inputFields, setInputFields] = useState(false)
-    const [recordID, setrecordID] = useState(props.id)
+    const [recordID, setrecordID] = useState(props.rowId)
     const { addToast, removeToast } = useToasts()
 
     useEffect(() => {
@@ -613,7 +613,7 @@ const Modal = (props) => {
                                                         }
                                                     }) :
                                                     inputFields && inputFields.map(f => <Field key={f} field={f} {...fieldProps} />) :
-                                                Array.isArray(data) &&
+                                                Array.isArray(data) && props.type !== 'Remarks' &&
                                                 <DataGrid
                                                     columns={transformLabels(
                                                         props.user,
@@ -639,24 +639,27 @@ const Modal = (props) => {
                                         </div>
                                     }
                                     {
-                                        recordID ? 
-                                        <Remarks
-                                            user={props.user}
-                                            id={recordID}
-                                            options={options}
-                                            getLabel={getLabel}
-                                            getInputProps={getInputProps}
-                                        /> :
-                                        <Panel header="Remarks" collapsible defaultExpanded={true}>
-                                            <p style={{
-                                                'width': '100%',
-                                                'textAlign': 'center',
-                                                'border': '1px solid #ddd',
-                                                'padding': '10px',
-                                                'color': '#999',
-                                                'fontWeight': 'normal',
-                                            }}>Click Save to add Remarks</p>
-                                        </Panel>
+                                        props.showRemarks &&
+                                            (recordID ? 
+                                            <Remarks
+                                                user={props.user}
+                                                id={recordID}
+                                                options={options}
+                                                getLabel={getLabel}
+                                                getInputProps={getInputProps}
+                                                editing={['Edit', 'New'].includes(props.mode)}
+                                                showPanel={props.type !== 'Remarks'}
+                                            /> :
+                                            <Panel header="Remarks" collapsible defaultExpanded={false}>
+                                                <p style={{
+                                                    'width': '100%',
+                                                    'textAlign': 'center',
+                                                    'border': '1px solid #ddd',
+                                                    'padding': '10px',
+                                                    'color': '#999',
+                                                    'fontWeight': 'normal',
+                                                }}>Click Save to add Remarks</p>
+                                            </Panel>)
                                     }
                                     <div className="level">
                                         <div className={!['View', 'List'].includes(props.mode) ? 'level-left' : 'level-item'}>
