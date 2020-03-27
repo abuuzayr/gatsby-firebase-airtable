@@ -30,6 +30,14 @@ export const headers = {
         'Outstanding',
         'Install / Maintenance',
         'Creator'
+    ],
+    'Products': [
+        'Model',
+        'Color',
+        'Price',
+        'Commission (sales)',
+        'Commission (install)',
+        'Creator'
     ]
 }
 
