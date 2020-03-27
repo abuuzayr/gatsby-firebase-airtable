@@ -75,29 +75,23 @@ const toDatetimeLocal = (str) => {
 }
 
 const Modal = (props) => {
-    const defaultData = props.type === 'Appointments' ? {
-        'PX': [],
-        'PX1': [],
-        'PX2': [],
-        'PX3': [],
-        'PX4': [],
-        'PX5': [],
-        'PX6': [],
-        'PX7': [],
-        'PX8': [],
-        'PX9': [],
-        'Unit': 1,
-        'Unit1': 1,
-        'Unit2': 1,
-        'Unit3': 1,
-        'Unit4': 1,
-        'Unit5': 1,
-        'Unit6': 1,
-        'Unit7': 1,
-        'Unit8': 1,
-        'Unit9': 1,
-        'Discount': 0,
-    } : {}
+    // Generate default data for all data
+    const defaultData = fields[props.type].reduce((acc, curr) => {
+        const defaultValue = field => {
+            if (field.includes('PX')) return []
+            if (field.includes('Unit')) return 1
+            return ''
+        }
+        if (curr === 'ENABLE_BLOCKS') return acc
+        if (typeof curr === 'object') return { 
+            ...acc, 
+            ...curr.fields.reduce((a, c) => {
+                const currKey = curr.prefix ? `${curr.name}---${c}` : c
+                return { ...a, [currKey]: defaultValue(c) }
+            }, {})
+        }
+        return { ...acc, [curr]: defaultValue(curr)}
+    }, {})
 
     const [modalIsOpen, setIsOpen] = useState(false)
     const [company, setCompany] = useState(false)
@@ -246,7 +240,7 @@ const Modal = (props) => {
                 console.error(e)
             }
         } else {
-            obj = recordID ? { id: recordID, ...defaultData } : { ...defaultData }
+            obj = props.id ? { id: props.id, ...defaultData } : { ...defaultData }
         }
         if (props.mode === 'List' && id) obj = obj.filter(o => o.fields['Appointments'].includes(id))
         setData(obj)
@@ -285,7 +279,7 @@ const Modal = (props) => {
 
     const afterOpenModal = async () => {
         if (props.type) {
-            const rData = await getData(props.type, recordID)
+            const rData = await getData(props.type, props.id)
             await getOptions()
             if (props.type === 'Appointments' && !hidden) {
                 const blankPXFields = inputFields.find(f => f.name && f.name === 'Product').fields.map(field => {
@@ -299,22 +293,6 @@ const Modal = (props) => {
     const closeModal = () => {
         setIsOpen(false)
         props.onCloseModal && props.onCloseModal()
-    }
-
-    const duplicateRows = block => {
-        setInputFields(prevInputFields => {
-            const row = prevInputFields.find(field => field.name === block)
-            // find the count of duplicates
-            let count = 0
-            if (row.fields.some(f => f.includes('###'))) {
-                count = row.fields.filter(f => f.includes('###')).map(f => f.split('###')[1]).sort().pop()
-                count = parseInt(count) + 1
-            }
-            const newFields = row.fields.filter(f => !f.includes('###')).map(f => f + '###' + count)
-            row.fields = [...row.fields, ...newFields]
-            console.log(prevInputFields)
-            return prevInputFields
-        })
     }
 
     const updateData = (key, value, blur) => {
@@ -510,7 +488,9 @@ const Modal = (props) => {
                         })
                     }
                     addToast('New record created!', { appearance: 'success', autoDismiss: true })
-                    setrecordID(records[0].id)
+                    if (props.type === 'Appointments' && props.mode === 'New') {
+                        setrecordID(records[0].id)
+                    } 
                 }
             })
         }
@@ -649,6 +629,7 @@ const Modal = (props) => {
                                                 getInputProps={getInputProps}
                                                 editing={['Edit', 'New'].includes(props.mode)}
                                                 showPanel={props.type !== 'Remarks'}
+                                                type={props.type}
                                             /> :
                                             <Panel header="Remarks" collapsible defaultExpanded={false}>
                                                 <p style={{
