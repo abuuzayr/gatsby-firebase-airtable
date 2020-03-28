@@ -2,7 +2,7 @@ export const headers = {
     'Appointments': [
         'Appointment name',
         'Company',
-        'Assigned to',
+        'Assign to',
         'Stage',
         'Appointment date & time',
         'Name',
