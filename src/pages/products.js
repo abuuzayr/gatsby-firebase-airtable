@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react'
 import { compose } from 'recompose'
 import {
   withAuthorization,
-  withEmailVerification,
 } from '../components/Session'
 import DataGrid from 'react-data-grid'
 import { FiPlus, FiEdit, FiTrash2, FiEyeOff, FiFilter, FiSearch } from 'react-icons/fi'
@@ -111,7 +110,6 @@ const ProductPageBase = (props) => {
 const condition = authUser => !!authUser;
 
 const ProductPage = compose(
-  withEmailVerification,
   withAuthorization(condition),
 )(ProductPageBase);
 

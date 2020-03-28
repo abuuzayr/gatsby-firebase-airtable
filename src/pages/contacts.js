@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { compose } from 'recompose';
 import {
   withAuthorization,
-  withEmailVerification,
 } from '../components/Session';
 import DataGrid from 'react-data-grid';
 import { FiPlus, FiEdit, FiTrash2 } from 'react-icons/fi';
@@ -161,7 +160,6 @@ const ContactPageBase = (props) => {
 const condition = authUser => !!authUser;
 
 const ContactPage = compose(
-  withEmailVerification,
   withAuthorization(condition),
 )(ContactPageBase);
 

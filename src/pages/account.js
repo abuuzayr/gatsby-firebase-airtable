@@ -5,7 +5,6 @@ import Layout from '../components/layout';
 import {
   AuthUserContext,
   withAuthorization,
-  withEmailVerification,
 } from '../components/Session';
 import PasswordForgetForm from '../components/PasswordForget';
 import PasswordChangeForm from '../components/PasswordChange';
@@ -48,7 +47,6 @@ const AccountPageBase = () => (
 const condition = authUser => !!authUser;
 
 const AccountPage = compose(
-  withEmailVerification,
   withAuthorization(condition),
 )(AccountPageBase);
 

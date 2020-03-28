@@ -3,7 +3,6 @@ import { compose } from 'recompose';
 
 import {
   withAuthorization,
-  withEmailVerification,
 } from '../components/Session';
 import { UserList } from '../components/Users';
 import { UsersContext } from '../components/layout'
@@ -21,7 +20,6 @@ const condition = authUser =>
   authUser && authUser.role === 'ADMIN';
 
 const AdminPage = compose(
-  withEmailVerification,
   withAuthorization(condition),
 )(AdminPageBase);
 

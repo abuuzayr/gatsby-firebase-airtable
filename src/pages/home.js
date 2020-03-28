@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react'
 import { compose } from 'recompose'
 import {
   withAuthorization,
-  withEmailVerification,
 } from '../components/Session'
 import { CompanyContext } from '../components/Company'
 import DataGrid from 'react-data-grid'
@@ -301,7 +300,6 @@ const HomePageBase = (props) => {
 const condition = authUser => !!authUser;
 
 const HomePage = compose(
-  withEmailVerification,
   withAuthorization(condition),
 )(HomePageBase);
 
