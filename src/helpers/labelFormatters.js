@@ -220,6 +220,7 @@ const transformLabels = (user, labels, onCloseModal, includeCount, colWidth, rem
                 obj.formatter = props => <ColoredCell {...props} colors={STAGES} />
                 break
             case 'Creator':
+            case 'Assign to':
                 obj.formatter = props => <CreatorCell {...props} />
                 break
             case 'Payments':
