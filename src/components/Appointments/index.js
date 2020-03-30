@@ -63,7 +63,10 @@ const Appointments = (props) => {
           if (labels.length === 0) {
             setLabels(
               transformLabels(
-                authUser, 
+                {
+                  user: authUser,
+                  type: 'Appointments'
+                },
                 headers['Appointments'], 
                 () => setTrigger(p => !p),
                 true,
@@ -107,7 +110,10 @@ const Appointments = (props) => {
       }
       setLabels(
         transformLabels(
-          authUser,
+          {
+            user: authUser,
+            type: 'Appointments'
+          },
           headers['Appointments'],
           () => setTrigger(p => !p),
           true,

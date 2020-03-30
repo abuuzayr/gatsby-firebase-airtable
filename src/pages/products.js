@@ -29,7 +29,10 @@ const ProductPageBase = (props) => {
           const body = await result.json()
           setData({ 
             labels: transformLabels(
-              authUser,
+              {
+                user: authUser,
+                type: 'Products'
+              },
               headers['Products'],
               () => setTrigger(p => !p),
               true,

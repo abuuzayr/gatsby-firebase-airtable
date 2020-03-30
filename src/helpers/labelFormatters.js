@@ -197,7 +197,7 @@ export const DeleteCell = ({ row, user, type, titleKey, onCloseModal }) => {
     </div>
 }
 
-const transformLabels = (user, labels, onCloseModal, includeCount, colWidth, remarks, remarksIndex) => {
+const transformLabels = (p, labels, onCloseModal, includeCount, colWidth, remarks) => {
     labels = labels.map(key => {
         const obj = {
             key,
@@ -225,7 +225,7 @@ const transformLabels = (user, labels, onCloseModal, includeCount, colWidth, rem
                 break
             case 'Payments':
             case 'Install / Maintenance':
-                obj.formatter = props => <MultiRecordCell {...props} type={key} user={user} onCloseModal={onCloseModal} />
+                obj.formatter = props => <MultiRecordCell {...props} type={key} user={p.user} onCloseModal={onCloseModal} />
                 break
             case 'Model':
                 obj.frozen = true
@@ -265,8 +265,8 @@ const transformLabels = (user, labels, onCloseModal, includeCount, colWidth, rem
             width: 30,
             formatter: props => <EditCell
                 {...props}
-                user={user}
-                type="Appointments"
+                user={p.user}
+                type={p.type}
                 onCloseModal={onCloseModal}
             />
         })
@@ -276,8 +276,8 @@ const transformLabels = (user, labels, onCloseModal, includeCount, colWidth, rem
             width: 30,
             formatter: props => <DeleteCell
                 {...props}
-                user={user}
-                type="Appointments"
+                user={p.user}
+                type={p.type}
                 titleKey="Appointment name"
                 onCloseModal={onCloseModal}
             />
@@ -302,7 +302,7 @@ const transformLabels = (user, labels, onCloseModal, includeCount, colWidth, rem
                         value={rm}
                         text={rm.length ? rm[0]['fields']['Text'] : 'No remarks'}
                         type="Remarks"
-                        user={user}
+                        user={p.user}
                         onCloseModal={onCloseModal}
                     />
                 }

@@ -38,7 +38,10 @@ const Remarks = (props) => {
                     const body = await result.json()
                     setData({
                         labels: transformLabels(
-                            user, 
+                            {
+                                user,
+                                type: 'Remarks'
+                            },
                             showTypeColumn ? ['Type', ...listLabels['Remarks']] : listLabels['Remarks'], 
                             null, 
                             true
