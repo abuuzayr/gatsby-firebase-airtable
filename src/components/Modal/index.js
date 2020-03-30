@@ -76,22 +76,24 @@ const toDatetimeLocal = (str) => {
 
 const Modal = (props) => {
     // Generate default data for all data
-    const defaultData = fields[props.type].reduce((acc, curr) => {
-        const defaultValue = field => {
-            if (field.includes('PX')) return []
-            if (field.includes('Unit')) return 1
-            return ''
-        }
-        if (curr === 'ENABLE_BLOCKS') return acc
-        if (typeof curr === 'object') return { 
-            ...acc, 
-            ...curr.fields.reduce((a, c) => {
-                const currKey = curr.prefix ? `${curr.name}---${c}` : c
-                return { ...a, [currKey]: defaultValue(c) }
-            }, {})
-        }
-        return { ...acc, [curr]: defaultValue(curr)}
-    }, {})
+    const defaultData = Object.keys(fields).includes(props.type) ?
+        fields[props.type].reduce((acc, curr) => {
+            const defaultValue = field => {
+                if (field.includes('PX')) return []
+                if (field.includes('Unit')) return 1
+                return ''
+            }
+            if (curr === 'ENABLE_BLOCKS') return acc
+            if (typeof curr === 'object') return { 
+                ...acc, 
+                ...curr.fields.reduce((a, c) => {
+                    const currKey = curr.prefix ? `${curr.name}---${c}` : c
+                    return { ...a, [currKey]: defaultValue(c) }
+                }, {})
+            }
+            return { ...acc, [curr]: defaultValue(curr)}
+        }, {}) :
+        {}
 
     const [modalIsOpen, setIsOpen] = useState(false)
     const [company, setCompany] = useState(false)
@@ -604,7 +606,10 @@ const Modal = (props) => {
                                                 Array.isArray(data) && props.type !== 'Remarks' &&
                                                 <DataGrid
                                                     columns={transformLabels(
-                                                        props.user,
+                                                        {
+                                                            user: props.user,
+                                                            type: props.type
+                                                        },
                                                         listLabels[props.type],
                                                         null,
                                                         true
