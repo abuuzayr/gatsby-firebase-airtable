@@ -313,15 +313,15 @@ export const selectFields = [
 ]
 
 export const largeFields = [
-    'Agreement date & time',
-    'Products',
-    'Payments',
-    'Install / Maintenance',
-    'Email',
-    'Customer company',
-    'Address',
-    'Name',
-    'Name 2',
-    'Appointment date & time',
-    'Timestamp'
+    // 'Agreement date & time',
+    // 'Products',
+    // 'Payments',
+    // 'Install / Maintenance',
+    // 'Email',
+    // 'Customer company',
+    // 'Address',
+    // 'Name',
+    // 'Name 2',
+    // 'Appointment date & time',
+    // 'Timestamp'
 ]
