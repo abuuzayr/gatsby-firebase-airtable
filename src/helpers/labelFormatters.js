@@ -164,7 +164,7 @@ export const EditCell = ({ row, user, type, onCloseModal }) => {
                     <Modal
                         button={<FiEdit />}
                         id={row.id}
-                        rowId={type === 'Appointments' ? false : row.id}
+                        rowId={row.id}
                         type={type}
                         title={type}
                         user={user}
@@ -234,6 +234,9 @@ const transformLabels = (p, labels, onCloseModal, includeCount, colWidth, remark
             case 'Model':
                 obj.frozen = true
                 obj.width = 250
+                break
+            case 'Priority':
+                obj.width = 50
                 break
             default:
                 break
