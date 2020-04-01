@@ -1,12 +1,12 @@
 export const STAGES = {
-    "New call": "#00C8F4",
-    "New follow up": "#0088AC",
+    "Call": "#00C8F4",
+    "Follow up": "#0088AC",
     "Appt": "#008EA8",
-    "Appt 25%": "#008E79",
-    "Appt 50%": "#318843",
-    "Appt 75%": "#717D11",
-    "Appt won": "#468015",
-    "Appt lost": "#C34A36",
+    "25%": "#008E79",
+    "50%": "#318843",
+    "75%": "#717D11",
+    "Won": "#468015",
+    "Lost": "#C34A36",
     "default": "#A16807"
 }
 
@@ -56,9 +56,9 @@ export const SOURCE = {
 }
 
 export const REMARKS_TYPES = {
-    "Sales": "#ffffff",
-    "Install / Maintenance": "#ffffff",
-    "Payment": "#ffffff"
+    "Sales": "#20639B",
+    "Maintenance": "#F6885C",
+    "Payment": "#ED553B"
 }
 
 const SELECTIONS = {
