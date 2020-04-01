@@ -2,7 +2,7 @@ import React from 'react'
 import Modal from '../components/Modal'
 import { Tooltip, Whisper } from 'rsuite'
 
-import { STAGES } from '../constants/selections'
+import { STAGES, REMARKS_TYPES } from '../constants/selections'
 import { datetimeFields, currencyFields, largeFields } from '../constants/fields'
 import { UsersContext } from '../components/layout'
 import { FiMaximize2, FiMoreHorizontal, FiPlus, FiEdit, FiTrash2 } from 'react-icons/fi'
@@ -164,7 +164,7 @@ export const EditCell = ({ row, user, type, onCloseModal }) => {
                     <Modal
                         button={<FiEdit />}
                         id={row.id}
-                        rowId={row.id}
+                        rowId={type === 'Appointments' ? false : row.id}
                         type={type}
                         title={type}
                         user={user}
@@ -209,15 +209,18 @@ const transformLabels = (p, labels, onCloseModal, includeCount, colWidth, remark
         switch (key) {
             case 'Appointment name':
                 obj.frozen = true
-                obj.width = 250
+                obj.width = 200
                 obj.formatter = props => <ExpandRow {...props} type="Appointments" />
                 break
             case 'Text':
-                obj.width = 300
+                obj.width = 250
                 obj.formatter = props => <TextCell {...props} />
                 break
             case 'Stage':
                 obj.formatter = props => <ColoredCell {...props} colors={STAGES} />
+                break
+            case 'Type':
+                obj.formatter = props => <ColoredCell {...props} colors={REMARKS_TYPES} />
                 break
             case 'Creator':
             case 'Assign to':
@@ -225,6 +228,7 @@ const transformLabels = (p, labels, onCloseModal, includeCount, colWidth, remark
                 break
             case 'Payments':
             case 'Install / Maintenance':
+                obj.width = 130
                 obj.formatter = props => <MultiRecordCell {...props} type={key} user={p.user} onCloseModal={onCloseModal} />
                 break
             case 'Model':
