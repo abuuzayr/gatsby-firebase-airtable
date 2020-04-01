@@ -75,7 +75,11 @@ const Appointments = (props) => {
               )
             )
           }
-          const rows = body.rows.map(row => {
+          const rows = body.rows.filter(row => {
+            if (authUser.role === 'ADMIN') return true
+            if (row.fields['Creator'] === authUser.uid) return true
+            if (row.fields['Assign to'] === authUser.uid) return true
+          }).map(row => {
             if (cpy && cpy !== 'All') {
               if (!row.fields['Company']) return false
               if (row.fields['CX'] && row.fields['CX'][0] !== cpy) return false
@@ -217,79 +221,84 @@ const Appointments = (props) => {
                     </section>
                   }
                   {
-                    rows.length &&
                     columns.length ?
                       <>
-                        <div className="rdg-head">
-                          <div className="level">
-                            <div className="level-left">
-                              <div className="level-item">
-                                <FiEyeOff /> 
-                                <span>Hide fields</span>
+                      {
+                        rows.length ?
+                        <>
+                          <div className="rdg-head">
+                            <div className="level">
+                              <div className="level-left">
+                                <div className="level-item">
+                                  <FiEyeOff />
+                                  <span>Hide fields</span>
+                                </div>
+                                <div className="level-item">
+                                  <FiFilter />
+                                  <span>Filter</span>
+                                </div>
+                                <div className="level-item">
+                                  <AiOutlineSortAscending />
+                                  <span>Sort</span>
+                                </div>
+                                <div style={{ 'margin': '10px 0', 'fontWeight': 700 }}>
+                                  <a style={{ 'verticalAlign': 'middle' }} href="#">
+                                    <Modal
+                                      button={
+                                        <><FiPlus style={{ 'verticalAlign': 'middle' }} /> Add new customer</>
+                                      }
+                                      type="Appointments"
+                                      user={authUser}
+                                      users={users}
+                                      mode="New"
+                                      onCloseModal={() => setTrigger(p => !p)}
+                                      showRemarks
+                                    ></Modal>
+                                  </a>
+                                </div>
                               </div>
-                              <div className="level-item">
-                                <FiFilter />
-                                <span>Filter</span>
-                              </div>
-                              <div className="level-item">
-                                <AiOutlineSortAscending />
-                                <span>Sort</span>
-                              </div>
-                              <div style={{ 'margin': '10px 0', 'fontWeight': 700 }}>
-                                <a style={{ 'verticalAlign': 'middle' }} href="#">
-                                  <Modal
-                                    button={
-                                      <><FiPlus style={{ 'verticalAlign': 'middle' }} /> Add new customer</>
-                                    }
-                                    type="Appointments"
-                                    user={authUser}
-                                    users={users}
-                                    mode="New"
-                                    onCloseModal={() => setTrigger(p => !p)}
-                                    showRemarks
-                                  ></Modal>
-                                </a>
-                              </div>
-                            </div>
-                            <div className="level-right">
-                              <div className="level-item">
-                                <FiSearch />
+                              <div className="level-right">
+                                <div className="level-item">
+                                  <FiSearch />
+                                </div>
                               </div>
                             </div>
                           </div>
-                        </div>
-                        <DataGrid
-                          columns={columns}
-                          rowGetter={i => { return { count: i + 1, ...rows[i] } }}
-                          rowsCount={rows.length}
-                          minHeight={500}
-                          minColumnWidth={20}
-                          onGridSort={(sortColumn, sortDirection) => {
-                            let direction = sortDirection
-                            switch (sort.direction) {
-                              case 'ASC':
-                                direction = 'DESC'
-                                break
-                              case 'DESC':
-                                direction = 'NONE'
-                                break
-                              case 'NONE':
-                                direction = 'ASC'
-                                break
-                              default:
-                                break
-                            }
-                            setRows(sortRows(initialRows, sortColumn, direction))
-                            setSort(prev => {
-                              return {
-                                column: sortColumn,
-                                direction
+                          <DataGrid
+                            columns={columns}
+                            rowGetter={i => { return { count: i + 1, ...rows[i] } }}
+                            rowsCount={rows.length}
+                            minHeight={500}
+                            minColumnWidth={20}
+                            onGridSort={(sortColumn, sortDirection) => {
+                              let direction = sortDirection
+                              switch (sort.direction) {
+                                case 'ASC':
+                                  direction = 'DESC'
+                                  break
+                                case 'DESC':
+                                  direction = 'NONE'
+                                  break
+                                case 'NONE':
+                                  direction = 'ASC'
+                                  break
+                                default:
+                                  break
                               }
-                            })
-                          }}
-                        />
+                              setRows(sortRows(initialRows, sortColumn, direction))
+                              setSort(prev => {
+                                return {
+                                  column: sortColumn,
+                                  direction
+                                }
+                              })
+                            }}
+                          />
+                        </> :
+                        <div className="title level-item">No appointments</div>
+                      }
                       </> :
-                      <div>Loading...</div>
+                      <div className="title level-item">Loading...</div>
                   }
                 </>
               )}
