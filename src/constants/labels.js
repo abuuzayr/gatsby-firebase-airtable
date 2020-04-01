@@ -32,6 +32,7 @@ export const headers = {
         'Creator'
     ],
     'Products': [
+        'Priority',
         'Model',
         'Color',
         'Price',
