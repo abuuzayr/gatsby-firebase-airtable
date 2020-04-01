@@ -31,6 +31,7 @@ const Remarks = (props) => {
         },
         'Text': ''
     })
+    const [remarkTypes, setRemarkTypes] = useState([])
     const { user, options, getLabel, getInputProps, id, setExpandedProps, editing } = props
     const { addToast } = useToasts()
 
@@ -47,7 +48,7 @@ const Remarks = (props) => {
                                     user,
                                     type: 'Remarks'
                                 },
-                                showTypeColumn ? ['Type', ...listLabels['Remarks']] : listLabels['Remarks'],
+                                listLabels['Remarks'],
                                 null,
                                 true
                             )
@@ -66,6 +67,12 @@ const Remarks = (props) => {
                     })
                     setRows(rows)
                     setInitialRows(rows)
+                    setRemarkTypes(rows.reduce((arr, row) => {
+                        if (!arr.includes(row['Type'])) {
+                            arr = arr.concat([row['Type']])
+                        }
+                        return arr
+                    }, []))
                 }
             } catch (e) {
                 console.error(e)
@@ -145,67 +152,74 @@ const Remarks = (props) => {
                 rows.length &&
                     labels.length ?
                     <div className="remarks">
-                        <DataGrid
-                            columns={labels.map(label => {
-                                return {
-                                    ...label,
-                                    headerRenderer: ({ column }) => (
-                                        <div className="level">
-                                            <div className="level-left">
-                                                <div className="level-item">
-                                                    {column.name}
-                                                </div>
-                                            </div>
-                                            <div className="level-right">
-                                                <div className="level-item">
-                                                    {
-                                                        sort.column &&
-                                                            sort.column === column.name ?
-                                                            (
-                                                                sort.direction === 'NONE' ?
-                                                                    <FiArrowUp style={{ 'color': '#ccc' }} /> :
-                                                                    sort.direction === 'ASC' ?
-                                                                        <FiArrowUp /> :
-                                                                        <FiArrowDown />
-                                                            ) :
-                                                            !['count'].includes(column.key) && <FiArrowUp style={{ 'color': '#ccc' }} />
-                                                    }
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )
-                                }
-                            })}
-                            rowGetter={i => ({ count: i + 1, ...rows[i] })}
-                            rowsCount={rows.length}
-                            minColumnWidth={35}
-                            headerRowHeight={35}
-                            rowHeight={50}
-                            minHeight={rows * 50}
-                            onGridSort={(sortColumn, sortDirection) => {
-                                let direction = sortDirection
-                                switch (sort.direction) {
-                                    case 'ASC':
-                                        direction = 'DESC'
-                                        break
-                                    case 'DESC':
-                                        direction = 'NONE'
-                                        break
-                                    case 'NONE':
-                                        direction = 'ASC'
-                                        break
-                                    default:
-                                        break
-                                }
-                                setRows(sortRows(initialRows, sortColumn, direction))
-                                setSort(prev => {
-                                    return {
-                                        column: sortColumn,
-                                        direction
-                                    }
-                                })
-                            }}
-                        />
+                        {
+                            remarkTypes.map(type => {
+                                const filteredRows = rows.filter(r => r['Type'] === type)
+                                return <Panel header={type} collapsible defaultExpanded={true}>
+                                    <DataGrid
+                                        columns={labels.map(label => {
+                                            return {
+                                                ...label,
+                                                headerRenderer: ({ column }) => (
+                                                    <div className="level">
+                                                        <div className="level-left">
+                                                            <div className="level-item">
+                                                                {column.name}
+                                                            </div>
+                                                        </div>
+                                                        <div className="level-right">
+                                                            <div className="level-item">
+                                                                {
+                                                                    sort.column &&
+                                                                        sort.column === column.name ?
+                                                                        (
+                                                                            sort.direction === 'NONE' ?
+                                                                                <FiArrowUp style={{ 'color': '#ccc' }} /> :
+                                                                                sort.direction === 'ASC' ?
+                                                                                    <FiArrowUp /> :
+                                                                                    <FiArrowDown />
+                                                                        ) :
+                                                                        !['count'].includes(column.key) && <FiArrowUp style={{ 'color': '#ccc' }} />
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )
+                                            }
+                                        })}
+                                        rowGetter={i => ({ count: i + 1, ...filteredRows[i] })}
+                                        rowsCount={filteredRows.length}
+                                        minColumnWidth={35}
+                                        headerRowHeight={35}
+                                        rowHeight={50}
+                                        minHeight={filteredRows * 50}
+                                        onGridSort={(sortColumn, sortDirection) => {
+                                            let direction = sortDirection
+                                            switch (sort.direction) {
+                                                case 'ASC':
+                                                    direction = 'DESC'
+                                                    break
+                                                case 'DESC':
+                                                    direction = 'NONE'
+                                                    break
+                                                case 'NONE':
+                                                    direction = 'ASC'
+                                                    break
+                                                default:
+                                                    break
+                                            }
+                                            setRows(sortRows(initialRows, sortColumn, direction))
+                                            setSort(prev => {
+                                                return {
+                                                    column: sortColumn,
+                                                    direction
+                                                }
+                                            })
+                                        }}
+                                    />
+                                </Panel>
+                            })
+                        }
                     </div> :
                     <div style={{
                         'width': '100%',
