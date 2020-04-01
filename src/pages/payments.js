@@ -214,7 +214,7 @@ const PaymentsPageBase = (props) => {
               minColumnWidth={35}
             />
           </> :
-          <div>Loading...</div>
+          <div className="title level-item">Loading...</div>
       }
     </>
   )

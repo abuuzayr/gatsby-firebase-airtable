@@ -151,7 +151,7 @@ const ContactPageBase = (props) => {
               </a>
             </div>
           </> :
-          <div>Loading...</div>
+          <div className="title level-item">Loading...</div>
       }
     </>
   )
