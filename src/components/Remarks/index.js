@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react'
 import DataGrid from 'react-data-grid'
 import { Panel } from 'rsuite'
-import { FiPlus } from 'react-icons/fi'
+import { FiPlus, FiArrowDown, FiArrowUp } from 'react-icons/fi'
 import { AiOutlineSortAscending } from 'react-icons/ai'
 import transformLabels from '../../helpers/labelFormatters'
 import { listLabels } from '../../constants/labels'
 import Field from '../Modal/Field'
 import { useToasts } from 'react-toast-notifications'
 import Airtable from 'airtable'
+import { datetimeFields } from '../../constants/fields'
 
 const base = new Airtable({
     apiKey: process.env.GATSBY_AIRTABLE_APIKEY
@@ -16,9 +17,12 @@ const base = new Airtable({
 const Remarks = (props) => {
     const showTypeColumn = ['Appointments', 'Remarks'].includes(props.type)
     const [trigger, setTrigger] = useState(false)
-    const [data, setData] = useState({
-        labels: [],
-        rows: []
+    const [labels, setLabels] = useState([])
+    const [rows, setRows] = useState([])
+    const [initialRows, setInitialRows] = useState([])
+    const [sort, setSort] = useState({
+        column: '',
+        direction: ''
     })
     const [remarksData, setRemarksData] = useState({
         'Type': {
@@ -36,28 +40,32 @@ const Remarks = (props) => {
                 const result = await fetch(`${process.env.GATSBY_STDLIB_URL}/getRawTableData?name=Remarks`)
                 if (result.status === 200) {
                     const body = await result.json()
-                    setData({
-                        labels: transformLabels(
-                            {
-                                user,
-                                type: 'Remarks'
-                            },
-                            showTypeColumn ? ['Type', ...listLabels['Remarks']] : listLabels['Remarks'], 
-                            null, 
-                            true
-                        ),
-                        rows: body.rows.filter(r => {
-                            if (showTypeColumn)  return r.fields['Appointments'].includes(id)
-                            return r.fields['Appointments'].includes(id) && r.fields['Type'] === props.type
-                        }).map((row, index) => {
-                            return {
-                                ...row.fields,
-                                index: index + 1,
-                                id: row.id,
-                                height: 200
-                            }
-                        })
+                    if (labels.length === 0) {
+                        setLabels(
+                            transformLabels(
+                                {
+                                    user,
+                                    type: 'Remarks'
+                                },
+                                showTypeColumn ? ['Type', ...listLabels['Remarks']] : listLabels['Remarks'],
+                                null,
+                                true
+                            )
+                        )
+                    }
+                    const rows = body.rows.filter(r => {
+                        if (showTypeColumn) return r.fields['Appointments'].includes(id)
+                        return r.fields['Appointments'].includes(id) && r.fields['Type'] === props.type
+                    }).map((row, index) => {
+                        return {
+                            ...row.fields,
+                            index: index + 1,
+                            id: row.id,
+                            height: 200
+                        }
                     })
+                    setRows(rows)
+                    setInitialRows(rows)
                 }
             } catch (e) {
                 console.error(e)
@@ -69,10 +77,10 @@ const Remarks = (props) => {
     useEffect(() => {
         if (!setExpandedProps) return
         setExpandedProps(
-            data.rows.length && data.labels.length ?
+            rows.length && labels.length ?
             {} :  { expanded: true }
         )
-    }, [data])
+    }, [rows, labels])
 
     const fieldProps = {
         props: {
@@ -110,20 +118,93 @@ const Remarks = (props) => {
         })
     }
 
+    const sortRows = (initialRows, sortColumn, sortDirection) => rows => {
+        const comparer = (a, b) => {
+            let A = a[sortColumn]
+            let B = b[sortColumn]
+            if (sortDirection === "ASC") {
+                if (datetimeFields.includes(sortColumn)) {
+                    A = A ? new Date(A).getTime() : new Date(new Date().getTime() + Math.pow(10, 12))
+                    B = B ? new Date(B).getTime() : new Date(new Date().getTime() + Math.pow(10, 12))
+                }
+                return A > B ? 1 : -1;
+            } else if (sortDirection === "DESC") {
+                if (datetimeFields.includes(sortColumn)) {
+                    A = A ? new Date(A).getTime() : new Date(null)
+                    B = B ? new Date(B).getTime() : new Date(null)
+                }
+                return A < B ? 1 : -1;
+            }
+        };
+        return sortDirection === "NONE" ? initialRows : [...rows].sort(comparer);
+    };
+
     return (
         <>
             {
-                data.rows.length &&
-                    data.labels.length ?
+                rows.length &&
+                    labels.length ?
                     <div className="remarks">
                         <DataGrid
-                            columns={data.labels}
-                            rowGetter={i => ({ count: i + 1, ...data.rows[i] })}
-                            rowsCount={data.rows.length}
+                            columns={labels.map(label => {
+                                return {
+                                    ...label,
+                                    headerRenderer: ({ column }) => (
+                                        <div className="level">
+                                            <div className="level-left">
+                                                <div className="level-item">
+                                                    {column.name}
+                                                </div>
+                                            </div>
+                                            <div className="level-right">
+                                                <div className="level-item">
+                                                    {
+                                                        sort.column &&
+                                                            sort.column === column.name ?
+                                                            (
+                                                                sort.direction === 'NONE' ?
+                                                                    <FiArrowUp style={{ 'color': '#ccc' }} /> :
+                                                                    sort.direction === 'ASC' ?
+                                                                        <FiArrowUp /> :
+                                                                        <FiArrowDown />
+                                                            ) :
+                                                            !['count'].includes(column.key) && <FiArrowUp style={{ 'color': '#ccc' }} />
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )
+                                }
+                            })}
+                            rowGetter={i => ({ count: i + 1, ...rows[i] })}
+                            rowsCount={rows.length}
                             minColumnWidth={35}
                             headerRowHeight={35}
                             rowHeight={50}
-                            minHeight={data.rows * 50}
+                            minHeight={rows * 50}
+                            onGridSort={(sortColumn, sortDirection) => {
+                                let direction = sortDirection
+                                switch (sort.direction) {
+                                    case 'ASC':
+                                        direction = 'DESC'
+                                        break
+                                    case 'DESC':
+                                        direction = 'NONE'
+                                        break
+                                    case 'NONE':
+                                        direction = 'ASC'
+                                        break
+                                    default:
+                                        break
+                                }
+                                setRows(sortRows(initialRows, sortColumn, direction))
+                                setSort(prev => {
+                                    return {
+                                        column: sortColumn,
+                                        direction
+                                    }
+                                })
+                            }}
                         />
                     </div> :
                     <div style={{
