@@ -44,7 +44,16 @@ const ProductPageBase = (props) => {
                 index: index + 1,
                 id: row.id
               }
-            }) 
+            }).sort((a, b) => {
+              const A = a['Priority']
+              const B = b['Priority']
+              if (!A && !B) return 0
+              if (A && !B) return -1
+              if (!A && B) return 1
+              if (parseInt(A) < parseInt(B)) return -1
+              if (parseInt(A) > parseInt(B)) return 1
+              return 0
+            })
           })
         }
       } catch (e) {
