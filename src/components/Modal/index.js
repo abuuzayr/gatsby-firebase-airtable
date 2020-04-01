@@ -334,7 +334,16 @@ const Modal = (props) => {
             value: row.id,
             label: row.fields[identifiers[field][1]],
             fields: row.fields
-        }))
+        })).sort((a, b) => {
+            const A = a.fields['Priority']
+            const B = b.fields['Priority']
+            if (!A && !B) return 0
+            if (A && !B) return -1
+            if (!A && B) return 1
+            if (parseInt(A) < parseInt(B)) return -1
+            if (parseInt(A) > parseInt(B)) return 1
+            return 0
+        })
     }
 
     const getInputProps = (field, props) => {
@@ -442,8 +451,8 @@ const Modal = (props) => {
         } else {
             cleanData = getCleanData(data, true)
         }
-        if (props.rowId) {
-            cleanData['Appointments'] = [props.rowId]
+        if (recordID && props.mode === 'New') {
+            cleanData['Appointments'] = [recordID]
         }
         // Save the record!
         if (data.hasOwnProperty('id')) {
