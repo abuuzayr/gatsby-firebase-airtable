@@ -119,6 +119,7 @@ export const fields = {
     ],
     'Products': [
         'Model',
+        'Priority',
         'Color',
         'Price',
         'Commission (sales)',
@@ -194,7 +195,8 @@ export const numberFields = [
     'Unit7',
     'Unit8',
     'Unit9',
-    'Postal Code'
+    'Postal Code',
+    'Priority'
 ]
 
 export const currencyFields = [
