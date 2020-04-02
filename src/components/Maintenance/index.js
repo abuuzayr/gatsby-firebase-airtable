@@ -3,7 +3,7 @@ import DataGrid from 'react-data-grid';
 import { FiPlus, FiEyeOff, FiFilter, FiSearch } from 'react-icons/fi';
 import { AiOutlineSortAscending } from 'react-icons/ai';
 import Modal from '../Modal';
-import transformLabels from '../../helpers/labelFormatters'
+import transformLabels, { RowRenderer } from '../../helpers/labelFormatters'
 import { headers } from '../../constants/labels'
 import { HeaderWithSorting, onGridSort } from '../../helpers/sort'
 
@@ -109,6 +109,7 @@ const Maintenance = (props) => {
               minHeight={500}
               minColumnWidth={35}
               onGridSort={(col, dir) => onGridSort(col, dir, initialRows, setRows, sort, setSort)}
+              rowRenderer={RowRenderer}
             />
           </> :
           <div className="title level-item">Loading...</div>
