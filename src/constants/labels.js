@@ -5,6 +5,7 @@ export const headers = {
         'Assign to',
         'Stage',
         'Appointment date & time',
+        'Confirmed',
         'Name',
         'Contact',
         'Customer company',
