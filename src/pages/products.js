@@ -11,7 +11,6 @@ import { headers } from '../constants/labels'
 import transformLabels from '../helpers/labelFormatters'
 import { prioritySort, HeaderWithSorting, onGridSort } from '../helpers/sort'
 
-
 const ProductPageBase = (props) => {
   const [trigger, setTrigger] = useState(false)
   const [labels, setLabels] = useState([])

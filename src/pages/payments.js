@@ -4,132 +4,23 @@ import {
   withAuthorization,
 } from '../components/Session';
 import DataGrid from 'react-data-grid';
-import { FiPlus, FiEdit, FiTrash2, FiEyeOff, FiFilter, FiSearch } from 'react-icons/fi';
+import { FiPlus, FiEyeOff, FiFilter, FiSearch } from 'react-icons/fi';
 import { AiOutlineSortAscending } from 'react-icons/ai';
 import Modal from '../components/Modal';
-import { currencyFields } from '../constants/fields'
-import { PAYMENT_MODE, PAYMENT_STATUS } from '../constants/selections'
-
-const hiddenFields = ['Appointments']
+import { headers } from '../constants/labels'
+import transformLabels from '../helpers/labelFormatters'
+import { HeaderWithSorting, onGridSort } from '../helpers/sort'
 
 const PaymentsPageBase = (props) => {
   const [trigger, setTrigger] = useState(false)
-  const [data, setData] = useState({
-    labels: [],
-    rows: []
+  const [labels, setLabels] = useState([])
+  const [rows, setRows] = useState([])
+  const [initialRows, setInitialRows] = useState([])
+  const [sort, setSort] = useState({
+    column: '',
+    direction: ''
   })
   const { authUser } = props
-
-  const transformLabels = labels => {
-    labels = labels.filter(label => !hiddenFields.includes(label.key))
-    labels = labels.map(label => {
-      if (label.key === 'ID') {
-        label.frozen = true
-        label.width = 250
-      }
-      if (currencyFields.includes(label.key)) {
-        label.formatter = ({ value }) => value ? `$${parseFloat(value).toFixed(2)}` : ''
-      }
-      if (label.key === 'Payment Mode') {
-        label.formatter = ({ value }) => {
-          const color = PAYMENT_MODE[value]
-          if (value && color) {
-            return (
-              <button
-                className="button is-rounded is-small"
-                style={{
-                  'backgroundColor': color
-                }}
-              >
-                {value}
-              </button>
-            )
-          } else {
-            return value
-          }
-        }
-      }
-      if (label.key === 'Payment Status') {
-        label.formatter = ({ value }) => {
-          const color = PAYMENT_STATUS[value]
-          if (value && color) {
-            return (
-              <button
-                className="button is-rounded is-small"
-                style={{
-                  'backgroundColor': color
-                }}
-              >
-                {value}
-              </button>
-            )
-          } else {
-            return value
-          }
-        }
-      }
-      return label
-    })
-    labels.unshift({
-      key: 'index',
-      name: '',
-      width: 30,
-      frozen: true,
-      formatter: ({ value }) => {
-        return <div
-          style={{
-            'textAlign': 'center',
-          }}
-        >
-          {value}
-        </div>
-      }
-    })
-    const idIndex = labels.map(l => l.key).indexOf('ID')
-    labels.splice(idIndex, 0, {
-      key: 'edit',
-      name: '',
-      frozen: true,
-      width: 30,
-      formatter: ({ row }) => {
-        return <div className="level actions">
-          <div className="level-item">
-            <Modal
-              button={<FiEdit />}
-              id={row.id}
-              type="Payments"
-              user={authUser}
-              mode="Edit"
-              onCloseModal={() => setTrigger(p => !p)}
-            >
-            </Modal>
-          </div>
-        </div>
-      }
-    })
-    labels.push({
-      key: 'delete',
-      name: '',
-      width: 30,
-      formatter: ({ row }) => {
-        return <div className="level actions">
-          <div className="level-item">
-            <Modal
-              button={<FiTrash2 />}
-              id={row.id}
-              title={row['Model']}
-              type="Payments"
-              user={authUser}
-              mode="Delete"
-              onCloseModal={() => setTrigger(p => !p)}
-            >
-            </Modal>
-          </div>
-        </div>
-      }
-    })
-    return labels
-  }
 
   useEffect(() => {
     async function getPayments() {
@@ -138,24 +29,26 @@ const PaymentsPageBase = (props) => {
         const result = await fetch(`${process.env.GATSBY_STDLIB_URL}/getRawTableData?name=Payments`)
         if (result.status === 200) {
           const body = await result.json()
-          const labels = Object.keys(body.rows[0].fields).map(key => {
-            return {
-              key,
-              name: key,
-              width: 180,
-              resizable: true
-            }
-          })
-          setData({ 
-            labels: transformLabels(labels), 
-            rows: body.rows.map((row, index) => {
-              return {
-                ...row.fields,
-                index: index + 1,
-                id: row.id
-              }
-            }) 
-          })
+          setLabels(
+            transformLabels(
+              {
+                user: authUser,
+                type: 'Payments',
+                setRows
+              },
+              headers['Payments'],
+              () => setTrigger(p => !p),
+              true,
+              150
+            )
+          )
+          const rows = body.rows.map((row, index) => ({
+            ...row.fields,
+            index: index + 1,
+            id: row.id
+          }))
+          setRows(rows)
+          setInitialRows(rows)
         }
       } catch (e) {
         console.error(e)
@@ -164,11 +57,18 @@ const PaymentsPageBase = (props) => {
     getPayments()
   }, [authUser, trigger])
 
+  const columns = labels.map(label => {
+    return {
+      ...label,
+      headerRenderer: props => <HeaderWithSorting {...props} sort={sort} />
+    }
+  })
+
   return (
     <>
       {
-        data.rows.length &&
-        data.labels.length ?
+        rows.length &&
+        labels.length ?
           <>
             <div className="rdg-head">
               <div className="level">
@@ -207,11 +107,12 @@ const PaymentsPageBase = (props) => {
               </div>
             </div>
             <DataGrid
-              columns={data.labels}
-              rowGetter={i => data.rows[i]}
-              rowsCount={data.rows.length}
+              columns={columns}
+              rowGetter={i => { return { count: i + 1, ...rows[i] } }}
+              rowsCount={rows.length}
               minHeight={500}
               minColumnWidth={35}
+              onGridSort={(col, dir) => onGridSort(col, dir, initialRows, setRows, sort, setSort)}
             />
           </> :
           <div className="title level-item">Loading...</div>
