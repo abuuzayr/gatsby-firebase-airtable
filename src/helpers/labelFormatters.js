@@ -2,7 +2,7 @@ import React from 'react'
 import Modal from '../components/Modal'
 import { Tooltip, Whisper, Checkbox } from 'rsuite'
 
-import { STAGES, REMARKS_TYPES } from '../constants/selections'
+import { STAGES, REMARKS_TYPES, PAYMENT_MODE, PAYMENT_STATUS } from '../constants/selections'
 import { datetimeFields, currencyFields, largeFields, booleanFields, numberFields } from '../constants/fields'
 import { UsersContext } from '../components/layout'
 import { FiMaximize2, FiMoreHorizontal, FiPlus, FiEdit, FiTrash2 } from 'react-icons/fi'
@@ -236,6 +236,12 @@ const transformLabels = (p, labels, onCloseModal, includeCount, colWidth, remark
                 break
             case 'Type':
                 obj.formatter = props => <ColoredCell {...props} colors={REMARKS_TYPES} />
+                break
+            case 'Payment Mode':
+                obj.formatter = props => <ColoredCell {...props} colors={PAYMENT_MODE} />
+                break
+            case 'Payment Status':
+                obj.formatter = props => <ColoredCell {...props} colors={PAYMENT_STATUS} />
                 break
             case 'Creator':
             case 'Assign to':
