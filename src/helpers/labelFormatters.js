@@ -208,7 +208,6 @@ export const BooleanCell = ({ type, value, row, field, setRows }) => {
     const { addToast, removeToast } = useToasts()
     return <Checkbox
         checked={value}
-        disabled={!row['Appointment date & time']}
         onChange={(v, c) => updateData(type, row.id, {[field]: c}, setRows, addToast, removeToast)}
     />
 }
