@@ -229,7 +229,14 @@ const Appointments = (props) => {
                             onGridSort={(col, dir) => onGridSort(col, dir, initialRows, setRows, sort, setSort)}
                           />
                         </> :
-                        <div className="title level-item">No appointments</div>
+                        <div class="container">
+                          <div class="title level-item">
+                            No appointments
+                          </div>
+                          <div class="level-item">
+                            <button class="is-small button" onClick={() => window.location.reload()}>Refresh</button>
+                          </div>
+                        </div>
                       }
                       </> :
                       <div className="title level-item">Loading...</div>
