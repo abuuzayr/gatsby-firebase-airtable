@@ -40,6 +40,17 @@ export const headers = {
         'Commission (sales)',
         'Commission (install)',
         'Creator'
+    ],
+    'Maintenance': [
+        'Appointment name',
+        'Job',
+        'Unit',
+        'Date & Time',
+        'Confirmed',
+        'Amount to collect',
+        'Mode',
+        'Status',
+        'Assign to'
     ]
 }
 

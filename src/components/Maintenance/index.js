@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import DataGrid from 'react-data-grid';
-import { FiPlus, FiEdit, FiTrash2, FiEyeOff, FiFilter, FiSearch } from 'react-icons/fi';
+import { FiPlus, FiEyeOff, FiFilter, FiSearch } from 'react-icons/fi';
 import { AiOutlineSortAscending } from 'react-icons/ai';
 import Modal from '../Modal';
-import { currencyFields, datetimeFields } from '../../constants/fields'
-import { STATUS } from '../../constants/selections'
-
-const hiddenFields = ['Appointments']
+import transformLabels from '../../helpers/labelFormatters'
+import { headers } from '../../constants/labels'
 
 const Maintenance = (props) => {
   const [trigger, setTrigger] = useState(false)
@@ -16,101 +14,6 @@ const Maintenance = (props) => {
   })
   const { authUser } = props
 
-  const transformLabels = labels => {
-    labels = labels.filter(label => !hiddenFields.includes(label.key))
-    labels = labels.map(label => {
-      if (label.key === 'Name') {
-        label.frozen = true
-        label.width = 250
-      }
-      if (currencyFields.includes(label.key)) {
-        label.formatter = ({ value }) => value ? `$${parseFloat(value).toFixed(2)}` : ''
-      }
-      if (datetimeFields.includes(label.key)) {
-        label.formatter = ({ value }) => value ? new Date(value).toLocaleString() : ''
-      }
-      if (label.key === 'Status') {
-        label.formatter = ({ value }) => {
-          const color = STATUS[value]
-          if (value && color) {
-            return (
-              <button
-                className="button is-rounded is-small"
-                style={{
-                  'backgroundColor': color
-                }}
-              >
-                {value}
-              </button>
-            )
-          } else {
-            return value
-          }
-        }
-      }
-      return label
-    })
-    labels.unshift({
-      key: 'index',
-      name: '',
-      width: 30,
-      frozen: true,
-      formatter: ({ value }) => {
-        return <div
-          style={{
-            'textAlign': 'center',
-          }}
-        >
-          {value}
-        </div>
-      }
-    })
-    const nameIndex = labels.map(l => l.key).indexOf('Name')
-    labels.splice(nameIndex, 0, {
-      key: 'edit',
-      name: '',
-      frozen: true,
-      width: 30,
-      formatter: ({ row }) => {
-        return <div className="level actions">
-          <div className="level-item">
-            <Modal
-              button={<FiEdit />}
-              id={row.id}
-              type="Maintenance"
-              user={authUser}
-              mode="Edit"
-              onCloseModal={() => setTrigger(p => !p)}
-            >
-            </Modal>
-          </div>
-        </div>
-      }
-    })
-    labels.push({
-      key: 'delete',
-      name: '',
-      width: 30,
-      formatter: ({ row }) => {
-        return <div className="level actions">
-          <div className="level-item">
-            <Modal
-              button={<FiTrash2 />}
-              id={row.id}
-              title={row['Model']}
-              type="Maintenance"
-              user={authUser}
-              mode="Delete"
-              onCloseModal={() => setTrigger(p => !p)}
-            >
-            </Modal>
-          </div>
-        </div>
-      }
-    })
-    return labels
-  }
-
   useEffect(() => {
     async function getMaintenance() {
       if (!authUser) return
@@ -118,16 +21,18 @@ const Maintenance = (props) => {
         const result = await fetch(`${process.env.GATSBY_STDLIB_URL}/getRawTableData?name=Maintenance`)
         if (result.status === 200) {
           const body = await result.json()
-          const labels = Object.keys(body.rows[0].fields).map(key => {
-            return {
-              key,
-              name: key,
-              width: 180,
-              resizable: true
-            }
-          })
           setData({ 
-            labels: transformLabels(labels), 
+            labels:
+              transformLabels(
+                {
+                  user: authUser,
+                  type: 'Maintenance'
+                },
+                headers['Maintenance'],
+                () => setTrigger(p => !p),
+                true,
+                180
+              ), 
             rows: body.rows.map((row, index) => {
               return {
                 ...row.fields,
@@ -188,7 +93,7 @@ const Maintenance = (props) => {
             </div>
             <DataGrid
               columns={data.labels}
-              rowGetter={i => data.rows[i]}
+              rowGetter={i => { return { count: i + 1, ...data.rows[i] } }}
               rowsCount={data.rows.length}
               minHeight={500}
               minColumnWidth={35}
