@@ -6,7 +6,7 @@ import { AiOutlineSortAscending } from 'react-icons/ai'
 import Modal from '../Modal'
 import { headers } from '../../constants/labels'
 import { UsersContext } from '../layout'
-import transformLabels from '../../helpers/labelFormatters'
+import transformLabels, { RowRenderer } from '../../helpers/labelFormatters'
 import { HeaderWithSorting, onGridSort } from '../../helpers/sort'
 
 const Appointments = (props) => {
@@ -227,6 +227,7 @@ const Appointments = (props) => {
                             minHeight={500}
                             minColumnWidth={20}
                             onGridSort={(col, dir) => onGridSort(col, dir, initialRows, setRows, sort, setSort)}
+                            rowRenderer={RowRenderer}
                           />
                         </> :
                         <div class="container">
