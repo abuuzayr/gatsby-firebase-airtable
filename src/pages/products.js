@@ -9,14 +9,17 @@ import { AiOutlineSortAscending } from 'react-icons/ai'
 import Modal from '../components/Modal'
 import { headers } from '../constants/labels'
 import transformLabels from '../helpers/labelFormatters'
-import { prioritySort } from '../helpers/sort'
+import { prioritySort, HeaderWithSorting, onGridSort } from '../helpers/sort'
 
 
 const ProductPageBase = (props) => {
   const [trigger, setTrigger] = useState(false)
-  const [data, setData] = useState({
-    labels: [],
-    rows: []
+  const [labels, setLabels] = useState([])
+  const [rows, setRows] = useState([])
+  const [initialRows, setInitialRows] = useState([])
+  const [sort, setSort] = useState({
+    column: '',
+    direction: ''
   })
   const { authUser } = props
 
@@ -27,25 +30,26 @@ const ProductPageBase = (props) => {
         const result = await fetch(`${process.env.GATSBY_STDLIB_URL}/getRawTableData?name=Products`)
         if (result.status === 200) {
           const body = await result.json()
-          setData({ 
-            labels: transformLabels(
+          setLabels(
+            transformLabels(
               {
                 user: authUser,
-                type: 'Products'
+                type: 'Products',
+                setRows
               },
               headers['Products'],
               () => setTrigger(p => !p),
               true,
-              180
-            ), 
-            rows: body.rows.map((row, index) => {
-              return {
-                ...row.fields,
-                index: index + 1,
-                id: row.id
-              }
-            }).sort(prioritySort)
-          })
+              150
+            )
+          )
+          const rows = body.rows.map((row, index) => ({
+            ...row.fields,
+            index: index + 1,
+            id: row.id
+          })).sort(prioritySort)
+          setRows(rows)
+          setInitialRows(rows)
         }
       } catch (e) {
         console.error(e)
@@ -54,11 +58,18 @@ const ProductPageBase = (props) => {
     getProducts()
   }, [authUser, trigger])
 
+  const columns = labels.map(label => {
+    return {
+      ...label,
+      headerRenderer: props => <HeaderWithSorting {...props} sort={sort} />
+    }
+  })
+
   return (
     <>
       {
-        data.rows.length &&
-        data.labels.length ?
+        rows.length &&
+        labels.length ?
           <>
             <div className="rdg-head">
               <div className="level">
@@ -97,11 +108,12 @@ const ProductPageBase = (props) => {
               </div>
             </div>
             <DataGrid
-              columns={data.labels}
-              rowGetter={i => { return { count: i + 1, ...data.rows[i] } }}
-              rowsCount={data.rows.length}
+              columns={columns}
+              rowGetter={i => { return { count: i + 1, ...rows[i] } }}
+              rowsCount={rows.length}
               minHeight={500}
               minColumnWidth={35}
+              onGridSort={(col, dir) => onGridSort(col, dir, initialRows, setRows, sort, setSort)}
             />
           </> :
           <div className="title level-item">Loading...</div>
