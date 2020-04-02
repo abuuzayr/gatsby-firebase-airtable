@@ -35,7 +35,7 @@ const Maintenance = (props) => {
               headers['Maintenance'],
               () => setTrigger(p => !p),
               true,
-              180
+              150
             )
           )
           const rows = body.rows.map((row, index) => ({
