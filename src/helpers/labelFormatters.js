@@ -1,11 +1,18 @@
 import React from 'react'
 import Modal from '../components/Modal'
-import { Tooltip, Whisper } from 'rsuite'
+import { Tooltip, Whisper, Checkbox } from 'rsuite'
 
 import { STAGES, REMARKS_TYPES } from '../constants/selections'
-import { datetimeFields, currencyFields, largeFields } from '../constants/fields'
+import { datetimeFields, currencyFields, largeFields, booleanFields } from '../constants/fields'
 import { UsersContext } from '../components/layout'
 import { FiMaximize2, FiMoreHorizontal, FiPlus, FiEdit, FiTrash2 } from 'react-icons/fi'
+
+import { useToasts } from 'react-toast-notifications'
+import Airtable from 'airtable'
+
+const base = new Airtable({
+    apiKey: process.env.GATSBY_AIRTABLE_APIKEY
+}).base(process.env.GATSBY_AIRTABLE_BASE);
 
 export const ExpandRow = props => (
     <div className="level">
@@ -197,6 +204,15 @@ export const DeleteCell = ({ row, user, type, titleKey, onCloseModal }) => {
     </div>
 }
 
+export const BooleanCell = ({ type, value, row, field, setRows }) => {
+    const { addToast, removeToast } = useToasts()
+    return <Checkbox
+        checked={value}
+        disabled={!row['Appointment date & time']}
+        onChange={(v, c) => updateData(type, row.id, {[field]: c}, setRows, addToast, removeToast)}
+    />
+}
+
 const transformLabels = (p, labels, onCloseModal, includeCount, colWidth, remarks) => {
     labels = labels.map(key => {
         const obj = {
@@ -249,6 +265,11 @@ const transformLabels = (p, labels, onCloseModal, includeCount, colWidth, remark
         }
         if (largeFields.includes(key)) {
             obj.width = 180
+        }
+        if (booleanFields.includes(key)) {
+            obj.sortable = false
+            obj.formatter = props => <BooleanCell {...props} type={p.type} field={key} setRows={p.setRows} />
+            obj.width = 50
         }
         return obj
     })
@@ -317,6 +338,46 @@ const transformLabels = (p, labels, onCloseModal, includeCount, colWidth, remark
         }
     }
     return labels
+}
+
+const updateRows = (id, fields, setRows) => {
+    if (!setRows) return
+    let prevRow = {}
+    setRows(prevRows => {
+        prevRow = { ...prevRows.find(p => p.id === id) }
+        const rows = [...prevRows]
+        const index = rows.findIndex(r => r.id === id)
+        if (index < 0) return rows
+        const row = rows[index]
+        Object.entries(fields).forEach(field => {
+            row[field[0]] = field[1]
+        })
+        rows[index] = row
+        return rows
+    })
+    return Object.keys(fields).reduce((obj, key) => {
+        obj[key] = prevRow[key]
+        return obj
+    }, {})
+    
+}
+
+const updateData = async (type, id, fields, setRows, addToast, removeToast) => {
+    if (!id || !fields) return
+    const prevFields = updateRows(id, fields, setRows)
+    const savingToast = addToast('Updating...', { appearance: 'info' })
+    base(type).update([{ id, fields }], function (err, records) {
+        removeToast(savingToast)
+        if (err) {
+            console.error(err);
+            addToast(`Error while updating: ${err}`, { appearance: 'error', autoDismiss: true })
+            updateRows(id, prevFields, setRows)
+            return
+        }
+        if (records.length > 0) {
+            addToast('Updated successfully!', { appearance: 'success', autoDismiss: true })
+        }
+    })
 }
 
 export default transformLabels
