@@ -389,4 +389,10 @@ const updateData = async (type, id, fields, setRows, addToast, removeToast) => {
     })
 }
 
+export const RowRenderer = ({ renderBaseRow, ...props }) => {
+    return <div style={{ fontWeight: props.row['Confirmed'] ? 'bold' : 'normal' }}>
+        {renderBaseRow(props)}
+    </div>;
+};
+
 export default transformLabels
