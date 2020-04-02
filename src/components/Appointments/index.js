@@ -65,7 +65,8 @@ const Appointments = (props) => {
               transformLabels(
                 {
                   user: authUser,
-                  type: 'Appointments'
+                  type: 'Appointments',
+                  setRows
                 },
                 headers['Appointments'], 
                 () => setTrigger(p => !p),
@@ -177,7 +178,7 @@ const Appointments = (props) => {
                                 <FiArrowUp /> :
                                 <FiArrowDown />
                           ) :
-                          !['count', 'edit', 'delete'].includes(column.key) && <FiArrowUp style={{ 'color': '#ccc' }} />
+                          column.sortable && <FiArrowUp style={{ 'color': '#ccc' }} />
                       }
                     </div>
                   </div>
