@@ -334,7 +334,9 @@ const Modal = (props) => {
             value: row.id,
             label: row.fields[identifiers[field][1]],
             fields: row.fields
-        })).sort((a, b) => {
+        }))
+        .filter(r => r.fields.hasOwnProperty('Priority') ? r.fields['Priority'] !== 0 : true)
+        .sort((a, b) => {
             const A = a.fields['Priority']
             const B = b.fields['Priority']
             if (!A && !B) return 0
