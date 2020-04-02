@@ -3,7 +3,7 @@ import Modal from '../components/Modal'
 import { Tooltip, Whisper, Checkbox } from 'rsuite'
 
 import { STAGES, REMARKS_TYPES } from '../constants/selections'
-import { datetimeFields, currencyFields, largeFields, booleanFields } from '../constants/fields'
+import { datetimeFields, currencyFields, largeFields, booleanFields, numberFields } from '../constants/fields'
 import { UsersContext } from '../components/layout'
 import { FiMaximize2, FiMoreHorizontal, FiPlus, FiEdit, FiTrash2 } from 'react-icons/fi'
 
@@ -264,6 +264,10 @@ const transformLabels = (p, labels, onCloseModal, includeCount, colWidth, remark
         }
         if (largeFields.includes(key)) {
             obj.width = 180
+        }
+        if (numberFields.includes(key)) {
+            obj.width = 50
+            obj.formatter = ({value}) => <div className="level-item">{value}</div>
         }
         if (booleanFields.includes(key)) {
             obj.sortable = false
