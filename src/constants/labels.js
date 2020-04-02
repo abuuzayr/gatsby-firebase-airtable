@@ -51,7 +51,16 @@ export const headers = {
         'Mode',
         'Status',
         'Assign to'
-    ]
+    ],
+    'Payments': [
+        'ID',
+        'Payment Mode',
+        'Amount',
+        'Date',
+        'Bank',
+        'Detail',
+        'Payment Status'
+    ],
 }
 
 export const listLabels = {
