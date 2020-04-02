@@ -327,3 +327,7 @@ export const largeFields = [
     // 'Appointment date & time',
     // 'Timestamp'
 ]
+
+export const booleanFields = [
+    'Confirmed'
+]
