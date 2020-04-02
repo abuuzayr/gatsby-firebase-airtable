@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import { CompanyContext } from '../Company'
 import DataGrid from 'react-data-grid'
-import { FiEyeOff, FiFilter, FiSearch, FiArrowUp, FiArrowDown, FiPlus } from 'react-icons/fi'
+import { FiEyeOff, FiFilter, FiSearch, FiPlus } from 'react-icons/fi'
 import { AiOutlineSortAscending } from 'react-icons/ai'
 import Modal from '../Modal'
-import { datetimeFields } from '../../constants/fields'
 import { headers } from '../../constants/labels'
 import { UsersContext } from '../layout'
 import transformLabels from '../../helpers/labelFormatters'
+import { HeaderWithSorting, onGridSort } from '../../helpers/sort'
 
 const Appointments = (props) => {
   const [stats, setStats] = useState({})
@@ -130,27 +130,6 @@ const Appointments = (props) => {
     updateRemarks()
   }, [trigger])
 
-  const sortRows = (initialRows, sortColumn, sortDirection) => rows => {
-    const comparer = (a, b) => {
-      let A = a[sortColumn]
-      let B = b[sortColumn]
-      if (sortDirection === "ASC") {
-        if (datetimeFields.includes(sortColumn)) {
-          A = A ? new Date(A).getTime() : new Date(new Date().getTime() + Math.pow(10, 12))
-          B = B ? new Date(B).getTime() : new Date(new Date().getTime() + Math.pow(10, 12))
-        }
-        return A > B ? 1 : -1;
-      } else if (sortDirection === "DESC") {
-        if (datetimeFields.includes(sortColumn)) {
-          A = A ? new Date(A).getTime() : new Date(null)
-          B = B ? new Date(B).getTime() : new Date(null)
-        }
-        return A < B ? 1 : -1;
-      }
-    };
-    return sortDirection === "NONE" ? initialRows : [...rows].sort(comparer);
-  };
-
   return (
     <CompanyContext.Consumer>
       {
@@ -159,31 +138,7 @@ const Appointments = (props) => {
           const columns = labels.map(label => {
             return {
               ...label,
-              headerRenderer: ({ column }) => (
-                <div className="level">
-                  <div className="level-left">
-                    <div className="level-item">
-                      {column.name}
-                    </div>
-                  </div>
-                  <div className="level-right">
-                    <div className="level-item">
-                      {
-                        sort.column &&
-                        sort.column === column.name ?
-                          (
-                            sort.direction === 'NONE' ? 
-                              <FiArrowUp style={{ 'color': '#ccc' }} /> :
-                              sort.direction === 'ASC' ? 
-                                <FiArrowUp /> :
-                                <FiArrowDown />
-                          ) :
-                          column.sortable && <FiArrowUp style={{ 'color': '#ccc' }} />
-                      }
-                    </div>
-                  </div>
-                </div>
-              )
+              headerRenderer: props => <HeaderWithSorting {...props} sort={sort} />
             }
           })
           return (
@@ -271,29 +226,7 @@ const Appointments = (props) => {
                             rowsCount={rows.length}
                             minHeight={500}
                             minColumnWidth={20}
-                            onGridSort={(sortColumn, sortDirection) => {
-                              let direction = sortDirection
-                              switch (sort.direction) {
-                                case 'ASC':
-                                  direction = 'DESC'
-                                  break
-                                case 'DESC':
-                                  direction = 'NONE'
-                                  break
-                                case 'NONE':
-                                  direction = 'ASC'
-                                  break
-                                default:
-                                  break
-                              }
-                              setRows(sortRows(initialRows, sortColumn, direction))
-                              setSort(prev => {
-                                return {
-                                  column: sortColumn,
-                                  direction
-                                }
-                              })
-                            }}
+                            onGridSort={(col, dir) => onGridSort(col, dir, initialRows, setRows, sort, setSort)}
                           />
                         </> :
                         <div className="title level-item">No appointments</div>
