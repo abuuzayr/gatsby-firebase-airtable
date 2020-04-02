@@ -5,12 +5,16 @@ import { AiOutlineSortAscending } from 'react-icons/ai';
 import Modal from '../Modal';
 import transformLabels from '../../helpers/labelFormatters'
 import { headers } from '../../constants/labels'
+import { HeaderWithSorting, onGridSort } from '../../helpers/sort'
 
 const Maintenance = (props) => {
   const [trigger, setTrigger] = useState(false)
-  const [data, setData] = useState({
-    labels: [],
-    rows: []
+  const [labels, setLabels] = useState([])
+  const [rows, setRows] = useState([])
+  const [initialRows, setInitialRows] = useState([])
+  const [sort, setSort] = useState({
+    column: '',
+    direction: ''
   })
   const { authUser } = props
 
@@ -21,26 +25,26 @@ const Maintenance = (props) => {
         const result = await fetch(`${process.env.GATSBY_STDLIB_URL}/getRawTableData?name=Maintenance`)
         if (result.status === 200) {
           const body = await result.json()
-          setData({ 
-            labels:
-              transformLabels(
-                {
-                  user: authUser,
-                  type: 'Maintenance'
-                },
-                headers['Maintenance'],
-                () => setTrigger(p => !p),
-                true,
-                180
-              ), 
-            rows: body.rows.map((row, index) => {
-              return {
-                ...row.fields,
-                index: index + 1,
-                id: row.id
-              }
-            }) 
-          })
+          setLabels(
+            transformLabels(
+              {
+                user: authUser,
+                type: 'Maintenance',
+                setRows
+              },
+              headers['Maintenance'],
+              () => setTrigger(p => !p),
+              true,
+              180
+            )
+          )
+          const rows = body.rows.map((row, index) => ({
+            ...row.fields,
+            index: index + 1,
+            id: row.id
+          })).filter(Boolean)
+          setRows(rows)
+          setInitialRows(rows)
         }
       } catch (e) {
         console.error(e)
@@ -49,11 +53,18 @@ const Maintenance = (props) => {
     getMaintenance()
   }, [authUser, trigger])
 
+  const columns = labels.map(label => {
+    return {
+      ...label,
+      headerRenderer: props => <HeaderWithSorting {...props} sort={sort} />
+    }
+  })
+
   return (
     <>
       {
-        data.rows.length &&
-        data.labels.length ?
+        rows.length &&
+        labels.length ?
           <>
             <div className="rdg-head">
               <div className="level">
@@ -92,11 +103,12 @@ const Maintenance = (props) => {
               </div>
             </div>
             <DataGrid
-              columns={data.labels}
-              rowGetter={i => { return { count: i + 1, ...data.rows[i] } }}
-              rowsCount={data.rows.length}
+              columns={columns}
+              rowGetter={i => { return { count: i + 1, ...rows[i] } }}
+              rowsCount={rows.length}
               minHeight={500}
               minColumnWidth={35}
+              onGridSort={(col, dir) => onGridSort(col, dir, initialRows, setRows, sort, setSort)}
             />
           </> :
           <div className="title level-item">Loading...</div>
