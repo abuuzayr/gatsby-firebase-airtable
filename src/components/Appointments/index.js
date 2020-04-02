@@ -230,12 +230,12 @@ const Appointments = (props) => {
                             rowRenderer={RowRenderer}
                           />
                         </> :
-                        <div class="container">
-                          <div class="title level-item">
+                        <div className="container">
+                          <div className="title level-item">
                             No appointments
                           </div>
-                          <div class="level-item">
-                            <button class="is-small button" onClick={() => window.location.reload()}>Refresh</button>
+                          <div className="level-item">
+                            <button className="is-small button" onClick={() => window.location.reload()}>Refresh</button>
                           </div>
                         </div>
                       }
