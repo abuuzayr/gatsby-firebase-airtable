@@ -4,13 +4,13 @@ import {
   withAuthorization,
 } from '../components/Session'
 import DataGrid from 'react-data-grid'
-import { FiPlus, FiEdit, FiTrash2, FiEyeOff, FiFilter, FiSearch } from 'react-icons/fi'
+import { FiPlus, FiEyeOff, FiFilter, FiSearch } from 'react-icons/fi'
 import { AiOutlineSortAscending } from 'react-icons/ai'
 import Modal from '../components/Modal'
 import { headers } from '../constants/labels'
 import transformLabels from '../helpers/labelFormatters'
+import { prioritySort } from '../helpers/sort'
 
-const hiddenFields = ['Appointments']
 
 const ProductPageBase = (props) => {
   const [trigger, setTrigger] = useState(false)
@@ -44,16 +44,7 @@ const ProductPageBase = (props) => {
                 index: index + 1,
                 id: row.id
               }
-            }).sort((a, b) => {
-              const A = a['Priority']
-              const B = b['Priority']
-              if (!A && !B) return 0
-              if (A && !B) return -1
-              if (!A && B) return 1
-              if (parseInt(A) < parseInt(B)) return -1
-              if (parseInt(A) > parseInt(B)) return 1
-              return 0
-            })
+            }).sort(prioritySort)
           })
         }
       } catch (e) {
