@@ -47,6 +47,7 @@ export const headers = {
         'Unit',
         'Date & Time',
         'Confirmed',
+        'Address & Zone',
         'Amount to collect',
         'Mode',
         'Status',
