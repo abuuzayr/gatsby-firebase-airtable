@@ -74,6 +74,14 @@ const toDatetimeLocal = (str) => {
         HH + ':' + II + ':' + SS;
 }
 
+const EmptyRowsView = () => (
+    <div className="container">
+        <div className="title level-item">
+            Loading...
+        </div>
+    </div>
+)
+
 const Modal = (props) => {
     // Generate default data for all data
     const defaultData = Object.keys(fields).includes(props.type) ?
@@ -635,6 +643,7 @@ const Modal = (props) => {
                                                     }}
                                                     rowsCount={data.length}
                                                     minColumnWidth={35}
+                                                    emptyRowsView={EmptyRowsView}
                                                 />
                                             }
                                         </> :
