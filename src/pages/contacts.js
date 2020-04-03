@@ -61,7 +61,6 @@ const ContactPageBase = (props) => {
               user={authUser}
               mode="Edit"
               onCloseModal={() => setTrigger(p => !p)}
-              shouldCloseOnOverlayClick={false}
             >
             </Modal>
           </div>
@@ -83,7 +82,6 @@ const ContactPageBase = (props) => {
               user={authUser}
               mode="Delete"
               onCloseModal={() => setTrigger(p => !p)}
-              shouldCloseOnOverlayClick={false}
             >
             </Modal>
           </div>
@@ -149,7 +147,6 @@ const ContactPageBase = (props) => {
                   user={authUser}
                   mode="New"
                   onCloseModal={() => setTrigger(p => !p)}
-                  shouldCloseOnOverlayClick={false}
                 ></Modal>
               </a>
             </div>

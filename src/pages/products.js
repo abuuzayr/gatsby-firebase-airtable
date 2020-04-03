@@ -95,7 +95,6 @@ const ProductPageBase = (props) => {
                         user={authUser}
                         mode="New"
                         onCloseModal={() => setTrigger(p => !p)}
-                        shouldCloseOnOverlayClick={false}
                       ></Modal>
                     </a>
                   </div>

@@ -29,7 +29,6 @@ export const ExpandRow = props => (
                         mode="View"
                         users={users}
                         showRemarks
-                        shouldCloseOnOverlayClick={false}
                     >
                     </Modal>
                 )}
@@ -114,7 +113,6 @@ export const MultiRecordCell = ({ value, row, type, user, text, onCloseModal }) 
                                         title={type}
                                         showRemarks
                                         onCloseModal={onCloseModal}
-                                        shouldCloseOnOverlayClick={false}
                                     >
                                     </Modal>
                                 </div> :
@@ -135,7 +133,6 @@ export const MultiRecordCell = ({ value, row, type, user, text, onCloseModal }) 
                                 mode="New"
                                 onCloseModal={onCloseModal}
                                 showRemarks
-                                shouldCloseOnOverlayClick={false}
                             >
                             </Modal>
                         </div>
@@ -182,7 +179,6 @@ export const EditCell = ({ row, user, type, onCloseModal }) => {
                         mode="Edit"
                         onCloseModal={onCloseModal}
                         showRemarks
-                        shouldCloseOnOverlayClick={false}
                     >
                     </Modal>
                 )}
@@ -202,7 +198,6 @@ export const DeleteCell = ({ row, user, type, titleKey, onCloseModal }) => {
                 user={user}
                 mode="Delete"
                 onCloseModal={onCloseModal}
-                shouldCloseOnOverlayClick={false}
             >
             </Modal>
         </div>
@@ -232,7 +227,6 @@ export const RemarksCell = ({ row, user, type, onCloseModal }) => {
                         mode="New"
                         onCloseModal={onCloseModal}
                         showRemarks
-                        shouldCloseOnOverlayClick={false}
                     >
                     </Modal>
                 )}
