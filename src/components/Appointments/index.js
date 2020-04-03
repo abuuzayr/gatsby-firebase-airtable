@@ -219,6 +219,7 @@ const Appointments = (props) => {
                                     mode="New"
                                     onCloseModal={() => setTrigger(p => !p)}
                                     showRemarks
+                                    shouldCloseOnOverlayClick={false}
                                   ></Modal>
                                 </a>
                               </div>
