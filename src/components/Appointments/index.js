@@ -1,13 +1,24 @@
 import React, { useState, useEffect } from 'react'
 import { CompanyContext } from '../Company'
 import DataGrid from 'react-data-grid'
-import { FiEyeOff, FiFilter, FiSearch, FiPlus } from 'react-icons/fi'
+import {
+  FiEyeOff,
+  FiFilter,
+  FiSearch,
+  FiPlus,
+  FiChevronsLeft,
+  FiChevronLeft,
+  FiChevronRight,
+  FiChevronsRight 
+} from 'react-icons/fi'
 import { AiOutlineSortAscending } from 'react-icons/ai'
 import Modal from '../Modal'
 import { headers } from '../../constants/labels'
 import { UsersContext } from '../layout'
 import transformLabels, { RowRenderer } from '../../helpers/labelFormatters'
 import { HeaderWithSorting, onGridSort } from '../../helpers/sort'
+import { Tooltip, Whisper } from 'rsuite'
+import scroll from '../../helpers/scroll'
 
 const EmptyRowsView = () => (
   <div className="container" style={{ 'padding': 100 }}>
@@ -207,6 +218,10 @@ const Appointments = (props) => {
                                 <AiOutlineSortAscending />
                                 <span>Sort</span>
                               </div>
+                              <div className="level-item">
+                                <FiSearch />
+                                <span>Search</span>
+                              </div>
                               <div style={{ 'margin': '10px 0', 'fontWeight': 700 }}>
                                 <a style={{ 'verticalAlign': 'middle' }} href="#">
                                   <Modal
@@ -224,10 +239,19 @@ const Appointments = (props) => {
                                 </a>
                               </div>
                             </div>
-                            <div className="level-right">
-                              <div className="level-item">
-                                <FiSearch />
-                              </div>
+                            <div className="level-right scroll-icons">
+                              <Whisper placement="top" speaker={<Tooltip>{`Scroll to first`}</Tooltip>}>
+                                <FiChevronsLeft onClick={scroll.scrollToFirst}/>
+                              </Whisper>
+                              <Whisper placement="top" speaker={<Tooltip>{`Scroll left`}</Tooltip>}>
+                                <FiChevronLeft onClick={scroll.scrollLeft}/>
+                              </Whisper>
+                              <Whisper placement="top" speaker={<Tooltip>{`Scroll right`}</Tooltip>}>
+                                <FiChevronRight onClick={scroll.scrollRight}/>
+                              </Whisper>
+                              <Whisper placement="top" speaker={<Tooltip>{`Scroll to last`}</Tooltip>}>
+                                <FiChevronsRight onClick={scroll.scrollToLast}/>
+                              </Whisper>
                             </div>
                           </div>
                         </div>
