@@ -239,16 +239,16 @@ const Appointments = (props) => {
                               </div>
                             </div>
                             <div className="level-right scroll-icons">
-                              <Whisper placement="top" speaker={<Tooltip>{`Scroll to first`}</Tooltip>}>
+                              <Whisper placement="autoVerticalEnd" speaker={<Tooltip>{`Scroll to first`}</Tooltip>}>
                                 <FiChevronsLeft onClick={scroll.scrollToFirst}/>
                               </Whisper>
-                              <Whisper placement="top" speaker={<Tooltip>{`Scroll left`}</Tooltip>}>
+                              <Whisper placement="autoVerticalEnd" speaker={<Tooltip>{`Scroll left`}</Tooltip>}>
                                 <FiChevronLeft onClick={scroll.scrollLeft}/>
                               </Whisper>
-                              <Whisper placement="top" speaker={<Tooltip>{`Scroll right`}</Tooltip>}>
+                              <Whisper placement="autoVerticalEnd" speaker={<Tooltip>{`Scroll right`}</Tooltip>}>
                                 <FiChevronRight onClick={scroll.scrollRight}/>
                               </Whisper>
-                              <Whisper placement="top" speaker={<Tooltip>{`Scroll to last`}</Tooltip>}>
+                              <Whisper placement="autoVerticalEnd" speaker={<Tooltip>{`Scroll to last`}</Tooltip>}>
                                 <FiChevronsRight onClick={scroll.scrollToLast}/>
                               </Whisper>
                             </div>
