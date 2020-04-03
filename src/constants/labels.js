@@ -1,6 +1,5 @@
 export const headers = {
     'Appointments': [
-        'Appointment name',
         'Company',
         'Assign to',
         'Stage',
