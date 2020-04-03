@@ -5,7 +5,7 @@ import { Tooltip, Whisper, Checkbox } from 'rsuite'
 import { STAGES, REMARKS_TYPES, PAYMENT_MODE, PAYMENT_STATUS } from '../constants/selections'
 import { datetimeFields, currencyFields, largeFields, booleanFields, numberFields } from '../constants/fields'
 import { UsersContext } from '../components/layout'
-import { FiMaximize2, FiMoreHorizontal, FiPlus, FiEdit, FiTrash2 } from 'react-icons/fi'
+import { FiMaximize2, FiMoreHorizontal, FiPlus, FiEdit, FiTrash2, FiFileText } from 'react-icons/fi'
 
 import { useToasts } from 'react-toast-notifications'
 import Airtable from 'airtable'
@@ -29,6 +29,7 @@ export const ExpandRow = props => (
                         mode="View"
                         users={users}
                         showRemarks
+                        shouldCloseOnOverlayClick={false}
                     >
                     </Modal>
                 )}
@@ -113,6 +114,7 @@ export const MultiRecordCell = ({ value, row, type, user, text, onCloseModal }) 
                                         title={type}
                                         showRemarks
                                         onCloseModal={onCloseModal}
+                                        shouldCloseOnOverlayClick={false}
                                     >
                                     </Modal>
                                 </div> :
@@ -133,6 +135,7 @@ export const MultiRecordCell = ({ value, row, type, user, text, onCloseModal }) 
                                 mode="New"
                                 onCloseModal={onCloseModal}
                                 showRemarks
+                                shouldCloseOnOverlayClick={false}
                             >
                             </Modal>
                         </div>
@@ -179,6 +182,7 @@ export const EditCell = ({ row, user, type, onCloseModal }) => {
                         mode="Edit"
                         onCloseModal={onCloseModal}
                         showRemarks
+                        shouldCloseOnOverlayClick={false}
                     >
                     </Modal>
                 )}
@@ -198,6 +202,7 @@ export const DeleteCell = ({ row, user, type, titleKey, onCloseModal }) => {
                 user={user}
                 mode="Delete"
                 onCloseModal={onCloseModal}
+                shouldCloseOnOverlayClick={false}
             >
             </Modal>
         </div>
@@ -210,6 +215,30 @@ export const BooleanCell = ({ type, value, row, field, setRows }) => {
         checked={value}
         onChange={(v, c) => updateData(type, row.id, {[field]: c}, setRows, addToast, removeToast)}
     />
+}
+
+export const RemarksCell = ({ row, user, type, onCloseModal }) => {
+    return <div className="level actions">
+        <div className="level-item">
+            <UsersContext.Consumer>
+                {users => (
+                    <Modal
+                        button={<FiFileText />}
+                        rowId={row.id}
+                        user={user}
+                        users={users}
+                        title={type}
+                        type={type === 'Install / Maintenance' ? 'Maintenance' : type}
+                        mode="New"
+                        onCloseModal={onCloseModal}
+                        showRemarks
+                        shouldCloseOnOverlayClick={false}
+                    >
+                    </Modal>
+                )}
+            </UsersContext.Consumer>
+        </div>
+    </div>
 }
 
 const transformLabels = (p, labels, onCloseModal, includeCount, colWidth, remarks) => {
@@ -320,7 +349,20 @@ const transformLabels = (p, labels, onCloseModal, includeCount, colWidth, remark
             />
         })
         if (remarks) {
-            // Add remarks row
+            // Add remarks to the beginning
+            labels.splice(2, added, {
+                key: 'remarks',
+                name: '',
+                frozen: true,
+                width: 30,
+                formatter: props => <RemarksCell
+                    {...props}
+                    user={p.user}
+                    type="Remarks"
+                    onCloseModal={onCloseModal}
+                />
+            })
+            // Add remarks to the end
             labels.splice(labels.map(l => l.key).indexOf('delete') - added, added, {
                 key: 'Remarks',
                 name: 'Remarks',
