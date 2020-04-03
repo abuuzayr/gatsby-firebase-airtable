@@ -566,6 +566,7 @@ const Modal = (props) => {
                 style={customStyles}
                 contentLabel="Record modal"
                 closeTimeoutMS={2000}
+                shouldCloseOnOverlayClick={false}
             >
                 <CompanyContext.Consumer>
                     {company => {
@@ -675,7 +676,7 @@ const Modal = (props) => {
                                                 }}>Click Save to add Remarks</p>
                                             </Panel>)
                                     }
-                                    <div className="level">
+                                    <div className="level modal-buttons">
                                         <div className={!closeButtonOnly ? 'level-left' : 'level-item'}>
                                             <button
                                                 className={`button is-danger ${closeButtonOnly && 'is-fullwidth'}`}
