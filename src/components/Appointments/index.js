@@ -9,7 +9,19 @@ import { UsersContext } from '../layout'
 import transformLabels, { RowRenderer } from '../../helpers/labelFormatters'
 import { HeaderWithSorting, onGridSort } from '../../helpers/sort'
 
+const EmptyRowsView = () => (
+  <div className="container" style={{ 'padding': 100 }}>
+    <div className="title level-item">
+      No appointments
+    </div>
+    <div className="level-item">
+      <button className="is-small button" onClick={() => window.location.reload()}>Refresh</button>
+    </div>
+  </div>
+)
+
 const Appointments = (props) => {
+  const [loaded, setLoaded] = useState(false)
   const [stats, setStats] = useState({})
   const [company, setCompany] = useState(false)
   const [labels, setLabels] = useState([])
@@ -92,6 +104,7 @@ const Appointments = (props) => {
           }).filter(Boolean)
           setRows(rows)
           setInitialRows(rows)
+          if (!loaded) setLoaded(true)
         }
       } catch (e) {
         console.error(e)
@@ -177,70 +190,58 @@ const Appointments = (props) => {
                     </section>
                   }
                   {
-                    columns.length ?
+                    loaded ?
                       <>
-                      {
-                        rows.length ?
-                        <>
-                          <div className="rdg-head">
-                            <div className="level">
-                              <div className="level-left">
-                                <div className="level-item">
-                                  <FiEyeOff />
-                                  <span>Hide fields</span>
-                                </div>
-                                <div className="level-item">
-                                  <FiFilter />
-                                  <span>Filter</span>
-                                </div>
-                                <div className="level-item">
-                                  <AiOutlineSortAscending />
-                                  <span>Sort</span>
-                                </div>
-                                <div style={{ 'margin': '10px 0', 'fontWeight': 700 }}>
-                                  <a style={{ 'verticalAlign': 'middle' }} href="#">
-                                    <Modal
-                                      button={
-                                        <><FiPlus style={{ 'verticalAlign': 'middle' }} /> Add new customer</>
-                                      }
-                                      type="Appointments"
-                                      user={authUser}
-                                      users={users}
-                                      mode="New"
-                                      onCloseModal={() => setTrigger(p => !p)}
-                                      showRemarks
-                                    ></Modal>
-                                  </a>
-                                </div>
+                        <div className="rdg-head">
+                          <div className="level">
+                            <div className="level-left">
+                              <div className="level-item">
+                                <FiEyeOff />
+                                <span>Hide fields</span>
                               </div>
-                              <div className="level-right">
-                                <div className="level-item">
-                                  <FiSearch />
-                                </div>
+                              <div className="level-item">
+                                <FiFilter />
+                                <span>Filter</span>
+                              </div>
+                              <div className="level-item">
+                                <AiOutlineSortAscending />
+                                <span>Sort</span>
+                              </div>
+                              <div style={{ 'margin': '10px 0', 'fontWeight': 700 }}>
+                                <a style={{ 'verticalAlign': 'middle' }} href="#">
+                                  <Modal
+                                    button={
+                                      <><FiPlus style={{ 'verticalAlign': 'middle' }} /> Add new customer</>
+                                    }
+                                    type="Appointments"
+                                    user={authUser}
+                                    users={users}
+                                    mode="New"
+                                    onCloseModal={() => setTrigger(p => !p)}
+                                    showRemarks
+                                  ></Modal>
+                                </a>
+                              </div>
+                            </div>
+                            <div className="level-right">
+                              <div className="level-item">
+                                <FiSearch />
                               </div>
                             </div>
                           </div>
-                          <DataGrid
-                            columns={columns}
-                            rowGetter={i => { return { count: i + 1, ...rows[i] } }}
-                            rowsCount={rows.length}
-                            minHeight={500}
-                            minColumnWidth={20}
-                            onGridSort={(col, dir) => onGridSort(col, dir, initialRows, setRows, sort, setSort)}
-                            rowRenderer={RowRenderer}
-                          />
-                        </> :
-                        <div className="container">
-                          <div className="title level-item">
-                            No appointments
-                          </div>
-                          <div className="level-item">
-                            <button className="is-small button" onClick={() => window.location.reload()}>Refresh</button>
-                          </div>
                         </div>
-                      }
+                        <DataGrid
+                          columns={columns}
+                          rowGetter={i => { return { count: i + 1, ...rows[i] } }}
+                          rowsCount={rows.length}
+                          minHeight={500}
+                          minColumnWidth={20}
+                          onGridSort={(col, dir) => onGridSort(col, dir, initialRows, setRows, sort, setSort)}
+                          rowRenderer={RowRenderer}
+                          emptyRowsView={EmptyRowsView}
+                        />
                       </> :
-                      <div className="title level-item">Loading...</div>
+                    <div className="title level-item">Loading...</div>
                   }
                 </>
               )}
