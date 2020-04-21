@@ -42,17 +42,19 @@ const Remarks = (props) => {
                 if (result.status === 200) {
                     const body = await result.json()
                     if (labels.length === 0) {
-                        setLabels(
-                            transformLabels(
-                                {
-                                    user,
-                                    type: 'Remarks'
-                                },
-                                listLabels['Remarks'],
-                                null,
-                                true
-                            )
-                        )
+                        const labels = transformLabels(
+                            {
+                                user,
+                                type: 'Remarks'
+                            },
+                            listLabels['Remarks'],
+                            null,
+                            true
+                        ).map(label => {
+                            if (label.key === 'count') label.width = 20
+                            return label
+                        })
+                        setLabels(labels)
                     }
                     const rows = body.rows.filter(r => {
                         if (showTypeColumn) return r.fields['Appointments'].includes(id)
@@ -189,7 +191,7 @@ const Remarks = (props) => {
                                         })}
                                         rowGetter={i => ({ count: i + 1, ...filteredRows[i] })}
                                         rowsCount={filteredRows.length}
-                                        minColumnWidth={35}
+                                        minColumnWidth={20}
                                         headerRowHeight={35}
                                         rowHeight={50}
                                         minHeight={filteredRows * 50}
