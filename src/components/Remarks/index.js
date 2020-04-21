@@ -31,6 +31,7 @@ const Remarks = (props) => {
         },
         'Text': ''
     })
+    const [busy, setBusy] = useState(false)
     const [remarkTypes, setRemarkTypes] = useState([])
     const { user, options, getLabel, getInputProps, id, setExpandedProps, editing } = props
     const { addToast } = useToasts()
@@ -109,6 +110,7 @@ const Remarks = (props) => {
     }
 
     const addRemark = () => {
+        setBusy(true)
         base('Remarks').create([{ fields: {
             'Type': remarksData['Type'].value,
             'Text': remarksData['Text'],
@@ -122,8 +124,13 @@ const Remarks = (props) => {
             }
             if (records.length > 0) {
                 addToast('New remark added', { appearance: 'success', autoDismiss: true })
+                setRemarksData(prevData => ({
+                    ...prevData,
+                    'Text': ''
+                }))
                 setTrigger(p => !p)
             }
+            setBusy(false)
         })
     }
 
@@ -239,7 +246,7 @@ const Remarks = (props) => {
                         showTypeColumn &&
                         <Field field="Type" {...fieldProps} />
                     }
-                    <Field field="Text" {...fieldProps} />
+                    <Field field="Text" {...fieldProps} disabled={busy} />
                     <button
                         className="button is-small is-fullwidth is-info is-light"
                         style={{
