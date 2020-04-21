@@ -15,9 +15,9 @@ export const fields = {
                 'House Unit',
                 'Postal Code',
                 'Zone',
-                'Name 2',
-                'Contact 2',
-                'Relationship',
+                '2 Name',
+                '2 Contact',
+                '2 Relationship',
                 'Creator'
             ]
         },
@@ -323,7 +323,7 @@ export const largeFields = [
     // 'Customer company',
     // 'Address',
     // 'Name',
-    // 'Name 2',
+    // '2 Name',
     // 'Appointment date & time',
     // 'Timestamp'
 ]
