@@ -36,13 +36,12 @@ const NavigationAuth = ({ authUser }) => (
         <div className="navbar-start">
           {
             (authUser.role === 'SALES' || authUser.role === 'ADMIN') &&
-            <Link className="navbar-item" to={ROUTES.APPOINTMENTS}>Appointments</Link>
+            <>
+              <Link className="navbar-item" to={ROUTES.APPOINTMENTS}>Appointments</Link>
+              <Link className="navbar-item" to={ROUTES.PAYMENTS}>Payments</Link>
+            </>
           }
-          <Link className="navbar-item" to={ROUTES.MAINTAINENCE}>Install / Maintenance</Link>
-          {
-            (authUser.role === 'SALES' || authUser.role === 'ADMIN') &&
-            <Link className="navbar-item" to={ROUTES.PAYMENTS}>Payments</Link>
-          }
+          <Link className="navbar-item" to={ROUTES.MAINTAINENCE}>Maintenance</Link>
           <Link className="navbar-item" to={ROUTES.PRODUCTS}>Products</Link>
           { 
             authUser.role === 'ADMIN' && 
