@@ -3,7 +3,7 @@ import Modal from '../components/Modal'
 import { Tooltip, Whisper, Checkbox } from 'rsuite'
 
 import { STAGES, REMARKS_TYPES, PAYMENT_MODE, PAYMENT_STATUS } from '../constants/selections'
-import { datetimeFields, currencyFields, largeFields, booleanFields, numberFields } from '../constants/fields'
+import { datetimeFields, currencyFields, largeFields, booleanFields, numberFields, dateFields } from '../constants/fields'
 import { UsersContext } from '../components/layout'
 import { FiMaximize2, FiMoreHorizontal, FiPlus, FiEdit, FiTrash2, FiFileText } from 'react-icons/fi'
 
@@ -251,7 +251,7 @@ const transformLabels = (p, labels, onCloseModal, includeCount, colWidth, remark
                 obj.formatter = props => <ExpandRow {...props} type="Appointments" />
                 break
             case 'Text':
-                obj.width = 250
+                obj.width = 350
                 obj.formatter = props => <TextCell {...props} />
                 break
             case 'Stage':
@@ -302,6 +302,14 @@ const transformLabels = (p, labels, onCloseModal, includeCount, colWidth, remark
             obj.sortable = false
             obj.formatter = props => <BooleanCell {...props} type={p.type} field={key} setRows={p.setRows} />
             obj.width = 50
+        }
+        if (dateFields.includes(key)) {
+            obj.formatter = ({ value }) => {
+                if (!value) return ''
+                const date = new Date(value)
+                return date.getDate() + '/' + (date.getMonth() + 1) + '/' + (date.getYear() - 100)
+            }
+            obj.width = 80
         }
         return obj
     })
