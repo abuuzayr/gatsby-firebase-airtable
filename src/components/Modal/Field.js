@@ -91,6 +91,7 @@ const Field = p => {
                                         updateData(field, e.currentTarget.value, true)
                                     }}
                                     {...getInputProps(fieldName, props)}
+                                    disabled={p.disabled}
                                 />
                         }
                     </>
