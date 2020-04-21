@@ -116,5 +116,9 @@
 }
 
 .remarks .rdg-viewport {
-    max-height: 300px;
+    max-height: 160px;
+}
+
+.remarks .rdg-cell:first-child {
+    padding: 0px;
 }
