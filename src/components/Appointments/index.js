@@ -91,7 +91,7 @@ const Appointments = (props) => {
                   type: 'Appointments',
                   setRows
                 },
-                headers['Appointments'], 
+                props.headers ? headers[props.headers] : headers['Appointments--Sales'], 
                 () => setTrigger(p => !p),
                 true,
                 100,
