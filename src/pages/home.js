@@ -10,7 +10,7 @@ const HomePageBase = props => {
   if (!props.authUser) return
   return props.authUser.role === 'INSTALL' ?
     <Maintenance {...props} /> :
-    <Appointments {...props} showStats={true} />
+    <Appointments {...props} showStats={true} headers="Appointments" />
 }
 
 const condition = authUser => !!authUser;
