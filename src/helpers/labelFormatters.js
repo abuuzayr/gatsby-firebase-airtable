@@ -280,10 +280,10 @@ const transformLabels = (p, labels, onCloseModal, includeCount, colWidth, remark
                 obj.formatter = props => <MultiRecordCell {...props} type={key} user={p.user} onCloseModal={onCloseModal} />
                 break
             case 'Model':
-                obj.frozen = true
                 obj.width = 250
                 break
             case 'Priority':
+                obj.frozen = true
                 obj.width = 50
                 break
             default:

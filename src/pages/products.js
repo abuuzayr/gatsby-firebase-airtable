@@ -38,7 +38,7 @@ const ProductPageBase = (props) => {
               },
               headers['Products'],
               () => setTrigger(p => !p),
-              true,
+              false,
               150
             )
           )
@@ -108,7 +108,7 @@ const ProductPageBase = (props) => {
             </div>
             <DataGrid
               columns={columns}
-              rowGetter={i => { return { count: i + 1, ...rows[i] } }}
+              rowGetter={i => rows[i]}
               rowsCount={rows.length}
               minHeight={500}
               minColumnWidth={35}
