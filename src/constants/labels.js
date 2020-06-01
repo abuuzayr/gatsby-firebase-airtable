@@ -92,6 +92,7 @@ export const listLabels = {
         'Job',
         'Unit',
         'Date & Time',
+        'Confirmed',
         'Amount to collect',
         'Mode',
         'Status'
