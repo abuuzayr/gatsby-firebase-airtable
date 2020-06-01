@@ -83,59 +83,48 @@ export const TextCell = ({ value }) => (
     </div>
 )
 
-export const MultiRecordCell = ({ value, row, type, user, text, onCloseModal }) => {
+export const MultiRecordCell = ({ value, row, type, user, onCloseModal }) => {
     if (value && Array.isArray(value)) {
         return <div className="level actions">
-            <div className="level-left">
-                <div className="level-item">
-                    {
-                        text ? text : value.length + ' record/s'
-                    }
-                </div>
-            </div>
             <UsersContext.Consumer>
                 {users => (
-                    <div className="level-right">
+                    <div className="level-item">
                         {
                             value.length ?
-                                <div className="level-item">
-                                    <Modal
-                                        button={
-                                            <Whisper placement="top" speaker={<Tooltip>{`See all ${type}`}</Tooltip>}>
-                                                <FiMoreHorizontal />
-                                            </Whisper>
-                                        }
-                                        id={row.id}
-                                        rowId={row.id}
-                                        type={type === 'Install / Maintenance' ? 'Maintenance' : type}
-                                        mode="List"
-                                        users={users}
-                                        title={type}
-                                        showRemarks
-                                        onCloseModal={onCloseModal}
-                                    >
-                                    </Modal>
-                                </div> :
+                                <Modal
+                                    button={
+                                        <Whisper placement="top" speaker={<Tooltip>{`See all ${type}`}</Tooltip>}>
+                                            <span class="tag is-warning" style={{ marginRight: 5, cursor: 'pointer', fontWeight: 'normal' }}>View <FiMoreHorizontal /></span>
+                                        </Whisper>
+                                    }
+                                    id={row.id}
+                                    rowId={row.id}
+                                    type={type === 'Install / Maintenance' ? 'Maintenance' : type}
+                                    mode="List"
+                                    users={users}
+                                    title={type}
+                                    showRemarks
+                                    onCloseModal={onCloseModal}
+                                >
+                                </Modal> :
                                 <></>
                         }
-                        <div className="level-item">
-                            <Modal
-                                button={
-                                    <Whisper placement="top" speaker={<Tooltip>{`Add new ${type}`}</Tooltip>}>
-                                        <FiPlus />
-                                    </Whisper>
-                                }
-                                rowId={row.id}
-                                user={user}
-                                users={users}
-                                title={type}
-                                type={type === 'Install / Maintenance' ? 'Maintenance' : type}
-                                mode="New"
-                                onCloseModal={onCloseModal}
-                                showRemarks
-                            >
-                            </Modal>
-                        </div>
+                        <Modal
+                            button={
+                                <Whisper placement="top" speaker={<Tooltip>{`Add new ${type}`}</Tooltip>}>
+                                    <span class="tag is-warning" style={{ marginRight: 5, cursor: 'pointer', fontWeight: 'normal' }}>Add <FiPlus /></span>
+                                </Whisper>
+                            }
+                            rowId={row.id}
+                            user={user}
+                            users={users}
+                            title={type}
+                            type={type === 'Install / Maintenance' ? 'Maintenance' : type}
+                            mode="New"
+                            onCloseModal={onCloseModal}
+                            showRemarks
+                        >
+                        </Modal>
                     </div>
                 )}
             </UsersContext.Consumer>
@@ -388,7 +377,6 @@ const transformLabels = (p, labels, onCloseModal, includeCount, colWidth, remark
                     return <MultiRecordCell
                         {...props}
                         value={rm}
-                        text={rm.length ? rm[0]['fields']['Text'] : 'No remarks'}
                         type="Remarks"
                         user={p.user}
                         onCloseModal={onCloseModal}
