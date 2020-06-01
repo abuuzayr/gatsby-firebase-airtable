@@ -133,6 +133,7 @@ const Modal = (props) => {
     }, [company])
 
     useEffect(() => {
+        if (props.type !== "Appointments") return
         if (!options || !Object.keys(options).length) return
         const products = [
             { unit: data['Unit'] || 1, price: data['Price'] || 0, discount: data['Discount'] || 0, total: data['Total'] || 0},
@@ -276,6 +277,7 @@ const Modal = (props) => {
                     Status: selections['STATUS'],
                     Job: selections['JOB'],
                     'Payment Mode': selections['PAYMENT_MODE'],
+                    'Payment Method': selections['PAYMENT_METHOD'],
                     'Payment Status': selections['PAYMENT_STATUS'],
                     Source: selections['SOURCE'],
                     'Assign to': userOptions,
