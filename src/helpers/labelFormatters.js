@@ -208,7 +208,11 @@ export const BooleanCell = ({ type, value, row, field, setRows }) => {
     const { addToast, removeToast } = useToasts()
     return <Checkbox
         checked={value}
-        onChange={(v, c) => updateData(type, row.id, {[field]: c}, setRows, addToast, removeToast)}
+        onChange={async (v, c) => {
+            try {
+                await updateData(type, row.id, {[field]: c}, setRows, addToast, removeToast)
+            } catch (e) {}
+        }}
     />
 }
 
@@ -403,7 +407,11 @@ const updateRows = (id, fields, setRows) => {
         if (index < 0) return rows
         const row = rows[index]
         Object.entries(fields).forEach(field => {
-            row[field[0]] = field[1]
+            if (row.hasOwnProperty('fields')) {
+                row['fields'][field[0]] = field[1]
+            } else {
+                row[field[0]] = field[1]
+            }
         })
         rows[index] = row
         return rows
@@ -419,17 +427,20 @@ const updateData = async (type, id, fields, setRows, addToast, removeToast) => {
     if (!id || !fields) return
     const prevFields = updateRows(id, fields, setRows)
     const savingToast = addToast('Updating...', { appearance: 'info' })
-    base(type).update([{ id, fields }], function (err, records) {
-        removeToast(savingToast)
-        if (err) {
-            console.error(err);
-            addToast(`Error while updating: ${err}`, { appearance: 'error', autoDismiss: true })
-            updateRows(id, prevFields, setRows)
-            return
-        }
-        if (records.length > 0) {
-            addToast('Updated successfully!', { appearance: 'success', autoDismiss: true })
-        }
+    return await new Promise((resolve, reject) => {
+        base(type).update([{ id, fields }], function (err, records) {
+            removeToast(savingToast)
+            if (err) {
+                console.error(err);
+                addToast(`Error while updating: ${err}`, { appearance: 'error', autoDismiss: true })
+                updateRows(id, prevFields, setRows)
+                reject()
+            }
+            if (records.length > 0) {
+                addToast('Updated successfully!', { appearance: 'success', autoDismiss: true })
+                resolve(records[0]["fields"])
+            }
+        })
     })
 }
 
