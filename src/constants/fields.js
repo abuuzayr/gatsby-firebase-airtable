@@ -128,7 +128,6 @@ export const fields = {
     'Maintenance': [
         'Name',
         'Job',
-        'Unit',
         'Date & Time',
         'Amount to collect',
         'Mode',

@@ -54,7 +54,6 @@ export const headers = {
     'Maintenance': [
         'Appointment name',
         'Job',
-        'Unit',
         'Date & Time',
         'Confirmed',
         'Address & Zone',
