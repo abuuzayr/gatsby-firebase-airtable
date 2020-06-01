@@ -628,7 +628,8 @@ const Modal = (props) => {
                                                     columns={transformLabels(
                                                         {
                                                             user: props.user,
-                                                            type: props.type
+                                                            type: props.type,
+                                                            setRows: setData
                                                         },
                                                         listLabels[props.type],
                                                         null,
@@ -637,7 +638,8 @@ const Modal = (props) => {
                                                     rowGetter={i => {
                                                         if (data[i]) {
                                                             return { 
-                                                                count: i + 1, 
+                                                                count: i + 1,
+                                                                id: data[i].id,
                                                                 ...data[i].fields 
                                                             }
                                                         }
