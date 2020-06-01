@@ -95,6 +95,7 @@ const ProductPageBase = (props) => {
                         user={authUser}
                         mode="New"
                         onCloseModal={() => setTrigger(p => !p)}
+                        showRemarks={false}
                       ></Modal>
                     </a>
                   </div>
