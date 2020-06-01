@@ -48,8 +48,8 @@ export const headers = {
         'Color',
         'Price',
         'Commission (sales)',
-        'Commission (install)',
-        'Creator'
+        'Commission (referrer)',
+        'Commission (install)'
     ],
     'Maintenance': [
         'Appointment name',
@@ -65,6 +65,7 @@ export const headers = {
     'Payments': [
         'ID',
         'Payment Mode',
+        'Payment Method',
         'Amount',
         'Date',
         'Bank',
@@ -82,6 +83,7 @@ export const listLabels = {
     'Payments': [
         'ID',
         'Payment Mode',
+        'Payment Method',
         'Amount',
         'Date',
         'Bank',

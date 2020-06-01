@@ -24,13 +24,18 @@ export const PAYMENT_STATUS = {
 }
 
 export const PAYMENT_MODE = {
-    "Cash": "#20c933",
-    "Cheque": "#338a17",
-    "Credit Card": "#b87503",
+    "Full": "#20c933",
     "Instalment - 3 Months": "#ffdaf6",
     "Instalment - 6 Months": "#f99de2",
     "Instalment - 9 Months": "#ff08c2",
     "Instalment - 12 Months": "#ba1e45",
+}
+
+export const PAYMENT_METHOD = {
+    "Cash": "#73b55c",
+    "Cheque": "#a56bff",
+    "Credit Card": "#008f6d",
+    "PayNow": "#ff0042"
 }
 
 export const JOB = {
@@ -67,6 +72,7 @@ const SELECTIONS = {
     JOB,
     PAYMENT_STATUS,
     PAYMENT_MODE,
+    PAYMENT_METHOD,
     SOURCE,
     REMARKS_TYPES
 }

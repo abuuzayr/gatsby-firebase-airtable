@@ -332,7 +332,7 @@ const Modal = (props) => {
         if (Array.isArray(id)) id = id[0]
         const optionKeys = Object.keys(options)
         if (!optionKeys.length) return ''
-        if (optionKeys.includes(field)) {
+        if (optionKeys.includes(field) && options[field]) {
             const found = options[field].filter(option => option.value === id)[0]
             return found ? found.label : ''
         }

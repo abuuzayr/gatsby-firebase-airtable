@@ -97,6 +97,7 @@ export const fields = {
             fields: [
                 'ID',
                 'Payment Mode',
+                'Payment Method',
                 'Amount',
                 'Date',
                 'Bank',
@@ -137,6 +138,7 @@ export const fields = {
     'Payments': [
         'ID',
         'Payment Mode',
+        'Payment Method',
         'Amount',
         'Date',
         'Bank',
@@ -306,6 +308,7 @@ export const selectFields = [
     'Status',
     'Job',
     'Payment Mode',
+    'Payment Method',
     'Payment Status',
     'Source',
     'Assign to',
