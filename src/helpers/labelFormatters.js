@@ -531,7 +531,6 @@ export const updateRows = (id, fields, setRows) => {
 }
 
 export const updateData = async (type, id, fields, setRows, addToast, removeToast) => {
-    console.log(fields)
     if (!id || !fields) return
     // Fix datatypes if all sent as string
     Object.keys(fields).forEach(key => {
@@ -553,7 +552,9 @@ export const updateData = async (type, id, fields, setRows, addToast, removeToas
         } catch (e) {
             delete fields[key]
         }
-        if (isNaN(fields[key])) delete fields[key]
+        if (currencyFields.includes(key) || numberFields.includes(key)) {
+            if (isNaN(fields[key])) delete fields[key]
+        }
     })
     const prevFields = updateRows(id, fields, setRows)
     if (Object.keys(prevFields).every((key) => prevFields[key] === fields[key])) return
