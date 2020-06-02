@@ -8,10 +8,12 @@ import { FiPlus, FiEyeOff, FiFilter, FiSearch } from 'react-icons/fi'
 import { AiOutlineSortAscending } from 'react-icons/ai'
 import Modal from '../components/Modal'
 import { headers } from '../constants/labels'
-import transformLabels from '../helpers/labelFormatters'
+import transformLabels, { updateData } from '../helpers/labelFormatters'
 import { prioritySort, HeaderWithSorting, onGridSort } from '../helpers/sort'
+import { useToasts } from 'react-toast-notifications'
 
 const ProductPageBase = (props) => {
+  const TYPE = 'Products'
   const [trigger, setTrigger] = useState(false)
   const [labels, setLabels] = useState([])
   const [rows, setRows] = useState([])
@@ -21,6 +23,7 @@ const ProductPageBase = (props) => {
     direction: ''
   })
   const { authUser } = props
+  const { addToast, removeToast } = useToasts()
 
   useEffect(() => {
     async function getProducts() {
@@ -33,10 +36,10 @@ const ProductPageBase = (props) => {
             transformLabels(
               {
                 user: authUser,
-                type: 'Products',
+                type: TYPE,
                 setRows
               },
-              headers['Products'],
+              headers[TYPE],
               () => setTrigger(p => !p),
               false,
               150
@@ -114,6 +117,9 @@ const ProductPageBase = (props) => {
               minHeight={500}
               minColumnWidth={35}
               onGridSort={(col, dir) => onGridSort(col, dir, initialRows, setRows, sort, setSort)}
+              enableCellSelect
+              enableCellCopyPaste
+              onGridRowsUpdated={(e) => updateData(TYPE, e.toRowId, e.updated, setRows, addToast, removeToast)}
             />
           </> :
           <div className="title level-item">Loading...</div>
