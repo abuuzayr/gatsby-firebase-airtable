@@ -144,7 +144,8 @@ const Appointments = (props) => {
         transformLabels(
           {
             user: authUser,
-            type: TYPE
+            type: TYPE,
+            setRows
           },
           headers[TYPE],
           () => setTrigger(p => !p),
