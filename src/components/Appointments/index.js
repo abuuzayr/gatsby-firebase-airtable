@@ -15,10 +15,11 @@ import { AiOutlineSortAscending } from 'react-icons/ai'
 import Modal from '../Modal'
 import { headers } from '../../constants/labels'
 import { UsersContext } from '../layout'
-import transformLabels, { RowRenderer } from '../../helpers/labelFormatters'
+import transformLabels, { RowRenderer, updateData } from '../../helpers/labelFormatters'
 import { HeaderWithSorting, onGridSort } from '../../helpers/sort'
 import { Tooltip, Whisper } from 'rsuite'
 import scroll from '../../helpers/scroll'
+import { useToasts } from 'react-toast-notifications'
 
 const EmptyRowsView = () => (
   <div className="container" style={{ 'padding': 100 }}>
@@ -32,6 +33,7 @@ const EmptyRowsView = () => (
 )
 
 const Appointments = (props) => {
+  const TYPE = "Appointments"
   const [loaded, setLoaded] = useState(false)
   const [stats, setStats] = useState({})
   const [company, setCompany] = useState(false)
@@ -44,6 +46,7 @@ const Appointments = (props) => {
     direction: ''
   })
   const { authUser } = props
+  const { addToast, removeToast } = useToasts()
 
   useEffect(() => {
     async function getStats() {
@@ -80,7 +83,7 @@ const Appointments = (props) => {
       const role = authUser.role
       const cpy = company.company && company.company.value
       try {
-        const result = await fetch(`${process.env.GATSBY_STDLIB_URL}/getRawTableData?name=Appointments`)
+        const result = await fetch(`${process.env.GATSBY_STDLIB_URL}/getRawTableData?name=${TYPE}`)
         if (result.status === 200) {
           const body = await result.json()
           if (labels.length === 0) {
@@ -88,7 +91,7 @@ const Appointments = (props) => {
               transformLabels(
                 {
                   user: authUser,
-                  type: 'Appointments',
+                  type: TYPE,
                   setRows
                 },
                 props.headers ? headers[props.headers] : headers['Appointments--Sales'], 
@@ -141,9 +144,9 @@ const Appointments = (props) => {
         transformLabels(
           {
             user: authUser,
-            type: 'Appointments'
+            type: TYPE
           },
-          headers['Appointments'],
+          headers[TYPE],
           () => setTrigger(p => !p),
           true,
           100,
@@ -228,7 +231,7 @@ const Appointments = (props) => {
                                     button={
                                       <><FiPlus style={{ 'verticalAlign': 'middle' }} /> Add new customer</>
                                     }
-                                    type="Appointments"
+                                    type={TYPE}
                                     user={authUser}
                                     users={users}
                                     mode="New"
@@ -263,6 +266,9 @@ const Appointments = (props) => {
                           onGridSort={(col, dir) => onGridSort(col, dir, initialRows, setRows, sort, setSort)}
                           rowRenderer={RowRenderer}
                           emptyRowsView={EmptyRowsView}
+                          enableCellSelect
+                          enableCellCopyPaste
+                          onGridRowsUpdated={(e) => updateData(TYPE, e.toRowId, e.updated, setRows, addToast, removeToast)}
                         />
                       </> :
                     <div className="title level-item">Loading...</div>
