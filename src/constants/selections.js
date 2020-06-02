@@ -25,7 +25,7 @@ export const PAYMENT_STATUS = {
 
 export const PAYMENT_MODE = {
     "Full": "#20c933",
-    "Instalment - 3 Months": "#ffdaf6",
+    "Instalment - 3 Months": "#c89595",
     "Instalment - 6 Months": "#f99de2",
     "Instalment - 9 Months": "#ff08c2",
     "Instalment - 12 Months": "#ba1e45",
