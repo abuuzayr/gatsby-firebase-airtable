@@ -8,10 +8,12 @@ import { FiPlus, FiEyeOff, FiFilter, FiSearch } from 'react-icons/fi';
 import { AiOutlineSortAscending } from 'react-icons/ai';
 import Modal from '../components/Modal';
 import { headers } from '../constants/labels'
-import transformLabels from '../helpers/labelFormatters'
+import transformLabels, { updateData } from '../helpers/labelFormatters'
 import { HeaderWithSorting, onGridSort } from '../helpers/sort'
+import { useToasts } from 'react-toast-notifications'
 
 const PaymentsPageBase = (props) => {
+  const TYPE = 'Payments'
   const [trigger, setTrigger] = useState(false)
   const [labels, setLabels] = useState([])
   const [rows, setRows] = useState([])
@@ -21,6 +23,7 @@ const PaymentsPageBase = (props) => {
     direction: ''
   })
   const { authUser } = props
+  const { addToast, removeToast } = useToasts()
 
   useEffect(() => {
     async function getPayments() {
@@ -33,10 +36,10 @@ const PaymentsPageBase = (props) => {
             transformLabels(
               {
                 user: authUser,
-                type: 'Payments',
+                type: TYPE,
                 setRows
               },
-              headers['Payments'],
+              headers[TYPE],
               () => setTrigger(p => !p),
               true,
               150
@@ -113,6 +116,9 @@ const PaymentsPageBase = (props) => {
               minHeight={500}
               minColumnWidth={35}
               onGridSort={(col, dir) => onGridSort(col, dir, initialRows, setRows, sort, setSort)}
+              enableCellSelect
+              enableCellCopyPaste
+              onGridRowsUpdated={(e) => updateData(TYPE, e.toRowId, e.updated, setRows, addToast, removeToast)}
             />
           </> :
           <div className="title level-item">Loading...</div>
