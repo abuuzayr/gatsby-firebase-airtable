@@ -3,11 +3,13 @@ import DataGrid from 'react-data-grid';
 import { FiPlus, FiEyeOff, FiFilter, FiSearch } from 'react-icons/fi';
 import { AiOutlineSortAscending } from 'react-icons/ai';
 import Modal from '../Modal';
-import transformLabels, { RowRenderer } from '../../helpers/labelFormatters'
+import transformLabels, { RowRenderer, updateData } from '../../helpers/labelFormatters'
 import { headers } from '../../constants/labels'
 import { HeaderWithSorting, onGridSort } from '../../helpers/sort'
+import { useToasts } from 'react-toast-notifications'
 
 const Maintenance = (props) => {
+  const TYPE = 'Maintenance'
   const [trigger, setTrigger] = useState(false)
   const [labels, setLabels] = useState([])
   const [rows, setRows] = useState([])
@@ -17,6 +19,7 @@ const Maintenance = (props) => {
     direction: ''
   })
   const { authUser } = props
+  const { addToast, removeToast } = useToasts()
 
   useEffect(() => {
     async function getMaintenance() {
@@ -29,10 +32,10 @@ const Maintenance = (props) => {
             transformLabels(
               {
                 user: authUser,
-                type: 'Maintenance',
+                type: TYPE,
                 setRows
               },
-              headers['Maintenance'],
+              headers[TYPE],
               () => setTrigger(p => !p),
               true,
               150
@@ -110,6 +113,9 @@ const Maintenance = (props) => {
               minColumnWidth={35}
               onGridSort={(col, dir) => onGridSort(col, dir, initialRows, setRows, sort, setSort)}
               rowRenderer={RowRenderer}
+              enableCellSelect
+              enableCellCopyPaste
+              onGridRowsUpdated={(e) => updateData(TYPE, e.toRowId, e.updated, setRows, addToast, removeToast)}
             />
           </> :
           <div className="title level-item">Loading...</div>
