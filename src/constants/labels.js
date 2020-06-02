@@ -12,7 +12,7 @@ export const headers = {
         'Postal Code',
         'Zone',
         'AG no.',
-        'Agreement date & time',
+        'Agreement date',
         'Total Price',
         'Grand Total',
         'Payments',

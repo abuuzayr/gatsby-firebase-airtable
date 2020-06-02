@@ -29,7 +29,7 @@ export const fields = {
                 'Stage',
                 'Appointment date & time',
                 'AG no.',
-                'Agreement date & time',
+                'Agreement date',
             ]
         },
         {
@@ -174,14 +174,14 @@ export const readOnlyFields = [
 
 export const datetimeFields = [
     'Appointment date & time',
-    'Agreement date & time',
     'Date & Time',
 ]
 
 export const dateFields = [
     'DOB',
     'Date',
-    'Payment---Date'
+    'Payment---Date',
+    'Agreement date',
 ]
 
 export const numberFields = [
@@ -316,7 +316,7 @@ export const selectFields = [
 ]
 
 export const largeFields = [
-    // 'Agreement date & time',
+    // 'Agreement date',
     // 'Products',
     // 'Payments',
     // 'Install / Maintenance',
