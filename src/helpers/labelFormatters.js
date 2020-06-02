@@ -1,18 +1,88 @@
-import React from 'react'
+import React, { useState, useRef, useImperativeHandle, forwardRef, useEffect } from 'react'
 import Modal from '../components/Modal'
-import { Tooltip, Whisper, Checkbox } from 'rsuite'
+import { Tooltip, Whisper, Checkbox, DatePicker } from 'rsuite'
 
-import { STAGES, REMARKS_TYPES, PAYMENT_MODE, PAYMENT_METHOD, PAYMENT_STATUS } from '../constants/selections'
-import { datetimeFields, currencyFields, largeFields, booleanFields, numberFields, dateFields } from '../constants/fields'
+import { STAGES, REMARKS_TYPES, PAYMENT_MODE, PAYMENT_METHOD, PAYMENT_STATUS, STATUS, JOB, SOURCE } from '../constants/selections'
+import { datetimeFields, currencyFields, largeFields, booleanFields, numberFields, dateFields, computedFields, selectFields } from '../constants/fields'
 import { UsersContext } from '../components/layout'
 import { FiMaximize2, FiMoreHorizontal, FiPlus, FiEdit, FiTrash2, FiFileText } from 'react-icons/fi'
-
 import { useToasts } from 'react-toast-notifications'
 import Airtable from 'airtable'
+import ZONES from '../constants/zones'
 
 const base = new Airtable({
     apiKey: process.env.GATSBY_AIRTABLE_APIKEY
 }).base(process.env.GATSBY_AIRTABLE_BASE);
+
+const DateSelector = forwardRef(({ column, value, onCommit, time }, ref) => {
+    const input = useRef(null)
+    const [val, setVal] = useState(value ? new Date(value) : null)
+
+    useEffect(() => {
+        if (val) onCommit()
+    }, [val])
+
+    useImperativeHandle(ref, () => ({
+        getValue() {
+            return {
+                [column.key]: val
+            }
+        },
+        getInputNode() {
+            return input.current
+        }
+    }))
+
+    return (
+        <DatePicker
+            ref={input}
+            onChange={setVal}
+            value={val}
+            format={time ? "YYYY-MM-DD HH:mm" : "YYYY-MM-DD"}
+            ranges={[
+                {
+                    label: time ? "Now" : "Today",
+                    value: new Date()
+                }
+            ]}
+        />
+    );
+})
+
+const Selector = forwardRef(({ column, value, onCommit, options }, ref) => {
+    const input = useRef(null)
+
+    useImperativeHandle(ref, () => ({
+        getValue() {
+            return { 
+                [column.key]: input.current && input.current.value 
+            }
+        },    
+        getInputNode() {
+            return input.current
+        }
+    }))
+
+    return (
+        <select
+            ref={input}
+            className=""
+            defaultValue={value}
+            onBlur={onCommit}
+            size={options.length}
+        >
+            {options.map(name => (
+                <option
+                    key={name}
+                    value={name}
+                    onClick={onCommit}
+                >
+                    {name}
+                </option>
+            ))}
+        </select>
+    );
+})
 
 export const ExpandRow = props => (
     <div className="level">
@@ -94,7 +164,7 @@ export const MultiRecordCell = ({ value, row, type, user, onCloseModal }) => {
                                 <Modal
                                     button={
                                         <Whisper placement="top" speaker={<Tooltip>{`See all ${type}`}</Tooltip>}>
-                                            <span class="tag is-warning" style={{ marginRight: 5, cursor: 'pointer', fontWeight: 'normal' }}>View <FiMoreHorizontal /></span>
+                                            <span className="tag is-warning" style={{ marginRight: 5, cursor: 'pointer', fontWeight: 'normal' }}>View <FiMoreHorizontal /></span>
                                         </Whisper>
                                     }
                                     id={row.id}
@@ -112,7 +182,7 @@ export const MultiRecordCell = ({ value, row, type, user, onCloseModal }) => {
                         <Modal
                             button={
                                 <Whisper placement="top" speaker={<Tooltip>{`Add new ${type}`}</Tooltip>}>
-                                    <span class="tag is-warning" style={{ marginRight: 5, cursor: 'pointer', fontWeight: 'normal' }}>Add <FiPlus /></span>
+                                    <span className="tag is-warning" style={{ marginRight: 5, cursor: 'pointer', fontWeight: 'normal' }}>Add <FiPlus /></span>
                                 </Whisper>
                             }
                             rowId={row.id}
@@ -235,7 +305,8 @@ const transformLabels = (p, labels, onCloseModal, includeCount, colWidth, remark
             name: key,
             sortable: true,
             width: colWidth || 100,
-            resizable: true
+            resizable: true,
+            editable: true
         }
         switch (key) {
             case 'Appointment name':
@@ -263,6 +334,7 @@ const transformLabels = (p, labels, onCloseModal, includeCount, colWidth, remark
                 obj.formatter = props => <ColoredCell {...props} colors={PAYMENT_STATUS} />
                 break
             case 'Creator':
+                obj.editable = false
             case 'Assign to':
                 obj.formatter = props => <CreatorCell {...props} />
                 break
@@ -277,6 +349,9 @@ const transformLabels = (p, labels, onCloseModal, includeCount, colWidth, remark
             case 'Priority':
                 obj.frozen = true
                 obj.width = 50
+                break
+            case 'Zone':
+                obj.editable = false
                 break
             default:
                 break
@@ -306,6 +381,47 @@ const transformLabels = (p, labels, onCloseModal, includeCount, colWidth, remark
                 return date.getDate() + '/' + (date.getMonth() + 1) + '/' + (date.getYear() - 100)
             }
             obj.width = 80
+        }
+        if (computedFields[p.type] && computedFields[p.type].includes(key)) {
+            obj.editable = false
+        }
+        if (selectFields.includes(key)) {
+            let options = []
+            switch (key) {
+                case 'Stage': 
+                    options = STAGES
+                    break
+                case 'Status': 
+                    options = STATUS
+                    break
+                case 'Job': 
+                    options = JOB
+                    break
+                case 'Payment Mode': 
+                    options = PAYMENT_MODE
+                    break
+                case 'Payment Method': 
+                    options = PAYMENT_METHOD
+                    break
+                case 'Payment Status': 
+                    options = PAYMENT_STATUS
+                    break
+                case 'Source': 
+                    options = SOURCE
+                    break
+                case 'Type': 
+                    options = REMARKS_TYPES
+                    break
+                default:
+                    break
+            }
+            obj.editor = forwardRef((props, ref) => <Selector ref={ref} {...props} options={Object.keys(options)} />)
+        }
+        if (dateFields.includes(key)) {
+            obj.editor = forwardRef((props, ref) => <DateSelector ref={ref} {...props} />)
+        }
+        if (datetimeFields.includes(key)) {
+            obj.editor = forwardRef((props, ref) => <DateSelector ref={ref} {...props} time />)
         }
         return obj
     })
@@ -388,7 +504,7 @@ const transformLabels = (p, labels, onCloseModal, includeCount, colWidth, remark
     return labels
 }
 
-const updateRows = (id, fields, setRows) => {
+export const updateRows = (id, fields, setRows) => {
     if (!setRows) return
     let prevRow = {}
     setRows(prevRows => {
@@ -414,9 +530,33 @@ const updateRows = (id, fields, setRows) => {
     
 }
 
-const updateData = async (type, id, fields, setRows, addToast, removeToast) => {
+export const updateData = async (type, id, fields, setRows, addToast, removeToast) => {
+    console.log(fields)
     if (!id || !fields) return
+    // Fix datatypes if all sent as string
+    Object.keys(fields).forEach(key => {
+        try {
+            if (key === 'Postal Code') {
+                if (fields[key] && fields[key].length === 6) {
+                    const area = fields[key].slice(0, 2)
+                    let zone = 'Invalid Postal Code'
+                    Object.values(ZONES).forEach((zones, index) => {
+                        if (zones.includes(area)) zone = Object.keys(ZONES)[index]
+                    })
+                    fields['Zone'] = zone
+                } else {
+                    fields['Zone'] = 'Invalid Postal Code'
+                }
+            }
+            if (currencyFields.includes(key)) fields[key] = fields[key] ? parseFloat(fields[key]) : 0
+            if (numberFields.includes(key)) fields[key] = fields[key] ? parseInt(fields[key]) : 0
+        } catch (e) {
+            delete fields[key]
+        }
+        if (isNaN(fields[key])) delete fields[key]
+    })
     const prevFields = updateRows(id, fields, setRows)
+    if (Object.keys(prevFields).every((key) => prevFields[key] === fields[key])) return
     const savingToast = addToast('Updating...', { appearance: 'info' })
     return await new Promise((resolve, reject) => {
         base(type).update([{ id, fields }], function (err, records) {
@@ -426,8 +566,7 @@ const updateData = async (type, id, fields, setRows, addToast, removeToast) => {
                 addToast(`Error while updating: ${err}`, { appearance: 'error', autoDismiss: true })
                 updateRows(id, prevFields, setRows)
                 reject()
-            }
-            if (records.length > 0) {
+            } else if (records.length > 0) {
                 addToast('Updated successfully!', { appearance: 'success', autoDismiss: true })
                 resolve(records[0]["fields"])
             }
