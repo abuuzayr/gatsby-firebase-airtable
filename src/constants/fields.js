@@ -157,7 +157,6 @@ export const hiddenFields = [
 export const readOnlyFields = [
     'Subtotal',
     'GST',
-    'Grand Total',
     'Total Price',
     'Zone',
     'Total',

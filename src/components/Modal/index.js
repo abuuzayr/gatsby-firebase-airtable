@@ -204,6 +204,13 @@ const Modal = (props) => {
 
     useEffect(() => {
         if (props.type !== 'Appointments') return
+        const subtotal = (data['Grand Total'] / 1.07).toFixed(1)
+        updateData('Subtotal', subtotal)
+        updateData('GST', data['Grand Total'] - subtotal)
+    }, [data['Grand Total']])
+
+    useEffect(() => {
+        if (props.type !== 'Appointments') return
         if (data['Postal Code'] && data['Postal Code'].length === 6) {
             const area = data['Postal Code'].slice(0,2)
             let zone = 'Invalid Postal Code'
@@ -391,7 +398,7 @@ const Modal = (props) => {
         delete cleanData['id']
         // Remove computed fields
         computedFields[props.type] && computedFields[props.type].forEach(field => {
-            delete cleanData[field]
+            if (field !== 'GST') delete cleanData[field]
         })
         // Transform react-select fields
         Object.keys(optionsObj).forEach(field => {
