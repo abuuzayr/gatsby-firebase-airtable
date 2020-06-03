@@ -115,6 +115,8 @@ export const fields = {
                 'Date & Time',
                 'Amount to collect',
                 'Mode',
+                'Next Service',
+                'Next Servicing Date',
             ]
         },
     ],
@@ -181,6 +183,7 @@ export const dateFields = [
     'Date',
     'Payment---Date',
     'Agreement date',
+    'Next Servicing Date'
 ]
 
 export const numberFields = [
@@ -311,7 +314,8 @@ export const selectFields = [
     'Payment Status',
     'Source',
     'Assign to',
-    'Type'
+    'Type',
+    'Next Service'
 ]
 
 export const largeFields = [
