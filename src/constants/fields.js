@@ -111,7 +111,6 @@ export const fields = {
             mode: 'New',
             fields: [
                 'Job',
-                'Unit',
                 'Date & Time',
                 'Amount to collect',
                 'Mode',
