@@ -88,7 +88,7 @@ const Modal = (props) => {
         fields[props.type].reduce((acc, curr) => {
             const defaultValue = field => {
                 if (field.includes('PX')) return []
-                if (field.includes('Unit')) return 1
+                if (field === 'Unit') return 1
                 if (field.includes('Next Service')) return { value: "3 months", label: "3 months" }
                 return ''
             }
@@ -509,14 +509,41 @@ const Modal = (props) => {
                     if (Object.keys(prefixedData).length) {
                         Object.keys(prefixedData).forEach(key => {
                             let table = key
-                            if (key === 'Payment') table = 'Payments'
-                            if (key === 'Installation') table = 'Maintenance'
-                            base(table).create([{ 
-                                fields: {
-                                    'Appointments': records.map(r => r.id), 
-                                    ...prefixedData[key]
+                            const toCreate = []
+                            if (key === 'Payment') {
+                                table = 'Payments'
+                                toCreate.push({
+                                    fields: {
+                                        'Appointments': records.map(r => r.id),
+                                        ...prefixedData[key]
+                                    }
+                                })
+                            }
+                            if (key === 'Installation') {
+                                table = 'Maintenance'
+                                if (Object.keys(prefixedData[key]).includes('Next Servicing Date')) {
+                                    toCreate.push({
+                                        fields: {
+                                            'Appointments': records.map(r => r.id),
+                                            'Date & Time': prefixedData[key]['Next Servicing Date'],
+                                            'Job': 'Change Filter',
+                                            'Unit': 1
+                                        }
+                                    })
                                 }
-                            }], function (err, records) {
+                                delete prefixedData[key]['Next Service']
+                                delete prefixedData[key]['Next Servicing Date']
+                                if (Object.keys(prefixedData[key]).includes('Date & Time')) {
+                                    toCreate.push({
+                                        fields: {
+                                            'Appointments': records.map(r => r.id),
+                                            'Unit': 1,
+                                            ...prefixedData[key],
+                                        }
+                                    })
+                                }
+                            }
+                            base(table).create(toCreate, function (err, records) {
                                 if (err) {
                                     console.error(err);
                                     addToast(`Error while saving: ${err}`, { appearance: 'error', autoDismiss: true })
