@@ -89,7 +89,8 @@ const Modal = (props) => {
             const defaultValue = field => {
                 if (field.includes('PX')) return []
                 if (field === 'Unit') return 1
-                if (field.includes('Next Service')) return { value: "3 months", label: "3 months" }
+                if (field === 'Next Service') return { value: "3 months", label: "3 months" }
+                if (field === 'Job') return { value: "Installation", label: "Installation" }
                 return ''
             }
             if (curr === 'ENABLE_BLOCKS') return acc
