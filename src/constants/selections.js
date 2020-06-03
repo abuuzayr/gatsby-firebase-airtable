@@ -66,6 +66,13 @@ export const REMARKS_TYPES = {
     "Payment": "#ED553B"
 }
 
+export const SERVICE_DURATION = {
+    "3 months": "#ffffff",
+    "6 months": "#ffffff",
+    "9 months": "#ffffff",
+    "12 months": "#ffffff"
+}
+
 const SELECTIONS = {
     STAGES,
     STATUS,
@@ -74,7 +81,8 @@ const SELECTIONS = {
     PAYMENT_MODE,
     PAYMENT_METHOD,
     SOURCE,
-    REMARKS_TYPES
+    REMARKS_TYPES,
+    SERVICE_DURATION
 }
 
 export default SELECTIONS
