@@ -19,7 +19,7 @@ import {
     selectFields,
 } from '../../constants/fields'
 import { listLabels } from '../../constants/labels'
-import transformLabels from '../../helpers/labelFormatters'
+import transformLabels, { updateData as updateRowData } from '../../helpers/labelFormatters'
 import { FiPlus } from 'react-icons/fi'
 import { useToasts } from 'react-toast-notifications'
 import Airtable from 'airtable'
@@ -656,6 +656,9 @@ const Modal = (props) => {
                                                     rowsCount={data.length}
                                                     minColumnWidth={35}
                                                     emptyRowsView={EmptyRowsView}
+                                                    enableCellSelect
+                                                    enableCellCopyPaste
+                                                    onGridRowsUpdated={(e) => updateRowData(props.type, e.toRowId, e.updated, setData, addToast, removeToast)}
                                                 />
                                             }
                                         </> :
