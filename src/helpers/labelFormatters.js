@@ -14,13 +14,9 @@ const base = new Airtable({
     apiKey: process.env.GATSBY_AIRTABLE_APIKEY
 }).base(process.env.GATSBY_AIRTABLE_BASE);
 
-const DateSelector = forwardRef(({ column, value, onCommit, time }, ref) => {
+const DateSelector = forwardRef(({ column, value, time }, ref) => {
     const input = useRef(null)
     const [val, setVal] = useState(value ? new Date(value) : null)
-
-    useEffect(() => {
-        if (val) onCommit()
-    }, [val])
 
     useImperativeHandle(ref, () => ({
         getValue() {
