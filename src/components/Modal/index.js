@@ -89,6 +89,7 @@ const Modal = (props) => {
             const defaultValue = field => {
                 if (field.includes('PX')) return []
                 if (field.includes('Unit')) return 1
+                if (field.includes('Next Service')) return { value: "3 months", label: "3 months" }
                 return ''
             }
             if (curr === 'ENABLE_BLOCKS') return acc
@@ -234,6 +235,15 @@ const Modal = (props) => {
         data['Payment---Amount'],
     ])
 
+    useEffect(() => {
+        if (!data['Installation---Next Service']) return
+        const duration = data['Installation---Next Service'].value.split(' ')[0]
+        const d = new Date();
+        updateData('Installation---Next Servicing Date', new Date(d.setMonth(d.getMonth() + parseInt(duration))))
+    }, [
+        data['Installation---Next Service'],
+    ])
+
     const getData = async (type, id) => {
         let obj = {}
         if (['Edit', 'View', 'List'].includes(props.mode)) {
@@ -288,7 +298,8 @@ const Modal = (props) => {
                     'Payment Status': selections['PAYMENT_STATUS'],
                     Source: selections['SOURCE'],
                     'Assign to': userOptions,
-                    'Type': selections['REMARKS_TYPES']
+                    'Type': selections['REMARKS_TYPES'],
+                    'Next Service': selections['SERVICE_DURATION']
                 })
             }
         } catch (e) {
@@ -340,7 +351,7 @@ const Modal = (props) => {
         const optionKeys = Object.keys(options)
         if (!optionKeys.length) return ''
         if (optionKeys.includes(field) && options[field]) {
-            const found = options[field].filter(option => option.value === id)[0]
+            const found = options[field].find(option => option.value === id)
             return found ? found.label : ''
         }
     }
