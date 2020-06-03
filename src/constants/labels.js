@@ -13,7 +13,6 @@ export const headers = {
         'Zone',
         'AG no.',
         'Agreement date',
-        'Total Price',
         'Grand Total',
         'Payments',
         'Outstanding',
