@@ -89,7 +89,7 @@ const Modal = (props) => {
             const defaultValue = field => {
                 if (field.includes('PX')) return []
                 if (field === 'Unit') return 1
-                if (field === 'Next Service') return { value: "3 months", label: "3 months" }
+                if (field === 'Next Service') return { value: "12 months", label: "12 months" }
                 if (field === 'Job') return { value: "Installation", label: "Installation" }
                 return ''
             }
