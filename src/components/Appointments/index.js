@@ -269,7 +269,11 @@ const Appointments = (props) => {
                           emptyRowsView={EmptyRowsView}
                           enableCellSelect
                           enableCellCopyPaste
-                          onGridRowsUpdated={(e) => updateData(TYPE, e.toRowId, e.updated, setRows, addToast, removeToast)}
+                          onGridRowsUpdated={(e) => {
+                            if (window.confirm('Save ?')) {
+                              updateData(TYPE, e.toRowId, e.updated, setRows, addToast, removeToast)
+                            }
+                          }}
                         />
                       </> :
                     <div className="title level-item">Loading...</div>

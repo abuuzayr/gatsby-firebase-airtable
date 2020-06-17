@@ -697,7 +697,11 @@ const Modal = (props) => {
                                                     emptyRowsView={EmptyRowsView}
                                                     enableCellSelect
                                                     enableCellCopyPaste
-                                                    onGridRowsUpdated={(e) => updateRowData(props.type, e.toRowId, e.updated, setData, addToast, removeToast)}
+                                                    onGridRowsUpdated={(e) => {
+                                                        if (window.confirm('Save ?')) {
+                                                            updateRowData(props.type, e.toRowId, e.updated, setData, addToast, removeToast)
+                                                        }
+                                                    }}
                                                 />
                                             }
                                         </> :
