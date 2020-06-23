@@ -125,6 +125,7 @@ export const fields = {
         'Color',
         'Price',
         'Commission (sales)',
+        'Commission (referral)',
         'Commission (install)'
     ],
     'Maintenance': [
@@ -238,6 +239,7 @@ export const currencyFields = [
     'Price8',
     'Price9',
     'Commission (sales)',
+    'Commission (referral)',
     'Commission (install)',
     'Amount',
     'Amount to collect',
