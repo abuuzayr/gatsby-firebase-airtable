@@ -6,7 +6,6 @@ html, body {
 }
 nav.navbar {
   border-top: 4px solid #276cda;
-  margin-bottom: 1rem;
 }
 nav.navbar.is-white .navbar-brand > a.navbar-item,
 nav.navbar.is-white .navbar-brand > a.navbar-item:hover,
@@ -22,7 +21,7 @@ nav .navbar-brand a > * {
   margin-left: 0;
 }
 .info-tiles {
-  margin: 1rem 0;
+  margin: -1.5rem 0 1rem;
 }
 .info-tiles .title {
   color: #363636;
@@ -42,6 +41,9 @@ nav .navbar-brand a > * {
 }
 .info-tiles .tile .title {
   font-size: 1.5rem;
+}
+.info-tiles .tile.is-child.box {
+  padding: 1rem 1.5rem;
 }
 .breadcrumb span {
   padding: 0 0.75em
