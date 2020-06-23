@@ -179,26 +179,50 @@ const Appointments = (props) => {
                         <div className="tile is-ancestor has-text-centered">
                         <div className="tile is-parent">
                             <article className="tile is-child box">
-                            <p className="title">{stats.fresh}</p>
-                            <p className="subtitle">New appointments</p>
+                              <div className="level">
+                                <div className="level-left">
+                                  <p className="title">{stats.fresh}</p>
+                                </div>
+                                <div className="level-right">
+                                  <p className="subtitle">New appointments</p>
+                                </div>
+                              </div>
+                            </article>
+                        </div>
+                        <div className="tile is-parent">
+                          <article className="tile is-child box">
+                            <div className="level">
+                              <div className="level-left">
+                                <p className="title">{stats.appointments}</p>
+                              </div>
+                              <div className="level-right">
+                                <p className="subtitle">Total appointments</p>
+                              </div>
+                            </div>
+                          </article>
+                        </div>
+                        <div className="tile is-parent">
+                            <article className="tile is-child box">
+                              <div className="level">
+                                <div className="level-left">
+                                  <p className="title">{stats.closed}</p>
+                                </div>
+                                <div className="level-right">
+                                  <p className="subtitle">Closed appointments</p>
+                                </div>
+                              </div>
                             </article>
                         </div>
                         <div className="tile is-parent">
                             <article className="tile is-child box">
-                            <p className="title">{stats.appointments}</p>
-                            <p className="subtitle">Total appointments</p>
-                            </article>
-                        </div>
-                        <div className="tile is-parent">
-                            <article className="tile is-child box">
-                            <p className="title">{stats.closed}</p>
-                            <p className="subtitle">Closed appointments</p>
-                            </article>
-                        </div>
-                        <div className="tile is-parent">
-                            <article className="tile is-child box">
-                            <p className="title">${stats.sales && stats.sales.toFixed(2)}</p>
-                            <p className="subtitle">Total sales</p>
+                              <div className="level">
+                                <div className="level-left">
+                                  <p className="title">${stats.sales && stats.sales.toFixed(2)}</p>
+                                </div>
+                                <div className="level-right">
+                                  <p className="subtitle">Total sales</p>
+                                </div>
+                              </div>
                             </article>
                         </div>
                         </div>
