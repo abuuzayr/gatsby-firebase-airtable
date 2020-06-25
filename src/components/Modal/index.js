@@ -240,7 +240,7 @@ const Modal = (props) => {
         if (!data['Installation---Next Service']) return
         const duration = data['Installation---Next Service'].value.split(' ')[0]
         const d = new Date();
-        updateData('Installation---Next Servicing Date', new Date(d.setMonth(d.getMonth() + parseInt(duration))))
+        updateData('Installation---Next Servicing Date', new Date(d.setMonth(d.getMonth() + parseInt(duration) + 1)))
     }, [
         data['Installation---Next Service'],
     ])
