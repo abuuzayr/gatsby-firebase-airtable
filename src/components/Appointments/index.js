@@ -81,7 +81,10 @@ const Appointments = (props) => {
 
       // Get Appointments
       const role = authUser.role
-      const cpy = company.company && company.company.value
+      let cpy = company.company && company.company.value
+      if (!cpy && company.companies.length && role.includes('_')) {
+        cpy = company.companies.find(c => c.fields['Company'].toUpperCase() === role.split('_')[1]).id
+      }
       try {
         const result = await fetch(`${process.env.GATSBY_STDLIB_URL}/getRawTableData?name=${TYPE}`)
         if (result.status === 200) {
@@ -103,7 +106,7 @@ const Appointments = (props) => {
             )
           }
           const rows = body.rows.filter(row => {
-            if (authUser.role === 'ADMIN') return true
+            if (authUser.role.includes('ADMIN')) return true
             if (row.fields['Creator'] === authUser.uid) return true
             if (row.fields['Assign to'] === authUser.uid) return true
           }).map(row => {
