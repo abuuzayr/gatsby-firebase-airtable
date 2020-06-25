@@ -140,6 +140,10 @@ const AppWithAuthentication = withAuthentication(props => {
                             } else if (companies.map(c => c.fields['Company']).includes('All')) {
                               companies = companies.filter(c => c.fields['Company'] !== 'All')
                             }
+                            if (authUser && authUser.role.includes('ADMIN_')) {
+                              const allowedCompany = authUser.role.split('_')[1]
+                              companies = companies.filter(c => c.fields['Company'].toUpperCase() === allowedCompany)
+                            }
                             companies = companies.map(c => {
                               return {
                                 value: c.id || c.fields['Company'],
