@@ -35,7 +35,7 @@ const NavigationAuth = ({ authUser }) => (
       <div id="topNav" className="navbar-menu">
         <div className="navbar-start">
           {
-            (authUser.role === 'SALES' || authUser.role === 'ADMIN') &&
+            (authUser.role === 'SALES' || authUser.role.includes('ADMIN')) &&
             <>
               <Link className="navbar-item" to={ROUTES.APPOINTMENTS}>Appointments</Link>
               <Link className="navbar-item" to={ROUTES.PAYMENTS}>Payments</Link>
