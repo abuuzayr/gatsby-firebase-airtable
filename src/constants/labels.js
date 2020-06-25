@@ -17,7 +17,13 @@ export const headers = {
         'Payments',
         'Outstanding',
         'Install / Maintenance',
-        'Creator'
+        'Creator',
+        'ID Name',
+        'ID Commission',
+        'Sales 1 Name',
+        'Sales 1 Commission',
+        'Sales 2 Name',
+        'Sales 2 Commission',
     ],
     'Appointments--Sales': [
         'Company',
@@ -40,6 +46,12 @@ export const headers = {
         'Subtotal',
         'GST',
         'Grand Total',
+        'ID Name',
+        'ID Commission',
+        'Sales 1 Name',
+        'Sales 1 Commission',
+        'Sales 2 Name',
+        'Sales 2 Commission',
     ],
     'Products': [
         'Priority',
