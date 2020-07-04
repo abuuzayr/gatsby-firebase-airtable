@@ -640,6 +640,7 @@ const Modal = (props) => {
                                                                     block.fields.map(f => {
                                                                         const fieldName = block.prefix ? `${block.name}---${f}` : f
                                                                         if (f.includes('PX') && hidden && hidden.includes(f.split('PX')[1])) return null
+                                                                        if (f.includes('Serial') && hidden && hidden.includes(f.split('Serial')[1])) return null
                                                                         if (f.includes('Unit') && hidden && hidden.includes(f.split('Unit')[1])) return null
                                                                         if (f.includes('Discount') && hidden && hidden.includes(f.split('Discount')[1])) return null
                                                                         if (f.includes('Price') && hidden && hidden.includes(f.split('Price')[1])) return null
