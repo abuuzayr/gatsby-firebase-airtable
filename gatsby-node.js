@@ -1,7 +1,7 @@
 exports.onCreatePage = ({ page, actions }) => {
     const { createPage } = actions
 
-    const fullPages = ['signin', 'pw-forget']
+    const fullPages = ['signin', 'pw-forget', 'form']
     const adminPages = ['products', 'admin', 'payments']
 
     if (fullPages.some(fp => page.path.match(new RegExp(fp)))) {
