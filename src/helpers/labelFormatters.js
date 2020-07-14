@@ -10,6 +10,8 @@ import { useToasts } from 'react-toast-notifications'
 import Airtable from 'airtable'
 import ZONES from '../constants/zones'
 
+const NON_EDITABLE_TYPES = ['Leads']
+
 const base = new Airtable({
     apiKey: process.env.GATSBY_AIRTABLE_APIKEY
 }).base(process.env.GATSBY_AIRTABLE_BASE);
@@ -358,7 +360,7 @@ const transformLabels = (p, labels, onCloseModal, includeCount, colWidth, remark
             sortable: true,
             width: colWidth || 100,
             resizable: true,
-            editable: true
+            editable: !NON_EDITABLE_TYPES.includes(p.type)
         }
         switch (key) {
             case 'Appointment name':
@@ -441,43 +443,45 @@ const transformLabels = (p, labels, onCloseModal, includeCount, colWidth, remark
         if (computedFields[p.type] && computedFields[p.type].includes(key)) {
             obj.editable = false
         }
-        if (selectFields.includes(key)) {
-            let options = []
-            switch (key) {
-                case 'Stage': 
-                    options = STAGES
-                    break
-                case 'Status': 
-                    options = STATUS
-                    break
-                case 'Job': 
-                    options = JOB
-                    break
-                case 'Payment Mode': 
-                    options = PAYMENT_MODE
-                    break
-                case 'Payment Method': 
-                    options = PAYMENT_METHOD
-                    break
-                case 'Payment Status': 
-                    options = PAYMENT_STATUS
-                    break
-                case 'Source': 
-                    options = SOURCE
-                    break
-                case 'Type': 
-                    options = REMARKS_TYPES
-                    break
-                default:
-                    break
+        if (!NON_EDITABLE_TYPES.includes(p.type)) {
+            if (selectFields.includes(key)) {
+                let options = []
+                switch (key) {
+                    case 'Stage': 
+                        options = STAGES
+                        break
+                    case 'Status': 
+                        options = STATUS
+                        break
+                    case 'Job': 
+                        options = JOB
+                        break
+                    case 'Payment Mode': 
+                        options = PAYMENT_MODE
+                        break
+                    case 'Payment Method': 
+                        options = PAYMENT_METHOD
+                        break
+                    case 'Payment Status': 
+                        options = PAYMENT_STATUS
+                        break
+                    case 'Source': 
+                        options = SOURCE
+                        break
+                    case 'Type': 
+                        options = REMARKS_TYPES
+                        break
+                    default:
+                        break
+                }
+                obj.editor = forwardRef((props, ref) => <Selector ref={ref} {...props} options={Object.keys(options)} />)
             }
-            obj.editor = forwardRef((props, ref) => <Selector ref={ref} {...props} options={Object.keys(options)} />)
-        }
-        if (dateFields.includes(key)) {
-            obj.editor = forwardRef((props, ref) => <DateSelector ref={ref} {...props} />)
-        }
-        if (datetimeFields.includes(key)) {
-            obj.editor = forwardRef((props, ref) => <DateSelector ref={ref} {...props} time />)
+            if (dateFields.includes(key)) {
+                obj.editor = forwardRef((props, ref) => <DateSelector ref={ref} {...props} />)
+            }
+            if (datetimeFields.includes(key)) {
+                obj.editor = forwardRef((props, ref) => <DateSelector ref={ref} {...props} time />)
+            }
         }
         return obj
     })
