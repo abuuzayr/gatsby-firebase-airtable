@@ -7,6 +7,7 @@ const ROUTES = {
     PASSWORD_FORGET: '/pw-forget',
     ADMIN: '/admin',
     ADMIN_DETAILS: '/admin/:id',
+    LEADS: '/leads',
     APPOINTMENTS: '/appointments',
     CONTACTS: '/contacts',
     MAINTAINENCE: '/maintenance',
