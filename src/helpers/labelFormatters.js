@@ -1,7 +1,7 @@
 import React, { useState, useRef, useImperativeHandle, forwardRef, useEffect } from 'react'
 import Modal from '../components/Modal'
 import { Tooltip, Whisper, Checkbox, DatePicker } from 'rsuite'
-
+import { AuthUserContext } from '../components/Session';
 import { STAGES, REMARKS_TYPES, PAYMENT_MODE, PAYMENT_METHOD, PAYMENT_STATUS, STATUS, JOB, SOURCE } from '../constants/selections'
 import { datetimeFields, currencyFields, largeFields, booleanFields, numberFields, dateFields, computedFields, selectFields } from '../constants/fields'
 import { UsersContext } from '../components/layout'
@@ -122,6 +122,62 @@ export const ColoredCell = props => {
     }
 }
 
+export const CreatorSelect = (props) => {
+    const { addToast, removeToast } = useToasts()
+    if (props.row['Assign to']) return <CreatorCell {...props} />
+    return (
+        <AuthUserContext.Consumer>
+            {authUser => (
+                <button className="tag is-small is-info" onClick={() => {
+                    const savingToast = addToast('Updating...', { appearance: 'info' })
+                    base('Appointments').create([{ 
+                        fields: {
+                            'Name': props.row['Name'],
+                            'Contact': props.row['Contact'],
+                            'Source': props.row['Source'],
+                            'Stage': 'Lead',
+                            'Assign to': authUser.uid
+                        }
+                    }], function (err, records) {
+                        removeToast(savingToast)
+                        if (err) {
+                            console.error(err);
+                            addToast(`Error while updating: ${err}`, { appearance: 'error', autoDismiss: true })
+                            return
+                        } 
+                        if (records.length > 0) {
+                            base('Leads').update([{
+                                id: props.row.id,
+                                fields: {
+                                    'Assign to': authUser.uid
+                                }
+                            }], function (err, records) {
+                                if (err) {
+                                    console.error(err);
+                                    addToast(`Error while updating: ${err}`, { appearance: 'error', autoDismiss: true })
+                                    return
+                                }
+                                if (records.length > 0) {
+                                    addToast('Lead converted to appointment successfully!', { appearance: 'success', autoDismiss: true })
+                                    props.trigger()
+                                }
+                            })
+                        }
+                    })
+                }}>
+                    Assign to me
+                </button>
+            )}
+        </AuthUserContext.Consumer>
+        // <UsersContext.Consumer>
+        //     {users => {
+        //         const user = users.filter(u => u.uid === value)[0]
+        //         return user ? `${user.username} (${user.email})` : ''
+        //     }}
+        // </UsersContext.Consumer>
+    )
+}
+
 export const CreatorCell = ({ value }) => {
     if (value) {
         return (
@@ -233,7 +289,7 @@ export const EditCell = ({ row, user, type, onCloseModal }) => {
                         users={users}
                         mode="Edit"
                         onCloseModal={onCloseModal}
-                        showRemarks={type !== "Products"}
+                        showRemarks={!["Products", "Leads"].includes(type)}
                     >
                     </Modal>
                 )}
@@ -332,7 +388,11 @@ const transformLabels = (p, labels, onCloseModal, includeCount, colWidth, remark
             case 'Creator':
                 obj.editable = false
             case 'Assign to':
-                obj.formatter = props => <CreatorCell {...props} />
+                if (p.type === 'Leads') {
+                    obj.formatter = props => <CreatorSelect {...props} trigger={onCloseModal} />
+                } else {
+                    obj.formatter = props => <CreatorCell {...props} />
+                }
                 break
             case 'Payments':
             case 'Install / Maintenance':
