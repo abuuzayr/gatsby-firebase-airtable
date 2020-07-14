@@ -20,7 +20,7 @@ const Form = () => {
   const [completed, setCompleted] = useState(false)
 
   const onSubmit = () => {
-    base('Leads').create([{ fields: { ...state, 'Timestamp': new Date() } }], function (err, records) {
+    base('Leads').create([{ fields: { ...state, 'Date & Time': new Date() } }], function (err, records) {
       if (err) {
         console.error(err);
         return
