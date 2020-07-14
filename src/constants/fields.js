@@ -158,6 +158,13 @@ export const fields = {
         'Payment Status'
     ],
     'Remarks': [
+    ],
+    'Leads': [
+        'Source',
+        'Name',
+        'Contact',
+        'No. of pax',
+        'Assign to',
     ]
 }
 
