@@ -89,7 +89,7 @@ export const headers = {
         'Contact',
         'No. of pax',
         'Assign to',
-        'Timestamp',
+        'Date & Time',
     ],
 }
 
