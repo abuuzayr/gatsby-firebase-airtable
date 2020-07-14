@@ -83,6 +83,14 @@ export const headers = {
         'Detail',
         'Payment Status'
     ],
+    'Leads': [
+        'Source',
+        'Name',
+        'Contact',
+        'No. of pax',
+        'Assign to',
+        'Timestamp',
+    ],
 }
 
 export const listLabels = {
