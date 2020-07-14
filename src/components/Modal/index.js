@@ -226,7 +226,7 @@ const Modal = (props) => {
     }, [data['Postal Code']])
 
     useEffect(() => {
-        let collect = 0
+        let collect = data['Grand Total'] || 0
         if (!isNaN(parseFloat(data['Grand Total'])) && !isNaN(parseFloat(data['Payment---Amount']))) {
             collect = parseFloat(data['Grand Total']) - parseFloat(data['Payment---Amount'])
         }
