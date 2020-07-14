@@ -20,7 +20,7 @@ const Form = () => {
   const [completed, setCompleted] = useState(false)
 
   const onSubmit = () => {
-    base('Walk in').create([{ fields: { ...state, 'Timestamp': new Date() } }], function (err, records) {
+    base('Leads').create([{ fields: { ...state, 'Timestamp': new Date() } }], function (err, records) {
       if (err) {
         console.error(err);
         return
@@ -32,6 +32,7 @@ const Form = () => {
   }
 
   const onChange = (value, label) => {
+    if (label === 'No. of pax') value = parseInt(value)
     setState(p => ({
       ...p,
       [label]: value
