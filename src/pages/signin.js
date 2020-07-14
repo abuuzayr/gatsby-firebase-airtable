@@ -17,7 +17,7 @@ export const SignInPage = () => {
     }
   `)
   return (
-    <section className="hero is-success is-fullheight">
+    <section className="hero is-fullheight">
       <div className="hero-body">
         <div className="container has-text-centered">
         <div className="column is-6 is-offset-3">
