@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { FaUser, FaRegIdCard, FaPhone, FaHandshake } from 'react-icons/fa'
+import { FaUser, FaRegIdCard, FaPhone, FaHandshake, FaArrowAltCircleRight, FaTimes } from 'react-icons/fa'
 import { UsersContext } from '../components/layout'
 import Airtable from 'airtable'
 import "../styles/login.scss"
@@ -8,18 +8,19 @@ const base = new Airtable({
   apiKey: process.env.GATSBY_AIRTABLE_APIKEY
 }).base(process.env.GATSBY_AIRTABLE_BASE);
 
-const Form = (props) => {
+const Form = () => {
   const baseState = {
     'Name': '',
     'No. of pax': 1,
     'Contact': '',
-    'Assign to': ''
+    'Assign to': '',
+    'Source': 'Walk in'
   }
   const [state, setState] = useState(baseState)
   const [completed, setCompleted] = useState(false)
 
   const onSubmit = () => {
-    base('Walk in').create([{ fields: state }], function (err, records) {
+    base('Walk in').create([{ fields: { ...state, 'Timestamp': new Date() } }], function (err, records) {
       if (err) {
         console.error(err);
         return
@@ -72,13 +73,36 @@ const Form = (props) => {
               <div>
                 <div className="field is-horizontal">
                   <div className="field-label is-normal">
+                    <label className="label">Source</label>
+                  </div>
+                  <div className="field-body">
+                    <div className="field">
+                      <div className="control is-expanded has-icons-left">
+                        <div className="select">
+                          <select value={state['Source']} onChange={e => onChange(e.currentTarget.value, 'Source')}>
+                            {
+                              ['Walk in', 'Facebook', 'Google', 'Referred by'].map(source => (
+                                <option key={source} value={source}>{source}</option>
+                              ))
+                            }
+                          </select>
+                        </div>
+                        <span className="icon is-small is-left">
+                            <FaArrowAltCircleRight />
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="field is-horizontal">
+                  <div className="field-label is-normal">
                     <label className="label">Name *</label>
                   </div>
                   <div className="field-body">
                     <div className="field">
                       <div className="control is-expanded has-icons-left">
                         <input required className={"input" + (state.name ? "" : " is-warning")} type="text" placeholder="e.g. James Lim" value={state['Name']} onChange={(e) => onChange(e.currentTarget.value, 'Name')} />
-                        <span class="icon is-small is-left">
+                        <span className="icon is-small is-left">
                           <FaRegIdCard />
                         </span>
                       </div>
@@ -94,7 +118,7 @@ const Form = (props) => {
                     <div className="field">
                       <div className="control is-expanded has-icons-left">
                         <input required className={"input" + (state.contact ? "" : " is-warning")} type="tel" placeholder="9876 5432" value={state['Contact']} onChange={(e) => onChange(e.currentTarget.value, 'Contact')} />
-                        <span class="icon is-small is-left">
+                        <span className="icon is-small is-left">
                           <FaPhone />
                         </span>
                       </div>
@@ -118,7 +142,7 @@ const Form = (props) => {
                             }
                           </select>
                         </div>
-                        <span class="icon is-small is-left">
+                        <span className="icon is-small is-left">
                           <FaUser />
                         </span>
                       </div>
@@ -149,9 +173,16 @@ const Form = (props) => {
                             }
                           </UsersContext.Consumer>
                         </div>
-                        <span class="icon is-small is-left">
+                        <span className="icon is-small is-left">
                           <FaHandshake />
                         </span>
+                        <div 
+                          className="icon is-small"
+                          style={{ color: state['Assign to'] ? 'red' : '', cursor: state['Assign to'] ? 'pointer' : 'normal', pointerEvents: 'initial' }}
+                          onClick={(e) => onChange('', 'Assign to')}
+                        >
+                          <FaTimes />
+                        </div>
                       </div>
                     </div>
                   </div>
