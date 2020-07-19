@@ -11,6 +11,7 @@ import { headers } from '../constants/labels'
 import transformLabels, { updateData } from '../helpers/labelFormatters'
 import { HeaderWithSorting, onGridSort } from '../helpers/sort'
 import { useToasts } from 'react-toast-notifications'
+import base from '../helpers/airtable'
 
 const PaymentsPageBase = (props) => {
   const TYPE = 'Payments'
@@ -29,30 +30,29 @@ const PaymentsPageBase = (props) => {
     async function getPayments() {
       if (!authUser) return
       try {
-        const result = await fetch(`${process.env.GATSBY_STDLIB_URL}/getRawTableData?name=Payments`)
-        if (result.status === 200) {
-          const body = await result.json()
-          setLabels(
-            transformLabels(
-              {
-                user: authUser,
-                type: TYPE,
-                setRows
-              },
-              headers[TYPE],
-              () => setTrigger(p => !p),
-              true,
-              150
-            )
+        const records = await base('Payments').select({
+          view: "Grid view"
+        }).all()
+        setLabels(
+          transformLabels(
+            {
+              user: authUser,
+              type: TYPE,
+              setRows
+            },
+            headers[TYPE],
+            () => setTrigger(p => !p),
+            true,
+            150
           )
-          const rows = body.rows.map((row, index) => ({
-            ...row.fields,
-            index: index + 1,
-            id: row.id
-          }))
-          setRows(rows)
-          setInitialRows(rows)
-        }
+        )
+        const rows = records.map(rec => rec._rawJson).map((row, index) => ({
+          ...row.fields,
+          index: index + 1,
+          id: row.id
+        }))
+        setRows(rows)
+        setInitialRows(rows)
       } catch (e) {
         console.error(e)
       }
