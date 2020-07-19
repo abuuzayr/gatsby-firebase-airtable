@@ -20,11 +20,7 @@ import { HeaderWithSorting, onGridSort } from '../../helpers/sort'
 import { Tooltip, Whisper } from 'rsuite'
 import scroll from '../../helpers/scroll'
 import { useToasts } from 'react-toast-notifications'
-import Airtable from 'airtable'
-
-const base = new Airtable({
-  apiKey: process.env.GATSBY_AIRTABLE_APIKEY
-}).base(process.env.GATSBY_AIRTABLE_BASE);
+import base from '../../helpers/airtable'
 
 const EmptyRowsView = () => (
   <div className="container" style={{ 'padding': 100 }}>

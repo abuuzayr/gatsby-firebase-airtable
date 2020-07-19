@@ -7,12 +7,8 @@ import transformLabels from '../../helpers/labelFormatters'
 import { listLabels } from '../../constants/labels'
 import Field from '../Modal/Field'
 import { useToasts } from 'react-toast-notifications'
-import Airtable from 'airtable'
 import { datetimeFields } from '../../constants/fields'
-
-const base = new Airtable({
-    apiKey: process.env.GATSBY_AIRTABLE_APIKEY
-}).base(process.env.GATSBY_AIRTABLE_BASE);
+import base from '../../helpers/airtable'
 
 const Remarks = (props) => {
     const showTypeColumn = ['Appointments', 'Remarks'].includes(props.type)

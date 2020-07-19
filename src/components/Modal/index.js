@@ -22,13 +22,9 @@ import { listLabels } from '../../constants/labels'
 import transformLabels, { updateData as updateRowData } from '../../helpers/labelFormatters'
 import { FiPlus } from 'react-icons/fi'
 import { useToasts } from 'react-toast-notifications'
-import Airtable from 'airtable'
 import DataGrid from 'react-data-grid'
 import Remarks from '../Remarks'
-
-const base = new Airtable({ 
-    apiKey: process.env.GATSBY_AIRTABLE_APIKEY 
-}).base(process.env.GATSBY_AIRTABLE_BASE);
+import base from '../../helpers/airtable'
 
 const customStyles = {
     content: {

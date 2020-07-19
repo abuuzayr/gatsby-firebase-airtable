@@ -1,12 +1,8 @@
 import React, { useState } from 'react'
 import { FaUser, FaRegIdCard, FaPhone, FaHandshake, FaArrowAltCircleRight, FaTimes } from 'react-icons/fa'
 import { UsersContext } from '../components/layout'
-import Airtable from 'airtable'
+import base from '../helpers/airtable'
 import "../styles/login.scss"
-
-const base = new Airtable({
-  apiKey: process.env.GATSBY_AIRTABLE_APIKEY
-}).base(process.env.GATSBY_AIRTABLE_BASE);
 
 const Form = () => {
   const baseState = {

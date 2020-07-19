@@ -9,11 +9,7 @@ import Select from 'react-select'
 import { CompanyContext } from './Company'
 import { ToastProvider } from 'react-toast-notifications'
 import { withFirebase } from './Firebase';
-import Airtable from 'airtable'
-
-const base = new Airtable({
-  apiKey: process.env.GATSBY_AIRTABLE_APIKEY
-}).base(process.env.GATSBY_AIRTABLE_BASE);
+import base from '../helpers/airtable'
 
 export const UsersContext = React.createContext([]);
 

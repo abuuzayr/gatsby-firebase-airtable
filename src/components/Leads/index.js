@@ -8,11 +8,7 @@ import { UsersContext } from '../layout'
 import transformLabels, { RowRenderer, updateData } from '../../helpers/labelFormatters'
 import { HeaderWithSorting, onGridSort } from '../../helpers/sort'
 import { useToasts } from 'react-toast-notifications'
-import Airtable from 'airtable'
-
-const base = new Airtable({
-  apiKey: process.env.GATSBY_AIRTABLE_APIKEY
-}).base(process.env.GATSBY_AIRTABLE_BASE);
+import base from '../../helpers/airtable'
 
 const EmptyRowsView = () => (
   <div className="container" style={{ 'padding': 100 }}>

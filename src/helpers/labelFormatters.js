@@ -7,14 +7,10 @@ import { datetimeFields, currencyFields, largeFields, booleanFields, numberField
 import { UsersContext } from '../components/layout'
 import { FiMaximize2, FiMoreHorizontal, FiPlus, FiEdit, FiTrash2, FiFileText } from 'react-icons/fi'
 import { useToasts } from 'react-toast-notifications'
-import Airtable from 'airtable'
+import base from './airtable'
 import ZONES from '../constants/zones'
 
 const NON_EDITABLE_TYPES = ['Leads']
-
-const base = new Airtable({
-    apiKey: process.env.GATSBY_AIRTABLE_APIKEY
-}).base(process.env.GATSBY_AIRTABLE_BASE);
 
 const DateSelector = forwardRef(({ column, value, time }, ref) => {
     const input = useRef(null)
