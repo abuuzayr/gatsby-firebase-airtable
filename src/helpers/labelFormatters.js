@@ -120,7 +120,7 @@ export const ColoredCell = props => {
             </button>
         )
     } else {
-        return value
+        return null
     }
 }
 
