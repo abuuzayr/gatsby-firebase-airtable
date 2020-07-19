@@ -20,6 +20,11 @@ import { HeaderWithSorting, onGridSort } from '../../helpers/sort'
 import { Tooltip, Whisper } from 'rsuite'
 import scroll from '../../helpers/scroll'
 import { useToasts } from 'react-toast-notifications'
+import Airtable from 'airtable'
+
+const base = new Airtable({
+  apiKey: process.env.GATSBY_AIRTABLE_APIKEY
+}).base(process.env.GATSBY_AIRTABLE_BASE);
 
 const EmptyRowsView = () => (
   <div className="container" style={{ 'padding': 100 }}>
@@ -70,11 +75,10 @@ const Appointments = (props) => {
       // Get remarks first
       let remarks = []
       try {
-        const result = await fetch(`${process.env.GATSBY_STDLIB_URL}/getOptions`)
-        if (result.status === 200) {
-          const body = await result.json()
-          remarks = body.rows['Remarks']
-        }
+        const records = await base('Remarks').select({
+          view: "Grid view"
+        }).all()
+        remarks = records.map(rec => rec._rawJson)
       } catch (e) {
         console.error(e)
       }
@@ -86,9 +90,10 @@ const Appointments = (props) => {
         cpy = company.companies.find(c => c.fields['Company'].toUpperCase() === role.split('_')[1]).id
       }
       try {
-        const result = await fetch(`${process.env.GATSBY_STDLIB_URL}/getRawTableData?name=${TYPE}`)
-        if (result.status === 200) {
-          const body = await result.json()
+        const records = await base('Appointments').select({
+          view: "Main data"
+        }).all()
+        if (records) {
           if (labels.length === 0) {
             setLabels(
               transformLabels(
@@ -105,7 +110,7 @@ const Appointments = (props) => {
               )
             )
           }
-          const rows = body.rows.filter(row => {
+          const rows = records.map(rec => rec._rawJson).filter(row => {
             if (authUser.role.includes('ADMIN')) return true
             if (row.fields['Creator'] === authUser.uid) return true
             if (row.fields['Assign to'] === authUser.uid) return true
@@ -135,11 +140,10 @@ const Appointments = (props) => {
       // Get remarks first
       let remarks = []
       try {
-        const result = await fetch(`${process.env.GATSBY_STDLIB_URL}/getOptions`)
-        if (result.status === 200) {
-          const body = await result.json()
-          remarks = body.rows['Remarks']
-        }
+        const records = await base('Remarks').select({
+          view: "Grid view"
+        }).all()
+        remarks = records.map(rec => rec._rawJson)
       } catch (e) {
         console.error(e)
       }
