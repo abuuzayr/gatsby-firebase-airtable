@@ -7,6 +7,7 @@ import transformLabels, { RowRenderer, updateData } from '../../helpers/labelFor
 import { headers } from '../../constants/labels'
 import { HeaderWithSorting, onGridSort } from '../../helpers/sort'
 import { useToasts } from 'react-toast-notifications'
+import base from '../../helpers/airtable'
 
 const Maintenance = (props) => {
   const TYPE = 'Maintenance'
@@ -25,30 +26,29 @@ const Maintenance = (props) => {
     async function getMaintenance() {
       if (!authUser) return
       try {
-        const result = await fetch(`${process.env.GATSBY_STDLIB_URL}/getRawTableData?name=Maintenance`)
-        if (result.status === 200) {
-          const body = await result.json()
-          setLabels(
-            transformLabels(
-              {
-                user: authUser,
-                type: TYPE,
-                setRows
-              },
-              headers[TYPE],
-              () => setTrigger(p => !p),
-              true,
-              150
-            )
+        const records = await base(TYPE).select({
+          view: "Grid view"
+        }).all()
+        setLabels(
+          transformLabels(
+            {
+              user: authUser,
+              type: TYPE,
+              setRows
+            },
+            headers[TYPE],
+            () => setTrigger(p => !p),
+            true,
+            150
           )
-          const rows = body.rows.map((row, index) => ({
-            ...row.fields,
-            index: index + 1,
-            id: row.id
-          })).filter(Boolean)
-          setRows(rows)
-          setInitialRows(rows)
-        }
+        )
+        const rows = records.map(rec => rec._rawJson).map((row, index) => ({
+          ...row.fields,
+          index: index + 1,
+          id: row.id
+        })).filter(Boolean)
+        setRows(rows)
+        setInitialRows(rows)
       } catch (e) {
         console.error(e)
       }
