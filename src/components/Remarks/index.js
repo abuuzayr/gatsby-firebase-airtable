@@ -35,44 +35,43 @@ const Remarks = (props) => {
     useEffect(() => {
         async function getRemarks() {
             try {
-                const result = await fetch(`${process.env.GATSBY_STDLIB_URL}/getRawTableData?name=Remarks`)
-                if (result.status === 200) {
-                    const body = await result.json()
-                    if (labels.length === 0) {
-                        const labels = transformLabels(
-                            {
-                                user,
-                                type: 'Remarks'
-                            },
-                            listLabels['Remarks'],
-                            null,
-                            true
-                        ).map(label => {
-                            if (label.key === 'count') label.width = 20
-                            return label
-                        })
-                        setLabels(labels)
-                    }
-                    const rows = body.rows.filter(r => {
-                        if (showTypeColumn) return r.fields['Appointments'].includes(id)
-                        return r.fields['Appointments'].includes(id) && r.fields['Type'] === props.type
-                    }).map((row, index) => {
-                        return {
-                            ...row.fields,
-                            index: index + 1,
-                            id: row.id,
-                            height: 200
-                        }
+                const records = await base('Remarks').select({
+                    view: "Grid view"
+                }).all()
+                if (labels.length === 0) {
+                    const labels = transformLabels(
+                        {
+                            user,
+                            type: 'Remarks'
+                        },
+                        listLabels['Remarks'],
+                        null,
+                        true
+                    ).map(label => {
+                        if (label.key === 'count') label.width = 20
+                        return label
                     })
-                    setRows(rows)
-                    setInitialRows(rows)
-                    setRemarkTypes(rows.reduce((arr, row) => {
-                        if (!arr.includes(row['Type'])) {
-                            arr = arr.concat([row['Type']])
-                        }
-                        return arr
-                    }, []))
+                    setLabels(labels)
                 }
+                const rows = records.map(rec => rec._rawJson).filter(r => {
+                    if (showTypeColumn) return r.fields['Appointments'].includes(id)
+                    return r.fields['Appointments'].includes(id) && r.fields['Type'] === props.type
+                }).map((row, index) => {
+                    return {
+                        ...row.fields,
+                        index: index + 1,
+                        id: row.id,
+                        height: 200
+                    }
+                })
+                setRows(rows)
+                setInitialRows(rows)
+                setRemarkTypes(rows.reduce((arr, row) => {
+                    if (!arr.includes(row['Type'])) {
+                        arr = arr.concat([row['Type']])
+                    }
+                    return arr
+                }, []))
             } catch (e) {
                 console.error(e)
             }
