@@ -23,7 +23,6 @@ const EmptyRowsView = () => (
 const Leads = (props) => {
   const TYPE = "Leads"
   const [loaded, setLoaded] = useState(false)
-  const [stats, setStats] = useState({})
   const [company, setCompany] = useState(false)
   const [labels, setLabels] = useState([])
   const [rows, setRows] = useState([])
@@ -35,21 +34,6 @@ const Leads = (props) => {
   })
   const { authUser } = props
   const { addToast, removeToast } = useToasts()
-
-  useEffect(() => {
-    async function getStats() {
-      try {
-        const result = await fetch(`${process.env.GATSBY_STDLIB_URL}/getHomeStats`)
-        if (result.status === 200) {
-          const body = await result.json()
-          setStats(body.stats)
-        }
-      } catch (e) {
-        console.error(e)
-      }
-    }
-    getStats()
-  }, [])
 
   useEffect(() => {
     async function getAppointments() {
@@ -131,61 +115,6 @@ const Leads = (props) => {
             <UsersContext.Consumer>
               {users => (
                 <>
-                  {
-                    props.showStats &&
-                    <section className="info-tiles">
-                        <div className="tile is-ancestor has-text-centered">
-                        <div className="tile is-parent">
-                            <article className="tile is-child box">
-                              <div className="level">
-                                <div className="level-left">
-                                  <p className="title">{stats.fresh}</p>
-                                </div>
-                                <div className="level-right">
-                                  <p className="subtitle">New appointments</p>
-                                </div>
-                              </div>
-                            </article>
-                        </div>
-                        <div className="tile is-parent">
-                          <article className="tile is-child box">
-                            <div className="level">
-                              <div className="level-left">
-                                <p className="title">{stats.appointments}</p>
-                              </div>
-                              <div className="level-right">
-                                <p className="subtitle">Total appointments</p>
-                              </div>
-                            </div>
-                          </article>
-                        </div>
-                        <div className="tile is-parent">
-                            <article className="tile is-child box">
-                              <div className="level">
-                                <div className="level-left">
-                                  <p className="title">{stats.closed}</p>
-                                </div>
-                                <div className="level-right">
-                                  <p className="subtitle">Closed appointments</p>
-                                </div>
-                              </div>
-                            </article>
-                        </div>
-                        <div className="tile is-parent">
-                            <article className="tile is-child box">
-                              <div className="level">
-                                <div className="level-left">
-                                  <p className="title">${stats.sales && stats.sales.toFixed(2)}</p>
-                                </div>
-                                <div className="level-right">
-                                  <p className="subtitle">Total sales</p>
-                                </div>
-                              </div>
-                            </article>
-                        </div>
-                        </div>
-                    </section>
-                  }
                   {
                     loaded ?
                       <>
