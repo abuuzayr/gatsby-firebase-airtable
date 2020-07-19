@@ -8,8 +8,12 @@ import '../styles/layout.scss'
 import Select from 'react-select'
 import { CompanyContext } from './Company'
 import { ToastProvider } from 'react-toast-notifications'
-
 import { withFirebase } from './Firebase';
+import Airtable from 'airtable'
+
+const base = new Airtable({
+  apiKey: process.env.GATSBY_AIRTABLE_APIKEY
+}).base(process.env.GATSBY_AIRTABLE_BASE);
 
 export const UsersContext = React.createContext([]);
 
@@ -36,16 +40,13 @@ class Layout extends Component {
     this.setState({ firebase });
 
     try {
-      const companies = await fetch(`${process.env.GATSBY_STDLIB_URL}/getRawTableData?name=Companies`)
-      if (companies.status === 200) {
-        const body = await companies.json()
-        if (body.result === 'success') {
-          const companies = body.rows.filter(row => !!row.fields['Company'])
-          this.setState({
-            companies
-          })
-        }
-      }
+      const records = await base('Companies').select({
+        view: "Grid view"
+      }).all()
+      const companies = records.filter(record => !!record.get('Company')).map(rec => rec._rawJson)
+      this.setState({
+        companies
+      })
     } catch (e) {
       console.error(e)
     }
