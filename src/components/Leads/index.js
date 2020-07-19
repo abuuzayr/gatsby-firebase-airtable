@@ -8,6 +8,11 @@ import { UsersContext } from '../layout'
 import transformLabels, { RowRenderer, updateData } from '../../helpers/labelFormatters'
 import { HeaderWithSorting, onGridSort } from '../../helpers/sort'
 import { useToasts } from 'react-toast-notifications'
+import Airtable from 'airtable'
+
+const base = new Airtable({
+  apiKey: process.env.GATSBY_AIRTABLE_APIKEY
+}).base(process.env.GATSBY_AIRTABLE_BASE);
 
 const EmptyRowsView = () => (
   <div className="container" style={{ 'padding': 100 }}>
@@ -38,42 +43,40 @@ const Leads = (props) => {
   useEffect(() => {
     async function getAppointments() {
       if (!(company && company.companies && authUser)) return
-
-      // Get Appointments
       const role = authUser.role
       try {
-        const result = await fetch(`${process.env.GATSBY_STDLIB_URL}/getRawTableData?name=${TYPE}`)
-        if (result.status === 200) {
-          const body = await result.json()
-          if (labels.length === 0) {
-            setLabels(
-              transformLabels(
-                {
-                  user: authUser,
-                  type: TYPE,
-                  setRows
-                },
-                props.headers ? headers[props.headers] : headers[TYPE], 
-                () => setTrigger(p => !p),
-                true,
-                150
-              )
+        const records = await base(TYPE).select({
+          view: "Grid view"
+        }).all()
+        if (labels.length === 0) {
+          setLabels(
+            transformLabels(
+              {
+                user: authUser,
+                type: TYPE,
+                setRows
+              },
+              props.headers ? headers[props.headers] : headers[TYPE], 
+              () => setTrigger(p => !p),
+              true,
+              150
             )
-          }
-          const rows = body.rows.map(row => {
-            return {
-              ...row.fields,
-              id: row.id
-            }
-          }).filter(Boolean).sort((a, b) => {
-            if (a['Assign to'] && !b['Assign to']) return 1
-            if (!a['Assign to'] && b['Assign to']) return -1
-            return 0
-          })
-          setRows(rows)
-          setInitialRows(rows)
-          if (!loaded) setLoaded(true)
+          )
         }
+        const rows = records.map(row => {
+          row = row._rawJson
+          return {
+            ...row.fields,
+            id: row.id
+          }
+        }).filter(Boolean).sort((a, b) => {
+          if (a['Assign to'] && !b['Assign to']) return 1
+          if (!a['Assign to'] && b['Assign to']) return -1
+          return 0
+        })
+        setRows(rows)
+        setInitialRows(rows)
+        if (!loaded) setLoaded(true)
       } catch (e) {
         console.error(e)
       }
