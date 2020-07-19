@@ -7,6 +7,7 @@ import DataGrid from 'react-data-grid';
 import { FiPlus, FiEdit, FiTrash2 } from 'react-icons/fi';
 import Modal from '../components/Modal';
 import { currencyFields } from '../constants/fields'
+import base from '../helpers/airtable'
 
 const hiddenFields = ['Appointments']
 
@@ -95,28 +96,28 @@ const ContactPageBase = (props) => {
     async function getContacts() {
       if (!authUser) return
       try {
-        const result = await fetch(`${process.env.GATSBY_STDLIB_URL}/getRawTableData?name=Contacts`)
-        if (result.status === 200) {
-          const body = await result.json()
-          const labels = Object.keys(body.rows[0].fields).map(key => {
+        const records = await base('Contacts').select({
+          view: "Grid view"
+        }).all()
+        const rows = records.map(rec => rec._rawJson)
+        const labels = Object.keys(rows[0].fields).map(key => {
+          return {
+            key,
+            name: key,
+            width: 180,
+            resizable: true
+          }
+        })
+        setData({ 
+          labels: transformLabels(labels), 
+          rows: rows.map((row, index) => {
             return {
-              key,
-              name: key,
-              width: 180,
-              resizable: true
+              ...row.fields,
+              index: index + 1,
+              id: row.id
             }
-          })
-          setData({ 
-            labels: transformLabels(labels), 
-            rows: body.rows.map((row, index) => {
-              return {
-                ...row.fields,
-                index: index + 1,
-                id: row.id
-              }
-            }) 
-          })
-        }
+          }) 
+        })
       } catch (e) {
         console.error(e)
       }
