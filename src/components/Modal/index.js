@@ -278,31 +278,42 @@ const Modal = (props) => {
 
     const getOptions = async () => {
         try {
-            const result = await fetch(`${process.env.GATSBY_STDLIB_URL}/getOptions`)
-            if (result.status === 200) {
-                const body = await result.json()
-                const obj = {}
-                Object.keys(optionsObj).map(option => {
-                    obj[option] = buildOptions(body.rows[optionsObj[option]], option)
-                })
-                const userOptions = props.users.map(user => ({
-                    value: user.uid,
-                    label: `${user.username} (${user.email})`
-                }))
-                setOptions({ 
-                    ...obj, 
-                    Stage: selections['STAGES'],
-                    Status: selections['STATUS'],
-                    Job: selections['JOB'],
-                    'Payment Mode': selections['PAYMENT_MODE'],
-                    'Payment Method': selections['PAYMENT_METHOD'],
-                    'Payment Status': selections['PAYMENT_STATUS'],
-                    Source: selections['SOURCE'],
-                    'Assign to': userOptions,
-                    'Type': selections['REMARKS_TYPES'],
-                    'Next Service': selections['SERVICE_DURATION']
-                })
-            }
+            const optionBases = [
+                'Companies',
+                'Products',
+                'Payments',
+                'Maintenance',
+                'Salespeople',
+                'Remarks'
+            ]
+            const body = {}
+            await Promise.all(optionBases.map(async optionBase => {
+                const records = await base(optionBase).select({
+                    view: "Grid view"
+                }).all()
+                body[optionBase] = records.map(rec => rec._rawJson)
+            }))
+            const obj = {}
+            Object.keys(optionsObj).map(option => {
+                obj[option] = buildOptions(body[optionsObj[option]], option)
+            })
+            const userOptions = props.users.map(user => ({
+                value: user.uid,
+                label: `${user.username} (${user.email})`
+            }))
+            setOptions({ 
+                ...obj, 
+                Stage: selections['STAGES'],
+                Status: selections['STATUS'],
+                Job: selections['JOB'],
+                'Payment Mode': selections['PAYMENT_MODE'],
+                'Payment Method': selections['PAYMENT_METHOD'],
+                'Payment Status': selections['PAYMENT_STATUS'],
+                Source: selections['SOURCE'],
+                'Assign to': userOptions,
+                'Type': selections['REMARKS_TYPES'],
+                'Next Service': selections['SERVICE_DURATION']
+            })
         } catch (e) {
             console.error(e)
         }
