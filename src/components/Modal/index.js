@@ -245,21 +245,17 @@ const Modal = (props) => {
         let obj = {}
         if (['Edit', 'View', 'List'].includes(props.mode)) {
             try {
-                let fetchUrl = `${process.env.GATSBY_STDLIB_URL}/getRawTableData?name=${type}`
-                if (id && props.mode !== 'List') fetchUrl += `&id=${id}`
-                const result = await fetch(fetchUrl)
-                if (result.status === 200) {
-                    const body = await result.json()
-                    if (props.mode === 'List') {
-                        obj = body.rows
-                    } else {
-                        if (body.rows[0]) {
-                            obj = {
-                                id: body.rows[0]['id'],
-                                ...body.rows[0]['fields'],
-                            }
-                        }
+                if (id && props.mode !== 'List') {
+                    const record = await base(type).find(id)
+                    obj = {
+                        id: record.id,
+                        ...record._rawJson.fields,
                     }
+                } else {
+                    const records = await base(type).select({
+                        view: "Grid view"
+                    }).all()
+                    obj = records.map(rec => rec._rawJson)
                 }
             } catch (e) {
                 console.error(e)
