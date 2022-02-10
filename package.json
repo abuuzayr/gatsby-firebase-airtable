@@ -15,7 +15,7 @@
     "gatsby": "^2.4.3",
     "gatsby-plugin-layout": "^1.1.22",
     "gatsby-plugin-sass": "^2.1.29",
-    "node-sass": "^4.13.1",
+    "node-sass": "^7.0.0",
     "react": "^16.8.6",
     "react-data-grid": "^7.0.0-alpha.29",
     "react-dom": "^16.8.6",
